@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SkillType
+{
+    Damage,
+    Recruit
+}
+
 public class Skill : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public float skillDamage;
+    public float skillCost;
+    public string skillName;
+    public int skillRange;
+    public SkillType type;
 }

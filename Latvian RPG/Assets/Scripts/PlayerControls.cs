@@ -13,46 +13,43 @@ public enum Direction
 
 public class PlayerControls : MonoBehaviour
 {
-    int playerSpeed = 5; // how many tiles can char move in single turn
-    int tilesWalked = 0;
+    public bool isNPC;
 
-    #region UI
     [SerializeField]
-    Text remainingMovesText;
+    private Character character;
+    public CharacterStats stats;
+    public int playerSpeed; // how many tiles can char move in single turn
+    public int tilesWalked = 0;
+    public bool characterIsSelected;
+
     [SerializeField]
-    Button endTurnButton;
+    private CharacterSelectArea characterSelector;
+    GameManager gameManager;
     [SerializeField]
-    Text currentTurnText;
-    #endregion
+    private Skill[] startingSkills;
 
     private void Start()
     {
-        if (GameData.current == null)
-            GameData.current = new GameData();
+        stats = new CharacterStats(character);
+        foreach (Skill newSkill in startingSkills)
+        {
+            stats.skills.Add(newSkill);
+        }
 
-        endTurnButton.onClick.AddListener(EndTurn);
-    }
-
-    private void EndTurn()
-    {
-        GameData.current.currentTurn++;
-        tilesWalked = 0;
-        currentTurnText.text = "Turn " + GameData.current.currentTurn.ToString();
+        characterIsSelected = false;
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
     }
 
     private void Update()
     {
+        if (isNPC)
+            return;
         ManagePlayerMovement();
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            EndTurn();
-        }
-        
     }
 
     private void ManagePlayerMovement()
     {
-        if (tilesWalked < playerSpeed)
+        if (tilesWalked < playerSpeed && characterIsSelected)
         {
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
@@ -74,18 +71,13 @@ public class PlayerControls : MonoBehaviour
                 MoveCharacter(Direction.Right);
                 tilesWalked++;
             }
-            UpdateRemainingMovesText();
+            
         }
-    }
-
-    private void UpdateRemainingMovesText()
-    {
-        int remainingMoves = playerSpeed - tilesWalked;
-        remainingMovesText.text = "Remaining moves: " + remainingMoves.ToString();
     }
 
     private void MoveCharacter(Direction moveDirection)
     {
+        gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
         switch (moveDirection)
         {
             case Direction.Up:
@@ -102,5 +94,11 @@ public class PlayerControls : MonoBehaviour
                 break;
         }
 
+    }
+
+    public void SelectCharacter(bool select)
+    {
+        characterIsSelected = select;
+        characterSelector.characterFrame.SetActive(select);
     }
 }

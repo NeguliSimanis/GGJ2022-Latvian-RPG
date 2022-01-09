@@ -9,27 +9,52 @@ public class CharacterSelectArea : MonoBehaviour
     SpriteRenderer spriteRenderer;
     GameManager gameManager;
 
+    [SerializeField]
+    PlayerControls characterController;
+
+    [Header("UI")]
+    [SerializeField]
+    GameObject selectCharAnimation;
+    [SerializeField]
+    public GameObject characterFrame; // displayed when character selected
+
+    int characterSelectedCount = 0; // how many times char has been selected
+
     private void Start()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         spriteRenderer.color = defaultCharColor;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+        selectCharAnimation.SetActive(false);
+        characterFrame.SetActive(characterController.characterIsSelected);
     }
 
     private void OnMouseOver()
     {
-        spriteRenderer.color = highlightColor;
+        selectCharAnimation.SetActive(true);
     }
 
     private void OnMouseExit()
     {
-        spriteRenderer.color = defaultCharColor;
+        selectCharAnimation.SetActive(false);
     }
 
 
     private void OnMouseDown()
     {
-        gameManager.ToggleCharInfoPanel(true);
+        if (characterController.isNPC)
+            return;
+        if (characterSelectedCount != 0 && gameManager.selectedCharacter == characterController)
+        {
+            gameManager.ToggleCharInfoPanel(true);
+        }
+        else
+        {
+
+            gameManager.SelectCharacter(characterController);
+            characterFrame.SetActive(characterController.characterIsSelected);
+        }
+        characterSelectedCount++;
     }
 
 }

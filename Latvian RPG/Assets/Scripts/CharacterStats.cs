@@ -11,7 +11,8 @@ public enum Alignment
 
 public enum Character
 {
-    Varna
+    Varna,
+    Siksparnis
 }
 
 public class CharacterStats
@@ -48,6 +49,9 @@ public class CharacterStats
             case Character.Varna:
                 GenerateVarna();
                 break;
+            case Character.Siksparnis:
+                GenerateSiksparnis();
+                break;
             default:
                 Debug.Log("CHARACTER NOT DEFINIED");
                 break;
@@ -79,5 +83,32 @@ public class CharacterStats
         alignment = Alignment.Piety;
         bio = "Half-woman, half-crow, Varna roams the lands in search of vengeance";
         name = "Varna";
+    }
+
+    private void GenerateSiksparnis()
+    {
+        level = 1;
+        currExp = 0;
+        expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
+
+        // combat
+        maxLife = 20;
+        currLife = maxLife;
+
+        maxMana = 30;
+        currMana = maxMana;
+
+        offense = 7;
+        defense = 8;
+
+        iniative = 9; // how quickly will the character act in turns
+        speed = 5; // number of tiles that char can walk in single turn
+
+        skills = new List<Skill>();
+
+        // flair
+        alignment = Alignment.Might;
+        bio = "Angry bat boy";
+        name = "Siksparnis";
     }
 }
