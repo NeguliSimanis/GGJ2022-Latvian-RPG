@@ -15,6 +15,9 @@ public class PlayerControls : MonoBehaviour
 {
     public bool isNPC;
 
+    public int xCoord;
+    public int yCoord;
+
     [SerializeField]
     private Character character;
     public CharacterStats stats;
@@ -28,8 +31,15 @@ public class PlayerControls : MonoBehaviour
     [SerializeField]
     private Skill[] startingSkills;
 
+
+    #region ANIMATIONS
+    [SerializeField]
+    Animator hurtAnimator;
+    #endregion
+
     private void Start()
     {
+        UpdateCoord();
         stats = new CharacterStats(character);
         foreach (Skill newSkill in startingSkills)
         {
@@ -93,12 +103,32 @@ public class PlayerControls : MonoBehaviour
                 transform.position = new Vector3(transform.position.x + GameData.current.tileSize, transform.position.y, transform.position.z);
                 break;
         }
-
+        UpdateCoord();
     }
 
     public void SelectCharacter(bool select)
     {
         characterIsSelected = select;
         characterSelector.characterFrame.SetActive(select);
+    }
+
+    public void UpdateCoord()
+    {
+        xCoord = (int)transform.position.x;
+        yCoord = (int)transform.position.y;
+    }
+
+    public void TakeDamage(float amount)
+    {
+        stats.currLife += amount;
+        hurtAnimator.SetTrigger("hurt");
+        Debug.Log(gameObject.name + " takes " + amount + " damage (remaining hp: " + stats.currLife + ")" );
+        if (stats.currLife <= 0)
+            Die();
+    }
+
+    private void Die()
+    {
+        gameObject.SetActive(false);
     }
 }
