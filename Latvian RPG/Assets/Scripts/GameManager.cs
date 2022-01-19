@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
         }
         endTurnButton.onClick.AddListener(EndTurn);
         InitializeSkillButton();
-        guideText.text = "";
+        UpdateTurnQueueHUD();
     }
 
     private void InitializeSkillButton()
@@ -113,8 +113,12 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            guideText.text = "Select Destination";
-            actionRange = selectedCharacter.playerSpeed - selectedCharacter.tilesWalked;
+            int speedLeft = selectedCharacter.playerSpeed - selectedCharacter.tilesWalked;
+            if (speedLeft > 0)
+                guideText.text = "Select Destination";
+            else
+                guideText.text = "No moves left";
+            actionRange = speedLeft;
         }
 
         bool reuseOldTargetHighlights = false;
@@ -197,7 +201,7 @@ public class GameManager : MonoBehaviour
             if (targetHighlightCounter <= skillHighlights.Count)
                 createNewHighLights = false;
         }
-        
+
         switch (createNewHighLights)
         {
             case true:
@@ -210,15 +214,15 @@ public class GameManager : MonoBehaviour
 
 
             case false:
-                skillHighlights[targetHighlightCounter-1].ShowTile(actionType, true);
-                skillHighlights[targetHighlightCounter-1].highlightObject.transform.position = highLightLocation;
+                skillHighlights[targetHighlightCounter - 1].ShowTile(actionType, true);
+                skillHighlights[targetHighlightCounter - 1].highlightObject.transform.position = highLightLocation;
                 //foreach (HighlightTileObject skillHighlight in skillHighlights)
                 //{
                 //    skillHighlight.ShowTile();
                 //}
                 break;
         }
-        
+
     }
 
     private void Update()
@@ -235,7 +239,7 @@ public class GameManager : MonoBehaviour
 
     public void UpdateRemainingMovesText(int remainingMoves)
     {
-        guideText.text = "Remaining moves: " + (remainingMoves-1).ToString();
+        guideText.text = "Remaining moves: " + (remainingMoves).ToString();
     }
 
     /// <summary>
@@ -274,7 +278,7 @@ public class GameManager : MonoBehaviour
     {
         GameData.current.currentTurn++;
         HideActionRange();
-        foreach(PlayerControls character in allCharacters)
+        foreach (PlayerControls character in allCharacters)
         {
             character.tilesWalked = 0;
         }
@@ -329,7 +333,7 @@ public class GameManager : MonoBehaviour
         // COMBAT INTERACTION
         bool targetViable = false;
         PlayerControls target = allCharacters[0];
-        
+
         // 1 - check if viable target on coordinates
         foreach (PlayerControls character in allCharacters)
         {
@@ -338,12 +342,13 @@ public class GameManager : MonoBehaviour
                 Debug.Log("TARGET ACQUIRED AT " + xCoordinate + ":" + yCoordinate);
                 target = character;
                 targetViable = true;
-                
+
             }
         }
         if (!targetViable)
         {
-            Debug.Log("NOOO TARGET AT " + xCoordinate + ":" + yCoordinate);
+            Debug.Log("NOOO TARGET AT CH" + xCoordinate + ":" + yCoordinate);
+            guideText.text = "Invalid target";
             return;
         }
         // 2 - check if enough mana
@@ -355,7 +360,63 @@ public class GameManager : MonoBehaviour
 
 
         // 3 - apply skill effect
-        target.TakeDamage(selectedSkill.skillDamage);
+        float damageDealt = target.TakeDamage(-selectedSkill.skillDamage, selectedCharacter);
 
     }
+
+    public void UpdateGuideText(string newText)
+    {
+        guideText.text = newText;
+    }
+
+    #region TURN QUEUE HUD
+
+
+    private int maxElementsInTurnQueue = 15;
+    [Header("TURN QUEUE")]
+    [SerializeField]
+    GameObject queuePortraitPrefab;
+    [SerializeField]
+    GameObject queueTurnInfo;
+    [SerializeField]
+    Transform queueParentTransform;
+    private void UpdateTurnQueueHUD()
+    {
+        int currElementCount = 0;
+        int turnCounter = 0;
+        while (currElementCount < maxElementsInTurnQueue)
+        {
+            // ADD CHAR INFO
+            currElementCount += AddCharInfoToQueue(GameData.current.currentTurn + turnCounter);
+
+            // ADD TURN INFO
+            AddTurnInfoToQueue(GameData.current.currentTurn + turnCounter + 1);
+            turnCounter++;
+            currElementCount++;
+        }
+    }
+
+    private int AddCharInfoToQueue(int turn)
+    {
+        int charsAdded = 0;
+        Debug.Log("what");
+        foreach(PlayerControls character in allCharacters)
+        {
+            Debug.Log("YO!");
+            GameObject newCharPortrait = Instantiate(queuePortraitPrefab, queueParentTransform);
+            Text newCharText = newCharPortrait.transform.GetChild(0).gameObject.GetComponent<Text>();
+            newCharText.text = character.name;
+            charsAdded++;
+        }
+        return charsAdded;
+    }
+
+    private void AddTurnInfoToQueue(int turn)
+    {
+        GameObject newTurnInfo = Instantiate(queueTurnInfo, queueParentTransform);
+        Text newTurnText = newTurnInfo.transform.GetChild(0).gameObject.GetComponent<Text>();
+        newTurnText.text = "Turn " + (turn);
+    }
+
+    #endregion
 }

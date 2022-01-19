@@ -138,17 +138,36 @@ public class PlayerControls : MonoBehaviour
         yCoord = (int)transform.position.y;
     }
 
-    public void TakeDamage(float amount)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="amount">raw damage to be dealt or healed</param>
+    /// <returns>actual damage dealt after increases and reductions</returns>
+    public float TakeDamage(float amount, PlayerControls damageSource)
     {
-        stats.currLife += amount;
+        float damageDealt = amount;
+        stats.currLife += damageDealt;
+
+        // ANIMATIONS
         hurtAnimator.SetTrigger("hurt");
-        Debug.Log(gameObject.name + " takes " + amount + " damage (remaining hp: " + stats.currLife + ")" );
+        Debug.Log(gameObject.name + " takes " + damageDealt + " damage (remaining hp: " + stats.currLife + ")" );
+
+        // COMBAT LOG
+        gameManager.UpdateGuideText(
+            damageSource.name + " dealt " + -damageDealt + " damage to " + name + "!");
+
+        // DEATH
         if (stats.currLife <= 0)
-            Die();
+            Die(damageSource);
+
+
+        return damageDealt;
     }
 
-    private void Die()
+    private void Die(PlayerControls murderer)
     {
+        gameManager.UpdateGuideText(
+            murderer.name + " killed " + name + "!");
         gameObject.SetActive(false);
     }
 }
