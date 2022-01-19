@@ -5,8 +5,9 @@ using UnityEngine;
 public class TileHighlight : MonoBehaviour
 {
     public bool active;
-    
-    
+    public ActionType tileActionType;
+
+    private Color transparent = new Color(1, 1, 1, 0);
     
     // attack colors
     [SerializeField]
@@ -40,7 +41,6 @@ public class TileHighlight : MonoBehaviour
     private void Start()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        attackDefaultColor = spriteRenderer.color;
         marker.SetActive(false);
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         UpdateCoord();
@@ -50,8 +50,7 @@ public class TileHighlight : MonoBehaviour
         if (active)
         {
             UpdateCoord();
-            spriteRenderer.color = attackHighlightColor;
-            marker.SetActive(true);
+            MarkTile(true);
         }
     }
 
@@ -65,24 +64,69 @@ public class TileHighlight : MonoBehaviour
     {
         if (active)
         {
-            spriteRenderer.color = attackDefaultColor;
-            marker.SetActive(false);
+            MarkTile(false);
         }
     }
 
 
     private void OnMouseDown()
     {
-        Debug.Log("test");
-        gameManager.ProcessSkillUseRequest(xCoord,yCoord);
+        if (active)
+        {
+            gameManager.ProcessInteractionRequest(xCoord, yCoord, tileActionType);
+        }
     }
 
-    public void ShowTile(bool show = true)
+
+    /// <summary>
+    /// Make the tile more highlighted when it's under mouse cursor
+    /// </summary>
+    /// <param name="mark"></param>
+    private void MarkTile(bool mark)
     {
+        marker.SetActive(mark);
+        switch (tileActionType)
+        {
+            case ActionType.UseCombatSkill:
+                if (mark)
+                    spriteRenderer.color = attackHighlightColor;
+                else
+                    spriteRenderer.color = attackDefaultColor;
+                break;
+            case ActionType.Walk:
+                if (mark)
+                    spriteRenderer.color = moveHighlightColor;
+                else
+                    spriteRenderer.color = moveDefaultColor;
+                break;
+        }
+    }
+
+    public void EnableTile(ActionType actionType, bool show = true)
+    {
+        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         active = show;
         if (!show)
         {
             marker.SetActive(false);
+            spriteRenderer.color = transparent;
+            gameObject.SetActive(false);
+        }
+        else
+        {
+            gameObject.SetActive(true);
+        }
+
+        tileActionType = actionType;
+        switch (tileActionType)
+        {
+            case ActionType.Walk:
+                spriteRenderer.color = moveDefaultColor;
+                break;
+            case ActionType.UseCombatSkill:
+                Debug.Log("use combat skill");
+                spriteRenderer.color = attackDefaultColor;
+                break;
         }
     }
 }

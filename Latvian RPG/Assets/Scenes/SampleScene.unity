@@ -18178,7 +18178,7 @@ PrefabInstance:
     - target: {fileID: 5263861361776117327, guid: a039031493ba29548a6d5ceede2a5db2,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5263861361776117327, guid: a039031493ba29548a6d5ceede2a5db2,
         type: 3}
@@ -18269,7 +18269,7 @@ MonoBehaviour:
   charInfoPanel: {fileID: 1200848506}
   endTurnButton: {fileID: 865840855}
   currentTurnText: {fileID: 774029725}
-  remainingMovesText: {fileID: 311433305}
+  guideText: {fileID: 311433305}
   skillButton: {fileID: 1605406244}
   targetHighlight: {fileID: 4943662844980051665, guid: 44cffc6b30d427247b072256bdf8b65d,
     type: 3}

@@ -54,7 +54,7 @@ public class PlayerControls : MonoBehaviour
     {
         if (isNPC)
             return;
-        ManagePlayerMovement();
+        //ManagePlayerMovement();
     }
 
     private void ManagePlayerMovement()
@@ -63,29 +63,49 @@ public class PlayerControls : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
-                MoveCharacter(Direction.Up);
+                MoveCharacterOneTile(Direction.Up);
                 tilesWalked++;
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
-                MoveCharacter(Direction.Down);
+                MoveCharacterOneTile(Direction.Down);
                 tilesWalked++;
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
-                MoveCharacter(Direction.Left);
+                MoveCharacterOneTile(Direction.Left);
                 tilesWalked++;
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
-                MoveCharacter(Direction.Right);
+                MoveCharacterOneTile(Direction.Right);
                 tilesWalked++;
             }
             
         }
     }
 
-    private void MoveCharacter(Direction moveDirection)
+    public void TeleportCharacter (int targetX, int targetY)
+    {
+        int currX = (int)transform.position.x;
+        int currY = (int)transform.position.y;
+
+        // CALCULATE WALKED TILES
+        int xDiff = targetX - currX;
+        int yDiff = targetY - currY;
+
+        int walkedTiles = Mathf.Abs(xDiff) + Mathf.Abs(yDiff);
+        Debug.Log("walked " + walkedTiles + " TILES ");
+
+        tilesWalked += walkedTiles;
+
+        // MOVE CHARACTER
+        transform.position = new Vector3((float)(targetX), (float)targetY, transform.position.z);
+
+        UpdateCoord();
+    }
+
+    private void MoveCharacterOneTile(Direction moveDirection)
     {
         gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
         switch (moveDirection)

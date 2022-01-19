@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum ActionType
+{
+    UseCombatSkill,
+    Walk
+}
+
 public class HighlightTileObject
 {
     public int ID;
@@ -20,17 +26,9 @@ public class HighlightTileObject
         tileHighlight = highlightObject.GetComponent<TileHighlight>();
     }
 
-    public void ShowTile(bool show = true)
+    public void ShowTile(ActionType actionType, bool show)
     {
-        if (show)
-        {
-            spriteRenderer.color = red;
-        }
-        else
-        {
-            spriteRenderer.color = transparent;
-        }
-        tileHighlight.ShowTile(show);
+        tileHighlight.EnableTile(actionType, show);
     }
 }
 
@@ -44,7 +42,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     Text currentTurnText;
     [SerializeField]
-    Text remainingMovesText;
+    Text guideText;
     [SerializeField]
     Button skillButton;
     Text skillButtonText;
@@ -80,7 +78,7 @@ public class GameManager : MonoBehaviour
         }
         endTurnButton.onClick.AddListener(EndTurn);
         InitializeSkillButton();
-        remainingMovesText.text = "";
+        guideText.text = "";
     }
 
     private void InitializeSkillButton()
@@ -94,22 +92,31 @@ public class GameManager : MonoBehaviour
     private void SelectSkill()
     {
         skillSelected = !skillSelected;
+        HideActionRange();
         if (skillSelected)
         {
             selectedSkill = selectedCharacter.stats.skills[0];
-            DisplaySkillRange();
+            skillButtonImage.color = skillButtonSelectedColor;
+            DisplayActionRange();
+        }
+        else
+            DisplayActionRange(ActionType.Walk);
+    }
 
+    private void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill)
+    {
+        int actionRange;
+        if (actionType == ActionType.UseCombatSkill)
+        {
+            guideText.text = "Select Target";
+            actionRange = selectedSkill.skillRange;
         }
         else
         {
-            HideSkillRange();
+            guideText.text = "Select Destination";
+            actionRange = selectedCharacter.playerSpeed - selectedCharacter.tilesWalked;
         }
-    }
 
-    private void DisplaySkillRange()
-    {
-        remainingMovesText.text = "Select Target";
-        skillButtonImage.color = skillButtonSelectedColor;
         bool reuseOldTargetHighlights = false;
         targetHighlightCounter = 0;
         if (skillHighlights.Count > 0)
@@ -118,71 +125,70 @@ public class GameManager : MonoBehaviour
         }
 
 
-        for (int i = 1; i < selectedSkill.skillRange + 1; i++)
+        for (int i = 1; i < actionRange + 1; i++)
         {
             // spawn up
             Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
                 selectedCharacter.transform.position.y + i, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights);
+            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
 
 
 
             // spawn up-right && up-left
-            for (int z = 1; z < selectedSkill.skillRange - i + 1; z++)
+            for (int z = 1; z < actionRange - i + 1; z++)
             {
                 highlightLocation = new Vector3(selectedCharacter.transform.position.x - z,
                 selectedCharacter.transform.position.y + i, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights);
+                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
 
                 highlightLocation = new Vector3(selectedCharacter.transform.position.x + z,
                 selectedCharacter.transform.position.y + i, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights);
+                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
             }
 
             //spawn down
             highlightLocation = new Vector3(selectedCharacter.transform.position.x,
                 selectedCharacter.transform.position.y - i, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights);
+            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
 
 
 
             // spawn down-right && down-left
-            for (int z = 1; z < selectedSkill.skillRange - i + 1; z++)
+            for (int z = 1; z < actionRange - i + 1; z++)
             {
                 highlightLocation = new Vector3(selectedCharacter.transform.position.x - z,
                 selectedCharacter.transform.position.y - i, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights);
+                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
 
                 highlightLocation = new Vector3(selectedCharacter.transform.position.x + z,
                 selectedCharacter.transform.position.y - i, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights);
+                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
             }
 
             // spawn right
             highlightLocation = new Vector3(selectedCharacter.transform.position.x + i,
                 selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights);
+            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
 
             // spawn left
             highlightLocation = new Vector3(selectedCharacter.transform.position.x - i,
                 selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights);
+            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
         }
     }
 
-    private void HideSkillRange()
+    private void HideActionRange()
     {
         UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
         skillButtonImage.color = skillButtonDefaultColor;
 
         foreach (HighlightTileObject skillHighlight in skillHighlights)
         {
-            skillHighlight.ShowTile(false);
-            // SetActive(false);
+            skillHighlight.ShowTile(ActionType.Walk, false);
         }
     }
 
-    private void SpawnHighlightTile(Vector3 highLightLocation, bool oldHighlightsExist)
+    private void SpawnHighlightTile(Vector3 highLightLocation, bool oldHighlightsExist, ActionType actionType)
     {
         bool createNewHighLights = true;
         targetHighlightCounter++;
@@ -197,13 +203,14 @@ public class GameManager : MonoBehaviour
             case true:
                 GameObject newHighlight = Instantiate(targetHighlight, highLightLocation, Quaternion.identity);
                 newHighlight.name = "highlight" + targetHighlightCounter.ToString();
-                skillHighlights.Add(new HighlightTileObject(targetHighlightCounter,newHighlight));
-                
+                HighlightTileObject highlightTileObject = new HighlightTileObject(targetHighlightCounter, newHighlight);
+                skillHighlights.Add(highlightTileObject);
+                highlightTileObject.ShowTile(actionType, true);
                 break;
 
 
             case false:
-                skillHighlights[targetHighlightCounter-1].ShowTile();
+                skillHighlights[targetHighlightCounter-1].ShowTile(actionType, true);
                 skillHighlights[targetHighlightCounter-1].highlightObject.transform.position = highLightLocation;
                 //foreach (HighlightTileObject skillHighlight in skillHighlights)
                 //{
@@ -228,7 +235,7 @@ public class GameManager : MonoBehaviour
 
     public void UpdateRemainingMovesText(int remainingMoves)
     {
-        remainingMovesText.text = "Remaining moves: " + (remainingMoves-1).ToString();
+        guideText.text = "Remaining moves: " + (remainingMoves-1).ToString();
     }
 
     /// <summary>
@@ -248,13 +255,15 @@ public class GameManager : MonoBehaviour
                 characterSelected = true;
                 selectedCharacter = characterToSelect;
                 ShowSkillButton();
+                HideActionRange();
+                DisplayActionRange(ActionType.Walk);
             }
             else
                 character.SelectCharacter(false);
         }
         return characterSelected;
     }
-    
+
     private void ShowSkillButton()
     {
         skillButton.gameObject.SetActive(true);
@@ -264,12 +273,13 @@ public class GameManager : MonoBehaviour
     private void EndTurn()
     {
         GameData.current.currentTurn++;
-        
+        HideActionRange();
         foreach(PlayerControls character in allCharacters)
         {
             character.tilesWalked = 0;
         }
         currentTurnText.text = "Turn " + GameData.current.currentTurn.ToString();
+        DisplayActionRange(ActionType.Walk);
         UpdateRemainingMovesText(selectedCharacter.playerSpeed);
     }
 
@@ -291,8 +301,32 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="xCoordinate"></param>
     /// <param name="yCoordinate"></param>
-    public void ProcessSkillUseRequest(int xCoordinate, int yCoordinate)
+    public void ProcessInteractionRequest(int xCoordinate, int yCoordinate, ActionType actionType)
     {
+
+        // WALK INTERACTION
+        if (actionType == ActionType.Walk)
+        {
+
+            // 1 - check if tile not occupied
+            foreach (PlayerControls character in allCharacters)
+            {
+                if (xCoordinate == character.xCoord && yCoordinate == character.yCoord)
+                {
+                    Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
+                    guideText.text = "Cannot move there!";
+                    return;
+                }
+            }
+            selectedCharacter.TeleportCharacter(xCoordinate, yCoordinate);
+            HideActionRange();
+            UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
+            DisplayActionRange(ActionType.Walk);
+            return;
+        }
+
+
+        // COMBAT INTERACTION
         bool targetViable = false;
         PlayerControls target = allCharacters[0];
         
@@ -317,6 +351,7 @@ public class GameManager : MonoBehaviour
 
         // 2.5 - hide current skill highlights
         SelectSkill();
+        HideActionRange();
 
 
         // 3 - apply skill effect
