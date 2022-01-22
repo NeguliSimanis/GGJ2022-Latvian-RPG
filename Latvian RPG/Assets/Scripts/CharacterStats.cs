@@ -77,7 +77,7 @@ public class CharacterStats
         offense = 10;
         defense = 6;
 
-        speed = 5; // number of tiles that char can walk in single turn
+        speed = 2; // number of tiles that char can walk in single turn
 
         skills = new List<Skill>();
 
@@ -103,7 +103,7 @@ public class CharacterStats
         offense = 7;
         defense = 8;
 
-        speed = 5; // number of tiles that char can walk in single turn
+        speed = 2; // number of tiles that char can walk in single turn
 
         skills = new List<Skill>();
 
@@ -130,7 +130,7 @@ public class CharacterStats
         offense = 7;
         defense = 8;
 
-        speed = 5; // number of tiles that char can walk in single turn
+        speed = 2; // number of tiles that char can walk in single turn
 
         skills = new List<Skill>();
 

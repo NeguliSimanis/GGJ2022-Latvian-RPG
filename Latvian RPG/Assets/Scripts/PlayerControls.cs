@@ -55,6 +55,7 @@ public class PlayerControls : MonoBehaviour
             stats.skills.Add(newSkill);
         }
         name = stats.name;
+        playerSpeed = stats.speed;
         characterIsSelected = false;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
     }

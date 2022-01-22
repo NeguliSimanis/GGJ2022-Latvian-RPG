@@ -125,7 +125,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill)
+    public void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill, CharType charType = CharType.Player)
     {
         int actionRange;
         if (actionType == ActionType.UseCombatSkill)
@@ -133,13 +133,16 @@ public class GameManager : MonoBehaviour
             guideText.text = "Select Target";
             actionRange = selectedSkill.skillRange;
         }
-        else
+        else 
         {
             int speedLeft = selectedCharacter.playerSpeed - selectedCharacter.tilesWalked;
-            if (speedLeft > 0)
-                guideText.text = "Select Destination";
-            else
-                guideText.text = "No moves left";
+            if (charType == CharType.Player)
+            {
+                if (speedLeft > 0)
+                    guideText.text = "Select Destination";
+                else
+                    guideText.text = "No moves left";
+            }
             actionRange = speedLeft;
         }
 
@@ -150,6 +153,12 @@ public class GameManager : MonoBehaviour
             reuseOldTargetHighlights = true;
         }
 
+        if (GameData.current.turnType != TurnType.Player)
+        {
+            Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
+            selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
+            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+        }
 
         for (int i = 1; i < actionRange + 1; i++)
         {
@@ -240,10 +249,6 @@ public class GameManager : MonoBehaviour
             case false:
                 skillHighlights[targetHighlightCounter - 1].ShowTile(actionType, true);
                 skillHighlights[targetHighlightCounter - 1].highlightObject.transform.position = highLightLocation;
-                //foreach (HighlightTileObject skillHighlight in skillHighlights)
-                //{
-                //    skillHighlight.ShowTile();
-                //}
                 break;
         }
 
@@ -277,8 +282,8 @@ public class GameManager : MonoBehaviour
     {
         bool characterSelected = false;
 
-        if (GameData.current.turnType != TurnType.Player)
-            return false;
+        if (characterToSelect.type == CharType.Player && GameData.current.turnType != TurnType.Player)
+            return characterSelected;
 
         foreach (PlayerControls character in allCharacters)
         {
@@ -289,9 +294,15 @@ public class GameManager : MonoBehaviour
                 UpdateRemainingMovesText(character.playerSpeed - character.tilesWalked);
                 characterSelected = true;
                 selectedCharacter = characterToSelect;
-                ShowSkillButton();
                 HideActionRange();
-                DisplayActionRange(ActionType.Walk);
+                DisplayActionRange(ActionType.Walk, character.type);
+                if (character.type != CharType.Player)
+                {
+                    Debug.Log("showing non player char");
+                    return characterSelected;
+                }
+                
+                ShowSkillButton();
                 return characterSelected;
             }
             else
@@ -348,8 +359,8 @@ public class GameManager : MonoBehaviour
                 (allCharacters[i].type == CharType.Enemy &&
                 GameData.current.turnType == TurnType.Enemy))
             {
-                Debug.Log("THIS WORKS");
                 allCharacters[i].npcController.id = i;
+                SelectCharacter(allCharacters[i]);
                 allCharacters[i].npcController.Act();
                 return;
             }
@@ -374,6 +385,7 @@ public class GameManager : MonoBehaviour
                 GameData.current.turnType == TurnType.Enemy))
             {
                 allCharacters[i].npcController.id = i;
+                SelectCharacter(allCharacters[i]);
                 allCharacters[i].npcController.Act();
                 return;
             }
@@ -401,6 +413,8 @@ public class GameManager : MonoBehaviour
     /// <param name="yCoordinate"></param>
     public void ProcessInteractionRequest(int xCoordinate, int yCoordinate, ActionType actionType)
     {
+        if (GameData.current.turnType != TurnType.Player)
+            return;
 
         // WALK INTERACTION
         if (actionType == ActionType.Walk)

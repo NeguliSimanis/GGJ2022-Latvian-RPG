@@ -50,6 +50,8 @@ public class NPC : MonoBehaviour
     /// </summary>
     private IEnumerator Patrol()
     {
+        yield return new WaitForSeconds(1f);
+        gameManager.DisplayActionRange(ActionType.Walk, playerControls.type);
         while (playerControls.tilesWalked < playerControls.playerSpeed)
         {
             playerControls.RandomMoveNPC();
