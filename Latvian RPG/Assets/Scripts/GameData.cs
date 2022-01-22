@@ -8,7 +8,13 @@ public class GameData
 
     #region GENERAL
     public int currentTurn = 1;
+    public TurnType turnType = TurnType.Player;
     public float tileSize = 1f;
+    #endregion
+
+    #region NPC
+    public float npcMoveDuration = 0.9f;
+    public float npcActionDuration = 0.5f;
     #endregion
 
     #region XP BALANCE

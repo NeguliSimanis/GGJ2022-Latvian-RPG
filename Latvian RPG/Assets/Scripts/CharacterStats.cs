@@ -12,7 +12,8 @@ public enum Alignment
 public enum Character
 {
     Varna,
-    Siksparnis
+    Siksparnis,
+    Nave
 }
 
 public class CharacterStats
@@ -32,7 +33,6 @@ public class CharacterStats
     public int offense;
     public int defense;
 
-    public int iniative; // how quickly will the character act in turns
     public int speed; // number of tiles that char can walk in single turn
     
     public List<Skill> skills;
@@ -51,6 +51,9 @@ public class CharacterStats
                 break;
             case Character.Siksparnis:
                 GenerateSiksparnis();
+                break;
+            case Character.Nave:
+                GenerateNave();
                 break;
             default:
                 Debug.Log("CHARACTER NOT DEFINIED");
@@ -74,7 +77,6 @@ public class CharacterStats
         offense = 10;
         defense = 6;
 
-        iniative = 10; // how quickly will the character act in turns
         speed = 5; // number of tiles that char can walk in single turn
 
         skills = new List<Skill>();
@@ -101,7 +103,6 @@ public class CharacterStats
         offense = 7;
         defense = 8;
 
-        iniative = 9; // how quickly will the character act in turns
         speed = 5; // number of tiles that char can walk in single turn
 
         skills = new List<Skill>();
@@ -110,5 +111,32 @@ public class CharacterStats
         alignment = Alignment.Might;
         bio = "Angry bat boy";
         name = "Siksparnis";
+    }    
+    
+    
+    private void GenerateNave()
+    {
+        level = 1;
+        currExp = 0;
+        expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
+
+        // combat
+        maxLife = 20;
+        currLife = maxLife;
+
+        maxMana = 30;
+        currMana = maxMana;
+
+        offense = 7;
+        defense = 8;
+
+        speed = 5; // number of tiles that char can walk in single turn
+
+        skills = new List<Skill>();
+
+        // flair
+        alignment = Alignment.Might;
+        bio = "Avatar of Death";
+        name = "Nave";
     }
 }

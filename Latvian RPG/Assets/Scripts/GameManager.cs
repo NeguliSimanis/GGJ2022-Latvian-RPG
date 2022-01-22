@@ -34,25 +34,26 @@ public class HighlightTileObject
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField]
+    TurnManager turnManager;
+
     [Header("UI")]
-    [SerializeField]
-    GameObject charInfoPanel;
-    [SerializeField]
-    Button endTurnButton;
-    [SerializeField]
-    Text currentTurnText;
-    [SerializeField]
-    Text guideText;
-    [SerializeField]
-    Button skillButton;
+    [SerializeField] GameObject charInfoPanel;
+    [SerializeField] Button endTurnButton;
+    [SerializeField] Text currentTurnText;
+    [SerializeField] Text guideText;
+
+    [SerializeField] Button skillButton;
     Text skillButtonText;
-    List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
-    [SerializeField]
-    GameObject targetHighlight;
+
+    [SerializeField] GameObject targetHighlight;
     List<HighlightTileObject> skillHighlights = new List<HighlightTileObject>();
 
+    #region CHAR MANAGEMENT
+    List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
     public PlayerControls selectedCharacter;
-
+    private bool isAnyCharSelected = false;
+    #endregion
 
     #region SKILLS
     bool skillSelected = false;
@@ -72,13 +73,31 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // INITIALIZE CHARACTERS
         foreach (PlayerControls character in FindObjectsOfType<PlayerControls>())
         {
             allCharacters.Add(character);
+            NPC npcController = character.GetComponent<NPC>();
+            npcController.gameManager = this;
+            npcController.playerControls = character;
         }
+
+        // INITIALIZE BUTTONS
         endTurnButton.onClick.AddListener(EndTurn);
         InitializeSkillButton();
-        UpdateTurnQueueHUD();
+    }
+
+    private void ShowEndTurnButton(bool show = true)
+    {
+        endTurnButton.gameObject.SetActive(show);
+    }
+
+    public void ProcessShowCharNameRequest(PlayerControls character)
+    {
+        if (!skillSelected && !isAnyCharSelected)
+        {
+            guideText.text = character.name;
+        }
     }
 
     private void InitializeSkillButton()
@@ -100,7 +119,10 @@ public class GameManager : MonoBehaviour
             DisplayActionRange();
         }
         else
+        {
+            skillButtonImage.color = skillButtonDefaultColor;
             DisplayActionRange(ActionType.Walk);
+        }
     }
 
     private void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill)
@@ -183,8 +205,10 @@ public class GameManager : MonoBehaviour
 
     private void HideActionRange()
     {
-        UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
-        skillButtonImage.color = skillButtonDefaultColor;
+        if (isAnyCharSelected)
+            UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
+        if (skillSelected)
+            skillButtonImage.color = skillButtonDefaultColor;
 
         foreach (HighlightTileObject skillHighlight in skillHighlights)
         {
@@ -231,7 +255,7 @@ public class GameManager : MonoBehaviour
         {
             ToggleCharInfoPanel();
         }
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) && GameData.current.turnType == TurnType.Player)
         {
             EndTurn();
         }
@@ -242,6 +266,8 @@ public class GameManager : MonoBehaviour
         guideText.text = "Remaining moves: " + (remainingMoves).ToString();
     }
 
+    
+
     /// <summary>
     /// Returns true if character selected successfully
     /// </summary>
@@ -250,10 +276,15 @@ public class GameManager : MonoBehaviour
     public bool SelectCharacter(PlayerControls characterToSelect)
     {
         bool characterSelected = false;
+
+        if (GameData.current.turnType != TurnType.Player)
+            return false;
+
         foreach (PlayerControls character in allCharacters)
         {
             if (character == characterToSelect)
             {
+                isAnyCharSelected = true;
                 character.SelectCharacter(true);
                 UpdateRemainingMovesText(character.playerSpeed - character.tilesWalked);
                 characterSelected = true;
@@ -261,30 +292,93 @@ public class GameManager : MonoBehaviour
                 ShowSkillButton();
                 HideActionRange();
                 DisplayActionRange(ActionType.Walk);
+                return characterSelected;
             }
             else
+            {
                 character.SelectCharacter(false);
+            }
         }
         return characterSelected;
     }
 
-    private void ShowSkillButton()
+    private void ShowSkillButton(bool show = true)
     {
-        skillButton.gameObject.SetActive(true);
+        skillButton.gameObject.SetActive(show);
+        if (show)
         skillButtonText.text = selectedCharacter.stats.skills[0].name;
     }
 
     private void EndTurn()
     {
-        GameData.current.currentTurn++;
+        turnManager.StartNewTurn();
+
+        // HIDE IRRELEVANT UI
         HideActionRange();
+        ShowSkillButton(false);
+        if (GameData.current.turnType != TurnType.Player)
+            ShowEndTurnButton(false);
+        else
+            ShowEndTurnButton(true);
+       
+        // RESET CHARACTER STATS
         foreach (PlayerControls character in allCharacters)
         {
             character.tilesWalked = 0;
         }
-        currentTurnText.text = "Turn " + GameData.current.currentTurn.ToString();
-        DisplayActionRange(ActionType.Walk);
-        UpdateRemainingMovesText(selectedCharacter.playerSpeed);
+
+        // SHOW CHAR UI IF PLAYER TURN
+        if (isAnyCharSelected && GameData.current.turnType == TurnType.Player)
+        {
+            ShowSkillButton(true);
+            DisplayActionRange(ActionType.Walk);
+            UpdateRemainingMovesText(selectedCharacter.playerSpeed);
+        }
+
+        // MAKE NEUTRAL/ENEMY CHARS ACT
+        if (GameData.current.turnType == TurnType.Player)
+            return;
+        for (int i = 0; i < allCharacters.Count; i++)
+        {
+            Debug.Log("CHECKING " + allCharacters[i].name + " WHO IS " + allCharacters[i].type);
+            Debug.Log("TURN TYPE " + GameData.current.turnType);
+            if ((allCharacters[i].type == CharType.Neutral &&
+                GameData.current.turnType == TurnType.Neutral)
+                ||
+                (allCharacters[i].type == CharType.Enemy &&
+                GameData.current.turnType == TurnType.Enemy))
+            {
+                Debug.Log("THIS WORKS");
+                allCharacters[i].npcController.id = i;
+                allCharacters[i].npcController.Act();
+                return;
+            }
+        }
+        EndTurn();
+    }
+
+
+    /// <summary>
+    /// Called by NPC when they finish their actions for the turn
+    /// </summary>
+    /// <param name="charType"></param>
+    /// <param name="currCharID">assigned by game manager script in end turn function </param>
+    public void ProcessEndCharMove(CharType charType, int currCharID)
+    {
+        for (int i = currCharID + 1; i < allCharacters.Count; i++)
+        {
+            if ((allCharacters[i].type == CharType.Neutral &&
+                GameData.current.turnType == TurnType.Neutral)
+                ||
+                (allCharacters[i].type == CharType.Enemy &&
+                GameData.current.turnType == TurnType.Enemy))
+            {
+                allCharacters[i].npcController.id = i;
+                allCharacters[i].npcController.Act();
+                return;
+            }
+        }
+        EndTurn();
     }
 
 
@@ -368,55 +462,4 @@ public class GameManager : MonoBehaviour
     {
         guideText.text = newText;
     }
-
-    #region TURN QUEUE HUD
-
-
-    private int maxElementsInTurnQueue = 15;
-    [Header("TURN QUEUE")]
-    [SerializeField]
-    GameObject queuePortraitPrefab;
-    [SerializeField]
-    GameObject queueTurnInfo;
-    [SerializeField]
-    Transform queueParentTransform;
-    private void UpdateTurnQueueHUD()
-    {
-        int currElementCount = 0;
-        int turnCounter = 0;
-        while (currElementCount < maxElementsInTurnQueue)
-        {
-            // ADD CHAR INFO
-            currElementCount += AddCharInfoToQueue(GameData.current.currentTurn + turnCounter);
-
-            // ADD TURN INFO
-            AddTurnInfoToQueue(GameData.current.currentTurn + turnCounter + 1);
-            turnCounter++;
-            currElementCount++;
-        }
-    }
-
-    private int AddCharInfoToQueue(int turn)
-    {
-        int charsAdded = 0;
-        Debug.Log("what");
-        foreach(PlayerControls character in allCharacters)
-        {
-            Debug.Log("YO!");
-            GameObject newCharPortrait = Instantiate(queuePortraitPrefab, queueParentTransform);
-            Text newCharText = newCharPortrait.transform.GetChild(0).gameObject.GetComponent<Text>();
-            newCharText.text = character.name;
-            charsAdded++;
-        }
-        return charsAdded;
-    }
-
-    private void AddTurnInfoToQueue(int turn)
-    {
-        GameObject newTurnInfo = Instantiate(queueTurnInfo, queueParentTransform);
-        Text newTurnText = newTurnInfo.transform.GetChild(0).gameObject.GetComponent<Text>();
-        newTurnText.text = "Turn " + (turn);
-    }
-
-    #endregion
 }

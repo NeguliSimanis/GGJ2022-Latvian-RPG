@@ -539,6 +539,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5263861361776117327}
   - component: {fileID: 5263861361776117320}
+  - component: {fileID: -6362190921303917739}
   m_Layer: 0
   m_Name: Varna
   m_TagString: Untagged
@@ -575,9 +576,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f890c518830274e48ab50334ec9bdfdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isNPC: 0
+  type: 0
   xCoord: 0
   yCoord: 0
+  npcController: {fileID: -6362190921303917739}
   character: 0
   playerSpeed: 4
   tilesWalked: 0
@@ -586,6 +588,21 @@ MonoBehaviour:
   startingSkills:
   - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
   hurtAnimator: {fileID: 0}
+--- !u!114 &-6362190921303917739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263861361776117321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72952c7fe81faf841ae85eaf1ccc3e6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  behaviour: 0
+  gameManager: {fileID: 0}
+  id: 0
 --- !u!1 &5263861361883099716
 GameObject:
   m_ObjectHideFlags: 0

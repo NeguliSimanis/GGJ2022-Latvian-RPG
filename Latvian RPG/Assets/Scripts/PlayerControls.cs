@@ -11,13 +11,23 @@ public enum Direction
     Left
 }
 
+public enum CharType
+{
+    Player,
+    Enemy,
+    Neutral
+}
+
 public class PlayerControls : MonoBehaviour
 {
-    public bool isNPC;
+    
+    public CharType type;
+    public bool isDead = false;
 
     public int xCoord;
     public int yCoord;
 
+    public NPC npcController;
     [SerializeField]
     private Character character;
     public CharacterStats stats;
@@ -30,7 +40,6 @@ public class PlayerControls : MonoBehaviour
     GameManager gameManager;
     [SerializeField]
     private Skill[] startingSkills;
-
 
     #region ANIMATIONS
     [SerializeField]
@@ -45,19 +54,13 @@ public class PlayerControls : MonoBehaviour
         {
             stats.skills.Add(newSkill);
         }
-
+        name = stats.name;
         characterIsSelected = false;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
     }
 
-    private void Update()
-    {
-        if (isNPC)
-            return;
-        //ManagePlayerMovement();
-    }
 
-    private void ManagePlayerMovement()
+    public void ManagePlayerMovement()
     {
         if (tilesWalked < playerSpeed && characterIsSelected)
         {
@@ -103,6 +106,14 @@ public class PlayerControls : MonoBehaviour
         transform.position = new Vector3((float)(targetX), (float)targetY, transform.position.z);
 
         UpdateCoord();
+    }
+
+    public void RandomMoveNPC()
+    {
+        int directionCount = Direction.GetNames(typeof(Direction)).Length - 1;
+        Direction direction = (Direction)Random.Range(0, directionCount);
+        MoveCharacterOneTile(direction);
+        tilesWalked++;
     }
 
     private void MoveCharacterOneTile(Direction moveDirection)
@@ -168,6 +179,7 @@ public class PlayerControls : MonoBehaviour
     {
         gameManager.UpdateGuideText(
             murderer.name + " killed " + name + "!");
+        isDead = true;
         gameObject.SetActive(false);
     }
 }

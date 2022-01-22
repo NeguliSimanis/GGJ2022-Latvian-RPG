@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ce379a846a3266e438b81c9ec0e5007e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 91be7a62d12ffcc49bbc0e12d8980a90, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -101,7 +101,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 1.05, y: 1}
     newSize: {x: 30.8, y: 30.424023}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -237,7 +237,7 @@ GameObject:
   - component: {fileID: 5263861361776117320}
   - component: {fileID: 5701418463263706139}
   m_Layer: 0
-  m_Name: Siksparnis
+  m_Name: Nave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -272,11 +272,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f890c518830274e48ab50334ec9bdfdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 2
+  type: 1
   xCoord: 0
   yCoord: 0
   npcController: {fileID: 5701418463263706139}
-  character: 1
+  character: 2
   playerSpeed: 5
   tilesWalked: 0
   characterIsSelected: 0

@@ -32,6 +32,7 @@ public class CharacterSelectArea : MonoBehaviour
     private void OnMouseOver()
     {
         selectCharAnimation.SetActive(true);
+        gameManager.ProcessShowCharNameRequest(characterController);
     }
 
     private void OnMouseExit()
@@ -42,7 +43,7 @@ public class CharacterSelectArea : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (characterController.isNPC)
+        if (characterController.type != CharType.Player)
             return;
         if (characterSelectedCount != 0 && gameManager.selectedCharacter == characterController)
         {
