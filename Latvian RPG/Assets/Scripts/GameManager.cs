@@ -34,8 +34,9 @@ public class HighlightTileObject
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
+
     TurnManager turnManager;
+    PopupManager popupManager;
 
     [Header("UI")]
     [SerializeField] GameObject charInfoPanel;
@@ -69,6 +70,13 @@ public class GameManager : MonoBehaviour
     {
         if (GameData.current == null)
             GameData.current = new GameData();
+        GetComponents();
+    }
+
+    private void GetComponents()
+    {
+         turnManager = gameObject.GetComponent<TurnManager>();
+         popupManager = gameObject.GetComponent<PopupManager>();
     }
 
     private void Start()
@@ -112,8 +120,14 @@ public class GameManager : MonoBehaviour
     {
         skillSelected = !skillSelected;
         HideActionRange();
+        
         if (skillSelected)
         {
+            if (selectedCharacter.hasUsedSkillThisTurn)
+            {
+                guideText.text = selectedCharacter.name +  " can only act once per turn!";
+                return;
+            }
             selectedSkill = selectedCharacter.stats.skills[0];
             skillButtonImage.color = skillButtonSelectedColor;
             DisplayActionRange();
@@ -256,13 +270,19 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (GameData.current.turnType != TurnType.Player)
+            return;
         if (Input.GetKeyDown(KeyCode.C))
         {
             ToggleCharInfoPanel();
         }
-        if (Input.GetKeyDown(KeyCode.Return) && GameData.current.turnType == TurnType.Player)
+        if (Input.GetKeyDown(KeyCode.Return))
         {
             EndTurn();
+        }
+        if (Input.GetKeyDown(KeyCode.Escape) && popupManager.isWarningPopupActive)
+        {
+            popupManager.ShowWarningPopup(false);
         }
     }
 
@@ -320,10 +340,35 @@ public class GameManager : MonoBehaviour
         skillButtonText.text = selectedCharacter.stats.skills[0].name;
     }
 
-    private void EndTurn()
+    /// <summary>
+    /// Returns true if there's any character in the player's party that can move or use ability
+    /// </summary>
+    /// <returns></returns>
+    private bool CanPlayerPartyAct()
     {
-        turnManager.StartNewTurn();
+        foreach(PlayerControls character in allCharacters)
+        {
+            if (character.type == CharType.Player &&
+                character.CanCharacterAct())
+                return true;
+        }
+        return false;
+    }
 
+    public void EndTurn()
+    {
+        if (GameData.current.turnType == TurnType.Player)
+        {
+            if (!popupManager.isWarningPopupActive && CanPlayerPartyAct())
+            {
+                popupManager.ShowWarningPopup(true);
+                return;
+            }
+            else
+                popupManager.ShowWarningPopup(false);
+        }
+
+        turnManager.StartNewTurn();
         // HIDE IRRELEVANT UI
         HideActionRange();
         ShowSkillButton(false);
@@ -335,7 +380,7 @@ public class GameManager : MonoBehaviour
         // RESET CHARACTER STATS
         foreach (PlayerControls character in allCharacters)
         {
-            character.tilesWalked = 0;
+            character.UpdateNewTurnStats();
         }
 
         // SHOW CHAR UI IF PLAYER TURN
@@ -469,6 +514,7 @@ public class GameManager : MonoBehaviour
 
         // 3 - apply skill effect
         float damageDealt = target.TakeDamage(-selectedSkill.skillDamage, selectedCharacter);
+        selectedCharacter.hasUsedSkillThisTurn = true;
 
     }
 

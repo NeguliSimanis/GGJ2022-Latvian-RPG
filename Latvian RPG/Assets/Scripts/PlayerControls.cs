@@ -22,7 +22,10 @@ public class PlayerControls : MonoBehaviour
 {
     
     public CharType type;
+    [HideInInspector]
     public bool isDead = false;
+    [HideInInspector]
+    public bool hasUsedSkillThisTurn = false;
 
     public int xCoord;
     public int yCoord;
@@ -109,10 +112,45 @@ public class PlayerControls : MonoBehaviour
         UpdateCoord();
     }
 
+    private bool IsTileFree(Vector3Int coordinates)
+    {
+        bool isTileFree = true;
+
+        return isTileFree;
+    }
+
     public void RandomMoveNPC()
     {
+        bool targetPositionFound = false;
         int directionCount = Direction.GetNames(typeof(Direction)).Length - 1;
         Direction direction = (Direction)Random.Range(0, directionCount);
+        Vector3Int targetPosition = new Vector3Int(xCoord, yCoord - 1, 0); ;
+        int whileCounter = 10;
+
+        /// WHAT IF SURROUNDED?
+        while (!targetPositionFound)
+        {
+            switch(direction)
+            {
+                case Direction.Down:
+                    targetPosition = new Vector3Int(xCoord, yCoord-1, 0);
+                    break;
+                case Direction.Left:
+                    targetPosition = new Vector3Int(xCoord-1, yCoord, 0);
+                    break;
+                case Direction.Right:
+                    targetPosition = new Vector3Int(xCoord+1, yCoord, 0);
+                    break;
+                case Direction.Up:
+                    targetPosition = new Vector3Int(xCoord, yCoord+1, 0);
+                    break;
+            }
+            targetPositionFound = IsTileFree(targetPosition);
+            whileCounter--;
+            if (whileCounter < 0)
+                return;
+        }
+        
         MoveCharacterOneTile(direction);
         tilesWalked++;
     }
@@ -182,5 +220,22 @@ public class PlayerControls : MonoBehaviour
             murderer.name + " killed " + name + "!");
         isDead = true;
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Resets movement points and all that jazz at the start of the turn
+    /// </summary>
+    public void UpdateNewTurnStats()
+    {
+        tilesWalked = 0;
+        hasUsedSkillThisTurn = false;
+    }
+
+    public bool CanCharacterAct()
+    {
+        if (tilesWalked < playerSpeed || !hasUsedSkillThisTurn)
+            return true;
+        else
+            return false;
     }
 }
