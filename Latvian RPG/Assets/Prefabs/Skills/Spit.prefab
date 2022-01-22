@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skillDamage: 5
-  skillCost: 1
+  manaCost: 3
   skillName: Spit
-  skillRange: 3
+  skillRange: 2
   type: 0

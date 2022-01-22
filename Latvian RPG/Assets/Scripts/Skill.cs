@@ -12,7 +12,7 @@ public class Skill : MonoBehaviour
 {
 
     public float skillDamage;
-    public float skillCost;
+    public float manaCost;
     public string skillName;
     public int skillRange;
     public SkillType type;

@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour
 
     [SerializeField] private Renderer m_levelRenderer;
     [SerializeField] private Bounds m_levelBounds;
-    [SerializeField] private float m_cameraSpeed = 30.0f;
+    [SerializeField] private float m_cameraSpeed = 0.1f;
     [SerializeField, Tooltip("Percent of screen size"), Range(0f, 50f)] private float m_screenDragBounds = 5f;
 
     private Vector3 m_targetCamPosition;

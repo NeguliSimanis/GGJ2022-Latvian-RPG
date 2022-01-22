@@ -13,7 +13,7 @@ public class GameData
     #endregion
 
     #region NPC
-    public float npcMoveDuration = 0.9f;
+    public float npcMoveDuration = 0.5f;
     public float npcActionDuration = 0.5f;
     #endregion
 

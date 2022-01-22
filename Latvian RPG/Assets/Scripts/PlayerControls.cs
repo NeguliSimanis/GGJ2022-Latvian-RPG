@@ -49,6 +49,14 @@ public class PlayerControls : MonoBehaviour
     Animator hurtAnimator;
     #endregion
 
+    #region UI
+    [Header("HUD")]
+    [SerializeField]
+    Image manaBar;
+    [SerializeField]
+    Image lifeBar;
+    #endregion
+
     private void Start()
     {
         UpdateCoord();
@@ -112,11 +120,14 @@ public class PlayerControls : MonoBehaviour
         UpdateCoord();
     }
 
-    private bool IsTileFree(Vector3Int coordinates)
+    private bool IsTileFree(int x, int y)
     {
-        bool isTileFree = true;
-
-        return isTileFree;
+        foreach (PlayerControls character in gameManager.allCharacters)
+        {
+            if (character.xCoord == x && character.yCoord == y)
+                return false;
+        }
+        return true;
     }
 
     public void RandomMoveNPC()
@@ -130,6 +141,7 @@ public class PlayerControls : MonoBehaviour
         /// WHAT IF SURROUNDED?
         while (!targetPositionFound)
         {
+            Debug.Log("checking pos");
             switch(direction)
             {
                 case Direction.Down:
@@ -145,7 +157,7 @@ public class PlayerControls : MonoBehaviour
                     targetPosition = new Vector3Int(xCoord, yCoord+1, 0);
                     break;
             }
-            targetPositionFound = IsTileFree(targetPosition);
+            targetPositionFound = IsTileFree(targetPosition.x, targetPosition.y);
             whileCounter--;
             if (whileCounter < 0)
                 return;
@@ -153,6 +165,7 @@ public class PlayerControls : MonoBehaviour
         
         MoveCharacterOneTile(direction);
         tilesWalked++;
+        gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
     }
 
     private void MoveCharacterOneTile(Direction moveDirection)
@@ -206,6 +219,9 @@ public class PlayerControls : MonoBehaviour
         gameManager.UpdateGuideText(
             damageSource.name + " dealt " + -damageDealt + " damage to " + name + "!");
 
+        // UPDATE HUD BARS
+        StartCoroutine(UpdateLifeBarWithDelay());
+
         // DEATH
         if (stats.currLife <= 0)
             Die(damageSource);
@@ -237,5 +253,23 @@ public class PlayerControls : MonoBehaviour
             return true;
         else
             return false;
+    }
+
+    private IEnumerator UpdateLifeBarWithDelay()
+    {
+        yield return new WaitForSeconds(0.5f);
+        lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
+    }
+
+    public void SpendMana(float amount)
+    {
+        stats.currMana -= amount;
+        StartCoroutine(UpdateManaBarWithDelay());
+    }
+
+    private IEnumerator UpdateManaBarWithDelay()
+    {
+        yield return new WaitForSeconds(0.5f);
+        manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
     }
 }

@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
 
     TurnManager turnManager;
     PopupManager popupManager;
+    [SerializeField]
+    CameraController cameraController;
 
     [Header("UI")]
     [SerializeField] GameObject charInfoPanel;
@@ -51,7 +53,7 @@ public class GameManager : MonoBehaviour
     List<HighlightTileObject> skillHighlights = new List<HighlightTileObject>();
 
     #region CHAR MANAGEMENT
-    List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
+    public List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
     public PlayerControls selectedCharacter;
     private bool isAnyCharSelected = false;
     #endregion
@@ -284,6 +286,10 @@ public class GameManager : MonoBehaviour
         {
             popupManager.ShowWarningPopup(false);
         }
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            SelectSkill();
+        }
     }
 
     public void UpdateRemainingMovesText(int remainingMoves)
@@ -355,8 +361,17 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
+    private void MoveCameraToPlayer()
+    {
+        cameraController.SetPosition(new Vector3(
+            selectedCharacter.transform.position.x,
+            selectedCharacter.transform.position.y,
+            cameraController.transform.position.z));
+    }
+
     public void EndTurn()
     {
+        // SHOW CONFIRMATION POPUP
         if (GameData.current.turnType == TurnType.Player)
         {
             if (!popupManager.isWarningPopupActive && CanPlayerPartyAct())
@@ -365,10 +380,13 @@ public class GameManager : MonoBehaviour
                 return;
             }
             else
+            {
                 popupManager.ShowWarningPopup(false);
+            }
         }
 
         turnManager.StartNewTurn();
+
         // HIDE IRRELEVANT UI
         HideActionRange();
         ShowSkillButton(false);
@@ -383,9 +401,20 @@ public class GameManager : MonoBehaviour
             character.UpdateNewTurnStats();
         }
 
-        // SHOW CHAR UI IF PLAYER TURN
-        if (isAnyCharSelected && GameData.current.turnType == TurnType.Player)
+        // SELECT FIRST RANDOM PLAYER CHARACTER
+        if (GameData.current.turnType == TurnType.Player)
         {
+            foreach (PlayerControls character in allCharacters)
+            {
+                if (character.type == CharType.Player)
+                {
+                    SelectCharacter(character);
+                    MoveCameraToPlayer();
+                    break;
+                }
+            }
+
+        // SHOW CHAR UI IF PLAYER TURN
             ShowSkillButton(true);
             DisplayActionRange(ActionType.Walk);
             UpdateRemainingMovesText(selectedCharacter.playerSpeed);
@@ -505,7 +534,11 @@ public class GameManager : MonoBehaviour
             return;
         }
         // 2 - check if enough mana
-
+        if (selectedCharacter.stats.currMana < selectedSkill.manaCost)
+        {
+            guideText.text = "Not enough mana!";
+            return;
+        }
 
         // 2.5 - hide current skill highlights
         SelectSkill();
@@ -516,6 +549,9 @@ public class GameManager : MonoBehaviour
         float damageDealt = target.TakeDamage(-selectedSkill.skillDamage, selectedCharacter);
         selectedCharacter.hasUsedSkillThisTurn = true;
 
+        // 4 - remove spent mana
+        selectedCharacter.SpendMana(selectedSkill.manaCost);
+            
     }
 
     public void UpdateGuideText(string newText)

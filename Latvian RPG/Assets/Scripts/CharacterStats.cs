@@ -68,10 +68,10 @@ public class CharacterStats
         expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
 
         // combat
-        maxLife = 100;
+        maxLife = 10;
         currLife = maxLife;
 
-        maxMana = 100;
+        maxMana = 10;
         currMana = maxMana;
 
         offense = 10;
@@ -94,10 +94,10 @@ public class CharacterStats
         expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
 
         // combat
-        maxLife = 20;
+        maxLife = 10;
         currLife = maxLife;
 
-        maxMana = 30;
+        maxMana = 10;
         currMana = maxMana;
 
         offense = 7;
@@ -121,10 +121,10 @@ public class CharacterStats
         expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
 
         // combat
-        maxLife = 20;
+        maxLife = 10;
         currLife = maxLife;
 
-        maxMana = 30;
+        maxMana = 10;
         currMana = maxMana;
 
         offense = 7;

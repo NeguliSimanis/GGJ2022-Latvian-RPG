@@ -50,7 +50,7 @@ public class NPC : MonoBehaviour
     /// </summary>
     private IEnumerator Patrol()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.9f);
         gameManager.DisplayActionRange(ActionType.Walk, playerControls.type);
         while (playerControls.tilesWalked < playerControls.playerSpeed)
         {
@@ -58,6 +58,11 @@ public class NPC : MonoBehaviour
             yield return new WaitForSeconds(GameData.current.npcMoveDuration);
         }
         EndTurn();
+    }
+
+    private IEnumerator HuntPlayer()
+    {
+        yield return new WaitForSeconds(0.9f);
     }
 
     private IEnumerator EndTurnAfterSeconds()
