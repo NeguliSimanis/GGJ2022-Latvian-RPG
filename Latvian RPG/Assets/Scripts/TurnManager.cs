@@ -43,13 +43,11 @@ public class TurnManager : MonoBehaviour
             case TurnType.Enemy:
                 GameData.current.turnType = TurnType.Neutral;
                 Debug.Log("start neutral turn");
-
                 newTurnText = "Neutral Turn";
                 break;
             case TurnType.Neutral:
                 GameData.current.turnType = TurnType.Player;
                 Debug.Log("start player turn");
-
                 newTurnText = "Player Turn";
                 break;
         }

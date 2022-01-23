@@ -42,7 +42,7 @@ public class PlayerControls : MonoBehaviour
     private CharacterSelectArea characterSelector;
     GameManager gameManager;
     [SerializeField]
-    private Skill[] startingSkills;
+    public Skill[] startingSkills;
 
     #region ANIMATIONS
     [SerializeField]
@@ -141,7 +141,6 @@ public class PlayerControls : MonoBehaviour
         /// WHAT IF SURROUNDED?
         while (!targetPositionFound)
         {
-            Debug.Log("checking pos");
             switch(direction)
             {
                 case Direction.Down:
@@ -168,7 +167,7 @@ public class PlayerControls : MonoBehaviour
         gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
     }
 
-    private void MoveCharacterOneTile(Direction moveDirection)
+    public void MoveCharacterOneTile(Direction moveDirection)
     {
         gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
         switch (moveDirection)
@@ -216,8 +215,16 @@ public class PlayerControls : MonoBehaviour
         Debug.Log(gameObject.name + " takes " + damageDealt + " damage (remaining hp: " + stats.currLife + ")" );
 
         // COMBAT LOG
+        if (type == CharType.Player || type == CharType.Enemy)
         gameManager.UpdateGuideText(
             damageSource.name + " dealt " + -damageDealt + " damage to " + name + "!");
+
+        else
+        {
+            gameManager.UpdateGuideText(
+            damageSource.name + " dealt " + -damageDealt + " damage to " + name + "! " + name + " becomes an enemy!");
+            type = CharType.Enemy;
+        }
 
         // UPDATE HUD BARS
         StartCoroutine(UpdateLifeBarWithDelay());

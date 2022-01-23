@@ -77,8 +77,8 @@ public class GameManager : MonoBehaviour
 
     private void GetComponents()
     {
-         turnManager = gameObject.GetComponent<TurnManager>();
-         popupManager = gameObject.GetComponent<PopupManager>();
+        turnManager = gameObject.GetComponent<TurnManager>();
+        popupManager = gameObject.GetComponent<PopupManager>();
     }
 
     private void Start()
@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
             allCharacters.Add(character);
             NPC npcController = character.GetComponent<NPC>();
             npcController.gameManager = this;
-            npcController.playerControls = character;
+            npcController.npcControls = character;
         }
 
         // INITIALIZE BUTTONS
@@ -106,7 +106,19 @@ public class GameManager : MonoBehaviour
     {
         if (!skillSelected && !isAnyCharSelected)
         {
-            guideText.text = character.name;
+            switch (character.type)
+            {
+                case CharType.Enemy:
+                    guideText.text = character.name + " (Enemy)";
+                    break;
+                case CharType.Player:
+                    guideText.text = character.name;
+                    break;
+                case CharType.Neutral:
+                    guideText.text = character.name + " (Neutral)";
+                    break;
+            }
+
         }
     }
 
@@ -122,12 +134,12 @@ public class GameManager : MonoBehaviour
     {
         skillSelected = !skillSelected;
         HideActionRange();
-        
+
         if (skillSelected)
         {
             if (selectedCharacter.hasUsedSkillThisTurn)
             {
-                guideText.text = selectedCharacter.name +  " can only act once per turn!";
+                guideText.text = selectedCharacter.name + " can only act once per turn!";
                 return;
             }
             selectedSkill = selectedCharacter.stats.skills[0];
@@ -146,10 +158,10 @@ public class GameManager : MonoBehaviour
         int actionRange;
         if (actionType == ActionType.UseCombatSkill)
         {
-            guideText.text = "Select Target";
+            guideText.text = "Use " + selectedSkill.name;
             actionRange = selectedSkill.skillRange;
         }
-        else 
+        else
         {
             int speedLeft = selectedCharacter.playerSpeed - selectedCharacter.tilesWalked;
             if (charType == CharType.Player)
@@ -286,7 +298,7 @@ public class GameManager : MonoBehaviour
         {
             popupManager.ShowWarningPopup(false);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha1) && isAnyCharSelected)
         {
             SelectSkill();
         }
@@ -297,7 +309,7 @@ public class GameManager : MonoBehaviour
         guideText.text = "Remaining moves: " + (remainingMoves).ToString();
     }
 
-    
+
 
     /// <summary>
     /// Returns true if character selected successfully
@@ -324,10 +336,9 @@ public class GameManager : MonoBehaviour
                 DisplayActionRange(ActionType.Walk, character.type);
                 if (character.type != CharType.Player)
                 {
-                    Debug.Log("showing non player char");
                     return characterSelected;
                 }
-                
+
                 ShowSkillButton();
                 return characterSelected;
             }
@@ -343,7 +354,7 @@ public class GameManager : MonoBehaviour
     {
         skillButton.gameObject.SetActive(show);
         if (show)
-        skillButtonText.text = selectedCharacter.stats.skills[0].name;
+            skillButtonText.text = selectedCharacter.stats.skills[0].name;
     }
 
     /// <summary>
@@ -352,7 +363,7 @@ public class GameManager : MonoBehaviour
     /// <returns></returns>
     private bool CanPlayerPartyAct()
     {
-        foreach(PlayerControls character in allCharacters)
+        foreach (PlayerControls character in allCharacters)
         {
             if (character.type == CharType.Player &&
                 character.CanCharacterAct())
@@ -368,6 +379,7 @@ public class GameManager : MonoBehaviour
             selectedCharacter.transform.position.y,
             cameraController.transform.position.z));
     }
+
 
     public void EndTurn()
     {
@@ -385,6 +397,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        // START NEW TURN
         turnManager.StartNewTurn();
 
         // HIDE IRRELEVANT UI
@@ -425,8 +438,6 @@ public class GameManager : MonoBehaviour
             return;
         for (int i = 0; i < allCharacters.Count; i++)
         {
-            Debug.Log("CHECKING " + allCharacters[i].name + " WHO IS " + allCharacters[i].type);
-            Debug.Log("TURN TYPE " + GameData.current.turnType);
             if ((allCharacters[i].type == CharType.Neutral &&
                 GameData.current.turnType == TurnType.Neutral)
                 ||

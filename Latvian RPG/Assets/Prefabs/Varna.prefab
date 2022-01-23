@@ -514,6 +514,7 @@ GameObject:
   - component: {fileID: 5263861361188574545}
   - component: {fileID: 5263861361188574551}
   - component: {fileID: 5263861361188574544}
+  - component: {fileID: 7913881009425419282}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -626,6 +627,25 @@ MonoBehaviour:
   characterController: {fileID: 5263861361776117320}
   selectCharAnimation: {fileID: 5263861361883099716}
   characterFrame: {fileID: 5263861361238292300}
+--- !u!95 &7913881009425419282
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263861361188574547}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 679e0a10967242149a282317ec8e0554, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &5263861361238292300
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,7 +869,7 @@ MonoBehaviour:
   characterSelector: {fileID: 5263861361188574544}
   startingSkills:
   - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  hurtAnimator: {fileID: 0}
+  hurtAnimator: {fileID: 7913881009425419282}
   manaBar: {fileID: 2888790600775042027}
   lifeBar: {fileID: 8303973664308921568}
 --- !u!114 &-6362190921303917739
@@ -866,7 +886,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   behaviour: 0
   gameManager: {fileID: 0}
-  playerControls: {fileID: 0}
+  npcControls: {fileID: 0}
   id: 0
 --- !u!1 &5263861361883099716
 GameObject:

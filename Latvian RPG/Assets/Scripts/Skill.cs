@@ -5,7 +5,9 @@ using UnityEngine;
 public enum SkillType
 {
     Damage,
-    Recruit
+    Recruit,
+    Buff,
+    Debuff
 }
 
 public class Skill : MonoBehaviour
@@ -15,5 +17,5 @@ public class Skill : MonoBehaviour
     public float manaCost;
     public string skillName;
     public int skillRange;
-    public SkillType type;
+    public SkillType[] type;
 }
