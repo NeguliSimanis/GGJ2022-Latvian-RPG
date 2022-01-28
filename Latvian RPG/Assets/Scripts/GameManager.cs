@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum ActionType
 {
@@ -60,7 +61,8 @@ public class GameManager : MonoBehaviour
 
     #region SKILLS
     bool skillSelected = false;
-    Skill selectedSkill;
+    [HideInInspector]
+    public Skill selectedSkill;
     private int targetHighlightCounter = 0;
     Image skillButtonImage;
 
@@ -155,6 +157,9 @@ public class GameManager : MonoBehaviour
 
     public void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill, CharType charType = CharType.Player)
     {
+        // show the char sprite above the tile sprites
+        selectedCharacter.SetToDefaultSortOrder(defaultOrder: false);
+
         int actionRange;
         if (actionType == ActionType.UseCombatSkill)
         {
@@ -251,6 +256,10 @@ public class GameManager : MonoBehaviour
         {
             skillHighlight.ShowTile(ActionType.Walk, false);
         }
+        foreach (PlayerControls character in allCharacters)
+        {
+            character.SetToDefaultSortOrder(true);
+        }
     }
 
     private void SpawnHighlightTile(Vector3 highLightLocation, bool oldHighlightsExist, ActionType actionType)
@@ -333,12 +342,11 @@ public class GameManager : MonoBehaviour
                 characterSelected = true;
                 selectedCharacter = characterToSelect;
                 HideActionRange();
-                DisplayActionRange(ActionType.Walk, character.type);
                 if (character.type != CharType.Player)
                 {
                     return characterSelected;
                 }
-
+                DisplayActionRange(ActionType.Walk, character.type);
                 ShowSkillButton();
                 return characterSelected;
             }
@@ -376,13 +384,38 @@ public class GameManager : MonoBehaviour
     {
         cameraController.SetPosition(new Vector3(
             selectedCharacter.transform.position.x,
-            selectedCharacter.transform.position.y,
+            selectedCharacter.transform.position.y+1,
             cameraController.transform.position.z));
     }
 
+    public bool CheckForAlivePlayers()
+    {
+        foreach (PlayerControls character in allCharacters)
+        {
+            if (character.type == CharType.Player && !character.isDead)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void EndGame()
+    {
+        popupManager.DisplayGameLostPopup();
+    }
 
     public void EndTurn()
     {
+        // CHECK IF ANY PLAYERS ARE ALIVE
+        if (!CheckForAlivePlayers())
+        {
+            Debug.Log("game should end");
+            EndGame();
+            return;
+        }
+
+
         // SHOW CONFIRMATION POPUP
         if (GameData.current.turnType == TurnType.Player)
         {
@@ -568,5 +601,11 @@ public class GameManager : MonoBehaviour
     public void UpdateGuideText(string newText)
     {
         guideText.text = newText;
+    }
+
+    public void RestartGame()
+    {
+        GameData.current = new GameData();
+        SceneManager.LoadScene(0);
     }
 }

@@ -48,7 +48,7 @@ public class TurnManager : MonoBehaviour
             case TurnType.Neutral:
                 GameData.current.turnType = TurnType.Player;
                 Debug.Log("start player turn");
-                newTurnText = "Player Turn";
+                newTurnText = "Your Turn";
                 break;
         }
         StartCoroutine(ShowTurnTextForSeconds(newTurnText));

@@ -7,6 +7,7 @@ public class PopupManager : MonoBehaviour
 {
     GameManager gameManager;
 
+    
     [HideInInspector]
     public bool isWarningPopupActive = false;
 
@@ -17,13 +18,24 @@ public class PopupManager : MonoBehaviour
     [SerializeField]
     Button cancelEndTurnButton;
 
+    [SerializeField]
+    GameObject gameLostPanel;
+    [SerializeField]
+    Button restartGameButton;
+
     private void Awake()
     {
         gameManager = gameObject.GetComponent<GameManager>();
+
         ShowWarningPopup(true);
+
         confirmEndTurnButton.onClick.AddListener(ConfirmEndTurn);
         cancelEndTurnButton.onClick.AddListener(CancelEndTurn);
+        restartGameButton.onClick.AddListener(RestartGame);
+
         ShowWarningPopup(false);
+        DisplayGameLostPopup(false);
+
     }
 
     public void ShowWarningPopup(bool show)
@@ -40,5 +52,20 @@ public class PopupManager : MonoBehaviour
     private void CancelEndTurn()
     {
         ShowWarningPopup(false);
+    }
+
+    private void RestartGame()
+    {
+        gameManager.RestartGame();
+    }
+
+    public void DisplayGameLostPopup(bool show = true)
+    {
+        if (!show)
+        {
+            gameLostPanel.SetActive(false);
+            return;
+        }
+        gameLostPanel.SetActive(true);
     }
 }

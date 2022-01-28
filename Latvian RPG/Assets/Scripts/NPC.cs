@@ -12,14 +12,14 @@ public enum Behaviour
 
 public class NPC : MonoBehaviour
 {
-    bool hasCombatSkills = false; // skills that deal direct damage
-    bool hasCombatUtilitySkills = false; // skills that don't deal damage but cause debuffs
-    bool hasSupportSkills = false; // skills that help other chars and dont deal damage
+    [SerializeField]
+    private SpriteRenderer npcSpriteRenderer;
+    private int defaultSortingOrder;
 
-    Skill selectedSkill;
-    PlayerControls closestPlayer;
+    private Skill selectedSkill;
+    private PlayerControls closestPlayer;
 
-    float delayBeforeActionStart = 0.9f;
+    private float delayBeforeActionStart = 0.9f;
 
     public Behaviour behaviour;
     public GameManager gameManager;
@@ -30,6 +30,7 @@ public class NPC : MonoBehaviour
     private void Start()
     {
         behaviour = Behaviour.Patrol;
+        defaultSortingOrder = npcSpriteRenderer.sortingOrder;
     }
 
     public void Act()
@@ -52,10 +53,11 @@ public class NPC : MonoBehaviour
             case Behaviour.HuntPlayer:
                 StartCoroutine(HuntPlayer());
                 return;
+            case Behaviour.Flee:
+                Flee();
+                return;
         }
-        StartCoroutine(EndTurnAfterSeconds());
     }
-
     /// <summary>
     /// 
     /// </summary>
@@ -85,8 +87,8 @@ public class NPC : MonoBehaviour
     /// </summary>
     private IEnumerator Patrol()
     {
+        DisplayWalkRange();
         yield return new WaitForSeconds(delayBeforeActionStart);
-        gameManager.DisplayActionRange(ActionType.Walk, npcControls.type);
         while (npcControls.tilesWalked < npcControls.playerSpeed)
         {
             npcControls.RandomMoveNPC();
@@ -95,7 +97,7 @@ public class NPC : MonoBehaviour
         EndTurn();
     }
 
-    private IEnumerator HuntPlayer()
+    private IEnumerator HuntPlayer(bool suicideHunt = false)
     {
         Debug.Log("hunt started");
         yield return new WaitForSeconds(delayBeforeActionStart);
@@ -110,15 +112,25 @@ public class NPC : MonoBehaviour
 
         if (!SelectDamagingSkill())
         {
-            SetBehaviour(Behaviour.Flee);
-            StartCoroutine(Flee());
+            if (!suicideHunt)
+            {
+                SetBehaviour(Behaviour.Flee);
+                Flee();
+            }
+            else
+            {
+                EndTurn();
+            }
             yield break;
         }
         Debug.Log("BREAK 2 didnt WORK - damaging skill selected");
 
         if (!IsTargetInSkillRange(target:closestPlayer, skill: selectedSkill))
         {
-            StartCoroutine(MoveCloserToTarget(target: closestPlayer));
+            Debug.Log("TARGET NOT IN SKILL RANGE");
+            StartCoroutine(MoveCloserToTarget(target: new Vector2Int(closestPlayer.xCoord, closestPlayer.yCoord)));
+            yield return new WaitForSeconds(delayBeforeActionStart*1.1f);
+            StartCoroutine(AttackIfPossible(target: closestPlayer));
             yield break;
         }
         Debug.Log("BREAK 3 didnt WORK - target within damaging skill range");
@@ -127,58 +139,152 @@ public class NPC : MonoBehaviour
         yield break;
     }
 
-    private IEnumerator MoveCloserToTarget(PlayerControls target)
+    private void DisplayWalkRange()
+    {
+        npcSpriteRenderer.sortingOrder = defaultSortingOrder + 7;
+        gameManager.DisplayActionRange(ActionType.Walk, npcControls.type);
+    }
+
+    private IEnumerator MoveCloserToTarget(Vector2Int target, bool endTurnAfter = false)
     {
         Debug.Log("MOVING CLOSER TO TARGET");
-        yield return new WaitForSeconds(delayBeforeActionStart);
-        gameManager.DisplayActionRange(ActionType.Walk, npcControls.type);
-        
+
+
+        DisplayWalkRange();
+
         while (npcControls.tilesWalked < npcControls.playerSpeed)
         {
+            yield return new WaitForSeconds(delayBeforeActionStart);
             // FURTHER ON X AXIS - move closer on X axis
-            if (Mathf.Abs(target.xCoord - npcControls.xCoord) >
-                Mathf.Abs(target.yCoord - npcControls.yCoord))
+            if (Mathf.Abs(target.x - npcControls.xCoord) >
+                Mathf.Abs(target.y - npcControls.yCoord))
             {
-                if (target.xCoord > npcControls.xCoord)
+                if (target.x > npcControls.xCoord)
                 {
                     npcControls.MoveCharacterOneTile(Direction.Right);
                 }
-                else if (target.xCoord < npcControls.xCoord)
+                else if (target.x < npcControls.xCoord)
                 {
                     npcControls.MoveCharacterOneTile(Direction.Left);
                 }
             }
             // FURTHER ON Y AXIS - move closer on Y axis
-            else 
+            else
             {
-                if (target.yCoord > npcControls.yCoord)
+                if (target.y > npcControls.yCoord)
                 {
                     npcControls.MoveCharacterOneTile(Direction.Up);
                 }
-                else if (target.yCoord < npcControls.yCoord)
+                else if (target.y < npcControls.yCoord)
                 {
                     npcControls.MoveCharacterOneTile(Direction.Down);
                 }
             }
+            Debug.Log(npcControls.name + " MOVED TO " + npcControls.xCoord + "." + npcControls.yCoord + ". CURR TILES WALKED + " + npcControls.tilesWalked);
             npcControls.tilesWalked++;
             
+        }
+        if (endTurnAfter)
+        {
+            yield return new WaitForSeconds(GameData.current.npcMoveDuration);
+            EndTurn();
+        }
+    }
+
+    /// <summary>
+    /// WARNING: WON'T WORK CORRECTLY IF HASN'T MOVED NEXT TO TARGET YET
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    private IEnumerator AttackIfPossible(PlayerControls target)
+    { 
             // CHECK IF IN SKILL RANGE NOW
             if (IsTargetInSkillRange(target: target, skill: selectedSkill))
             {
                 StartCoroutine(UseDamageSkillOnTarget(target, selectedSkill));
                 yield break;
             }
-
             yield return new WaitForSeconds(GameData.current.npcMoveDuration);
-        }
+        
         EndTurn();
         yield break;
     }
 
-    private IEnumerator Flee()
+
+    private void Flee()
     {
-        Debug.Log("FLEEING NOT IMPLEMENTED");
-        yield return new WaitForSeconds(delayBeforeActionStart);
+        Debug.Log("FLEEEING (OBSTACLE AVOIDANCE NOT TAKEN INTO ACCOUNT)");
+        Debug.Log("FLEEING ENEMY COORD = " + npcControls.xCoord + "." + npcControls.yCoord);
+
+        int xMin = npcControls.xCoord - npcControls.playerSpeed;
+        int xMax = npcControls.xCoord + npcControls.playerSpeed;
+        int yMin = npcControls.yCoord - npcControls.playerSpeed;
+        int yMax = npcControls.yCoord + npcControls.playerSpeed;
+
+        Vector2Int npcCoord = new Vector2Int(npcControls.xCoord, npcControls.yCoord);
+        Vector2Int defaultSafestCoord = new Vector2Int(99999, 99999);
+        Vector2Int safestCoord = new Vector2Int(xMin, yMin);
+        Vector2Int coordToCheck = safestCoord;
+
+        bool safeSpaceFound = true;
+
+        // 1. Go through all players chars
+        foreach (PlayerControls player in gameManager.allCharacters)
+        {
+            if (player.type == CharType.Player)
+            {
+                // 2. Current safe space not safe after all - find a new one
+                if (!IsCoordinateSafeFromPlayer(player, safestCoord))
+                {
+                    safeSpaceFound = false;
+
+                    // 2.1. go through all remaining coords
+                    for (int xCoord = safestCoord.x; xCoord < xMax; xCoord++)
+                    {
+                        if (safeSpaceFound)
+                            break;
+                        for (int yCoord = safestCoord.y; yCoord < yMax; yCoord++)
+                        {
+                            coordToCheck = new Vector2Int(xCoord, yCoord);
+                            // 2.2 SAFE SPACE FOUND!
+                            if (IsCoordinateSafeFromPlayer(player, coordToCheck))
+                            {
+                                safestCoord = coordToCheck;
+                                safeSpaceFound = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        // 4. Go to safe coord
+        if (safeSpaceFound)
+        {
+            Debug.Log(npcControls.name + "MOVING TO SAFEST COORD:    " + safestCoord);
+            StartCoroutine(MoveCloserToTarget(target: safestCoord, endTurnAfter: true));
+        }
+        else
+        {
+            // 5. No safe place exists - skip movement 
+
+            // 6. No safe place exists & enough mana - suicide attack
+            HuntPlayer(suicideHunt:true);
+        }
+    }
+
+    private bool IsCoordinateSafeFromPlayer(PlayerControls player, Vector2Int coord)
+    {
+        bool isInDanger = false;
+
+        isInDanger = MathUtils.IsWithinDamageRange(
+            target: coord,                                                  // npc
+            damageSource: new Vector2Int(player.xCoord, player.yCoord),    // player
+            damageSkill: player.GetLongestRangeDamageSkill(),               // 
+            moveSpeed: player.playerSpeed);
+
+        return !isInDanger;
     }
 
     private bool SelectDamagingSkill()
@@ -192,6 +298,7 @@ public class NPC : MonoBehaviour
                     if (npcControls.stats.currMana >= skill.manaCost)
                     {
                         selectedSkill = skill;
+                        gameManager.selectedSkill = skill;
                         return true;
                     }
                     else
@@ -201,6 +308,8 @@ public class NPC : MonoBehaviour
         }
         return false;
     }
+
+    
 
     private bool FindClosestPlayer()
     {
@@ -248,38 +357,72 @@ public class NPC : MonoBehaviour
 
     private IEnumerator UseDamageSkillOnTarget(PlayerControls target, Skill skill)
     {
+        yield return new WaitForSeconds(GameData.current.npcActionDuration * 1);
+        gameManager.DisplayActionRange(ActionType.UseCombatSkill, CharType.Enemy);
+        yield return new WaitForSeconds(GameData.current.npcActionDuration * 3);
         target.TakeDamage(amount: -skill.skillDamage, damageSource: npcControls);
         npcControls.SpendMana(skill.manaCost);
 
         // DECIDE ON WHAT TO DO AFTER ATTACKING
-        yield return new WaitForSeconds(GameData.current.npcActionDuration*3);
+        
 
-        // stay in place if alive and enough mana to attack again
-        if (!target.isDead && npcControls.stats.currMana >= skill.manaCost)
+        // flee if dont have mana
+        bool allCharsDead = true;
+        foreach (PlayerControls character in gameManager.allCharacters)
         {
-            Debug.Log("should stay in place to attack again");
-            EndTurn();
+            if (!character.isDead)
+            {
+                allCharsDead = false;
+                if (npcControls.stats.currMana < skill.manaCost)
+                {
+                    SetBehaviour(Behaviour.Flee);
+                    Flee();
+                    yield break;
+                }
+            }
         }
-        // flee if don't have mana
-        else
+
+        
+        if (npcControls.stats.currMana >= skill.manaCost)
         {
-            SetBehaviour(Behaviour.Flee);
-            StartCoroutine(Flee());
+            // stay in place if alive and enough mana to attack again
+            if (!target.isDead)
+            {
+                Debug.Log("should stay in place to attack again");
+                EndTurn();
+                yield break;
+            }
+            else
+            {
+                Debug.Log("OTHER TARGETS AVAILABLE, SHOULD IMPLEMENT NEW HUNT");
+            }
+        }
+
+
+        Debug.Log(npcControls.name + " IS HERE");
+        EndTurn();
+
+        // end turn if all characters dead
+        if (allCharsDead)
+        {
+            Debug.Log("All chars dead");
+            
         }
 
     }
 
 
-    private IEnumerator EndTurnAfterSeconds()
+    private IEnumerator EndTurnAfterSeconds(float seconds)
     {
         Debug.Log("beginning wait");
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(seconds);
         Debug.Log("end wait");
         EndTurn();
     }
 
     private void EndTurn()
     {
+        npcSpriteRenderer.sortingOrder = defaultSortingOrder;
         gameManager.ProcessEndCharMove(npcControls.type, id);
     }
 }

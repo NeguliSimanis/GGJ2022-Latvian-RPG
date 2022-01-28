@@ -44,6 +44,10 @@ public class CharacterStats
 
     public CharacterStats (Character newCharacter)
     {
+        level = 1;
+        currExp = 0;
+        expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
+
         switch (newCharacter)
         {
             case Character.Varna:
@@ -63,10 +67,6 @@ public class CharacterStats
 
     private void GenerateVarna()
     {
-        level = 1;
-        currExp = 0;
-        expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
-
         // combat
         maxLife = 10;
         currLife = maxLife;
@@ -89,10 +89,6 @@ public class CharacterStats
 
     private void GenerateSiksparnis()
     {
-        level = 1;
-        currExp = 0;
-        expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
-
         // combat
         maxLife = 10;
         currLife = maxLife;
@@ -116,15 +112,11 @@ public class CharacterStats
     
     private void GenerateNave()
     {
-        level = 1;
-        currExp = 0;
-        expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
-
         // combat
         maxLife = 10;
         currLife = maxLife;
 
-        maxMana = 10;
+        maxMana = 1;
         currMana = maxMana;
 
         offense = 7;

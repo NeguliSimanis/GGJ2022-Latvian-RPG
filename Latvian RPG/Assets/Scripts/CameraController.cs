@@ -21,43 +21,44 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        if (m_levelRenderer != null)
-        {
-            m_levelBounds = m_levelRenderer.bounds;
-        }
+        //if (m_levelRenderer != null)
+        //{
+        //    m_levelBounds = m_levelRenderer.bounds;
+        //}
 
         m_targetCamPosition = new Vector3(startTarget.position.x, startTarget.position.y, transform.position.z);
         m_prevCamPosition = transform.position;
+        SetPosition(m_targetCamPosition, instant: true);
 
         m_screenBounds = new Vector2(Screen.width * (m_screenDragBounds * 0.01f), Screen.height * (m_screenDragBounds * 0.01f));
     }
 
     private void Update()
     {
-        Vector3 dir = Vector3.zero;
+        //Vector3 dir = Vector3.zero;
 
-        if (mouseMove)
-        {
-            dir += GetMouseInput();
-        }
+        //if (mouseMove)
+        //{
+        //    dir += GetMouseInput();
+        //}
 
         //if (keyboardMove)
         //{
         //    dir += GetKeyboardInput();
         //}
 
-        if (dir.magnitude > m_cameraSpeed)
-        {
-            dir = dir.normalized * m_cameraSpeed;
-        }
+        //if (dir.magnitude > m_cameraSpeed)
+        //{
+        //    dir = dir.normalized * m_cameraSpeed;
+        //}
 
-        if (dir.magnitude > 0f)
-        {
-            m_targetCamPosition = transform.position + dir;
-        }
+        //if (dir.magnitude > 0f)
+        //{
+        //    m_targetCamPosition = transform.position + dir;
+        //}
 
-        m_targetCamPosition.x = Mathf.Clamp(m_targetCamPosition.x, m_levelBounds.min.x + cam.orthographicSize * cam.aspect, m_levelBounds.max.x - cam.orthographicSize * cam.aspect);
-        m_targetCamPosition.y = Mathf.Clamp(m_targetCamPosition.y, m_levelBounds.min.y + cam.orthographicSize, m_levelBounds.max.y - cam.orthographicSize);
+        //m_targetCamPosition.x = Mathf.Clamp(m_targetCamPosition.x, m_levelBounds.min.x + cam.orthographicSize * cam.aspect, m_levelBounds.max.x - cam.orthographicSize * cam.aspect);
+        //m_targetCamPosition.y = Mathf.Clamp(m_targetCamPosition.y, m_levelBounds.min.y + cam.orthographicSize, m_levelBounds.max.y - cam.orthographicSize);
     }
 
     private void LateUpdate()
@@ -66,9 +67,14 @@ public class CameraController : MonoBehaviour
         m_prevCamPosition = transform.position;
     }
 
-    public void SetPosition(Vector3 position)
+
+    public void SetPosition(Vector3 position, bool instant = false)
     {
         m_targetCamPosition = position;
+
+        if (!instant)
+            return;
+
         m_targetCamPosition.x = Mathf.Clamp(m_targetCamPosition.x, m_levelBounds.min.x + cam.orthographicSize * cam.aspect, m_levelBounds.max.x - cam.orthographicSize * cam.aspect);
         m_targetCamPosition.y = Mathf.Clamp(m_targetCamPosition.y, m_levelBounds.min.y + cam.orthographicSize, m_levelBounds.max.y - cam.orthographicSize);
         transform.position = m_targetCamPosition;

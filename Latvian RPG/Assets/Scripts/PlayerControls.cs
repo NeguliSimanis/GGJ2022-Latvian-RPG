@@ -44,11 +44,6 @@ public class PlayerControls : MonoBehaviour
     [SerializeField]
     public Skill[] startingSkills;
 
-    #region ANIMATIONS
-    [SerializeField]
-    Animator hurtAnimator;
-    #endregion
-
     #region UI
     [Header("HUD")]
     [SerializeField]
@@ -57,9 +52,20 @@ public class PlayerControls : MonoBehaviour
     Image lifeBar;
     #endregion
 
+    [Header("VISUAL")]
+    [SerializeField]
+    private SpriteRenderer spriteRenderer;
+    private int defaultSortingOrder;
+    private int startingSortingOrder = 3;
+
+    #region ANIMATIONS
+    [SerializeField]
+    Animator hurtAnimator;
+    #endregion
+
     private void Start()
     {
-        UpdateCoord();
+        UpdateCoordAndSortOrder();
         stats = new CharacterStats(character);
         foreach (Skill newSkill in startingSkills)
         {
@@ -68,6 +74,7 @@ public class PlayerControls : MonoBehaviour
         name = stats.name;
         playerSpeed = stats.speed;
         characterIsSelected = false;
+        defaultSortingOrder = spriteRenderer.sortingOrder;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
     }
 
@@ -117,7 +124,7 @@ public class PlayerControls : MonoBehaviour
         // MOVE CHARACTER
         transform.position = new Vector3((float)(targetX), (float)targetY, transform.position.z);
 
-        UpdateCoord();
+        UpdateCoordAndSortOrder();
     }
 
     private bool IsTileFree(int x, int y)
@@ -185,7 +192,7 @@ public class PlayerControls : MonoBehaviour
                 transform.position = new Vector3(transform.position.x + GameData.current.tileSize, transform.position.y, transform.position.z);
                 break;
         }
-        UpdateCoord();
+        UpdateCoordAndSortOrder();
     }
 
     public void SelectCharacter(bool select)
@@ -194,10 +201,12 @@ public class PlayerControls : MonoBehaviour
         characterSelector.characterFrame.SetActive(select);
     }
 
-    public void UpdateCoord()
+    public void UpdateCoordAndSortOrder()
     {
         xCoord = (int)transform.position.x;
         yCoord = (int)transform.position.y;
+
+        defaultSortingOrder = startingSortingOrder - yCoord;
     }
 
     /// <summary>
@@ -225,14 +234,12 @@ public class PlayerControls : MonoBehaviour
             damageSource.name + " dealt " + -damageDealt + " damage to " + name + "! " + name + " becomes an enemy!");
             type = CharType.Enemy;
         }
-
-        // UPDATE HUD BARS
-        StartCoroutine(UpdateLifeBarWithDelay());
-
         // DEATH
         if (stats.currLife <= 0)
             Die(damageSource);
 
+        // UPDATE HUD BARS
+        StartCoroutine(UpdateLifeBarWithDelay());
 
         return damageDealt;
     }
@@ -242,6 +249,7 @@ public class PlayerControls : MonoBehaviour
         gameManager.UpdateGuideText(
             murderer.name + " killed " + name + "!");
         isDead = true;
+        Debug.Log(this.name + " IS DEAD");
         gameObject.SetActive(false);
     }
 
@@ -278,5 +286,39 @@ public class PlayerControls : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
+    }
+
+    public Skill GetLongestRangeDamageSkill()
+    {
+        Skill longestSkill = startingSkills[0];
+        
+        foreach (Skill skilly in startingSkills)
+        {
+            foreach (SkillType skillType in skilly.type)
+            {
+                if (skillType == SkillType.Damage)
+                {
+                    if (skilly.skillRange >= longestSkill.skillRange)
+                    {
+                        Debug.Log("______________________________________________" + skilly.name + " has longer range than " + longestSkill.name);
+                        longestSkill = skilly;
+                    }
+                }
+            }
+        }
+
+        return longestSkill;
+    }
+
+    public void SetToDefaultSortOrder(bool defaultOrder = true)
+    {
+        if (defaultOrder)
+        {
+            spriteRenderer.sortingOrder = defaultSortingOrder;
+        }
+        else
+        {
+            spriteRenderer.sortingOrder = defaultSortingOrder + 9;
+        }
     }
 }
