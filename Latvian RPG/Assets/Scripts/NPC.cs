@@ -27,10 +27,17 @@ public class NPC : MonoBehaviour
     [HideInInspector]
     public int id;
 
+    private Dictionary<Direction, bool> occuppiedDirections = new Dictionary<Direction, bool>();
+
     private void Start()
     {
         behaviour = Behaviour.Patrol;
         defaultSortingOrder = npcSpriteRenderer.sortingOrder;
+        occuppiedDirections.Add(Direction.Down, false);
+        occuppiedDirections.Add(Direction.Right, false);
+        occuppiedDirections.Add(Direction.Up, false);
+        occuppiedDirections.Add(Direction.Left, false);
+
     }
 
     public void Act()
@@ -40,7 +47,7 @@ public class NPC : MonoBehaviour
             EndTurn();
             return;
         }
-
+        CheckForNearbyObstructions();
         SetBehaviour();
 
         switch(behaviour)
@@ -58,6 +65,51 @@ public class NPC : MonoBehaviour
                 return;
         }
     }
+
+    private void CheckForNearbyObstructions()
+    {
+        occuppiedDirections[Direction.Right] = false;
+        occuppiedDirections[Direction.Left] = false;
+        occuppiedDirections[Direction.Up] = false;
+        occuppiedDirections[Direction.Down] = false;
+        foreach (Obstacle obstacle in gameManager.allObstacles)
+        {
+            if (obstacle.pos.y == npcControls.yCoord)
+            {
+                // right
+                if (obstacle.pos.x + 1 == npcControls.xCoord)
+                {
+                    occuppiedDirections[Direction.Right] = true;
+                }
+                // left
+                else if (obstacle.pos.x - 1 == npcControls.xCoord)
+                {
+                    occuppiedDirections[Direction.Left] = true;
+                }
+            }
+            else if (obstacle.pos.x == npcControls.xCoord)
+            {
+                // up
+                if (obstacle.pos.y + 1 == npcControls.xCoord)
+                {
+                    occuppiedDirections[Direction.Up] = true;
+                }
+                // down
+                else if (obstacle.pos.y - 1 == npcControls.xCoord)
+                {
+                    occuppiedDirections[Direction.Down] = true;
+                }
+            }
+        }
+        foreach (KeyValuePair<Direction, bool> curDirection in occuppiedDirections)
+        {
+            if (curDirection.Value == true)
+            {
+                Debug.Log(npcControls.name + " is occuppued to  " + curDirection.Key);
+            }
+        }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -258,7 +310,6 @@ public class NPC : MonoBehaviour
             }
         }
 
-
         // 4. Go to safe coord
         if (safeSpaceFound)
         {
@@ -276,8 +327,14 @@ public class NPC : MonoBehaviour
 
     private bool IsCoordinateSafeFromPlayer(PlayerControls player, Vector2Int coord)
     {
-        bool isInDanger = false;
 
+        if (gameManager.IsTileOccupiedByObstacle(coord))
+        {
+            Debug.Log(coord + "obstacle on tile, cannot move there");
+            return false;
+        }
+
+        bool isInDanger = false;
         isInDanger = MathUtils.IsWithinDamageRange(
             target: coord,                                                  // npc
             damageSource: new Vector2Int(player.xCoord, player.yCoord),    // player

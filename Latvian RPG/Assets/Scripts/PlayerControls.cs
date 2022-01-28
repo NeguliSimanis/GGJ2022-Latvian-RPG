@@ -56,7 +56,7 @@ public class PlayerControls : MonoBehaviour
     [SerializeField]
     private SpriteRenderer spriteRenderer;
     private int defaultSortingOrder;
-    private int startingSortingOrder = 3;
+    private int startingSortingOrder;
 
     #region ANIMATIONS
     [SerializeField]
@@ -273,6 +273,7 @@ public class PlayerControls : MonoBehaviour
     private IEnumerator UpdateLifeBarWithDelay()
     {
         yield return new WaitForSeconds(0.5f);
+        Debug.Log("LIFEBAR YPDATE " + stats.currLife + " out of " + stats.maxLife + " lidf");
         lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
     }
 

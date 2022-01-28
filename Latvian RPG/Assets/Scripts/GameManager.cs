@@ -70,6 +70,16 @@ public class GameManager : MonoBehaviour
     Color skillButtonSelectedColor = Color.red;
     #endregion
 
+    #region ENVIRONMENT
+    [Header("ENVIRONMENT")]
+    public LevelBounds levelTopBorder;
+    public LevelBounds levelBottomBorder;
+    public LevelBounds levelRightBorder;
+    public LevelBounds levelLeftBorder;
+    [HideInInspector]
+    public List<Obstacle> allObstacles = new List<Obstacle>();
+    #endregion
+
     private void Awake()
     {
         if (GameData.current == null)
@@ -92,6 +102,11 @@ public class GameManager : MonoBehaviour
             NPC npcController = character.GetComponent<NPC>();
             npcController.gameManager = this;
             npcController.npcControls = character;
+        }
+
+        foreach (Obstacle obstacle in FindObjectsOfType<Obstacle>())
+        {
+            allObstacles.Add(obstacle);
         }
 
         // INITIALIZE BUTTONS
@@ -191,58 +206,92 @@ public class GameManager : MonoBehaviour
             Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
             selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
             SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+
         }
 
         for (int i = 1; i < actionRange + 1; i++)
         {
             // spawn up
-            Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
-                selectedCharacter.transform.position.y + i, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+            ProcessSpawnHighlightTileRequest(
+                xOffset: 0,
+                yOffset: i,
+                reuseOldTargetHighlights,
+                actionType);
 
 
 
             // spawn up-right && up-left
             for (int z = 1; z < actionRange - i + 1; z++)
             {
-                highlightLocation = new Vector3(selectedCharacter.transform.position.x - z,
-                selectedCharacter.transform.position.y + i, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+                ProcessSpawnHighlightTileRequest(
+                    xOffset: -z,
+                    yOffset: +i,
+                    reuseOldTargetHighlights,
+                    actionType);
 
-                highlightLocation = new Vector3(selectedCharacter.transform.position.x + z,
-                selectedCharacter.transform.position.y + i, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+                ProcessSpawnHighlightTileRequest(
+                    xOffset: z,
+                    yOffset: i,
+                    reuseOldTargetHighlights,
+                    actionType);
             }
 
             //spawn down
-            highlightLocation = new Vector3(selectedCharacter.transform.position.x,
-                selectedCharacter.transform.position.y - i, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
-
-
+            ProcessSpawnHighlightTileRequest(
+                    xOffset: 0,
+                    yOffset: -i,
+                    reuseOldTargetHighlights,
+                    actionType);
 
             // spawn down-right && down-left
             for (int z = 1; z < actionRange - i + 1; z++)
             {
-                highlightLocation = new Vector3(selectedCharacter.transform.position.x - z,
-                selectedCharacter.transform.position.y - i, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+                ProcessSpawnHighlightTileRequest(
+                    xOffset: -z,
+                    yOffset: -i,
+                    reuseOldTargetHighlights,
+                    actionType);
 
-                highlightLocation = new Vector3(selectedCharacter.transform.position.x + z,
-                selectedCharacter.transform.position.y - i, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+                ProcessSpawnHighlightTileRequest(
+                    xOffset: +z,
+                    yOffset: -i,
+                    reuseOldTargetHighlights,
+                    actionType);
             }
 
             // spawn right
-            highlightLocation = new Vector3(selectedCharacter.transform.position.x + i,
-                selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+            ProcessSpawnHighlightTileRequest(
+                xOffset: +i,
+                yOffset: 0,
+                reuseOldTargetHighlights,
+                actionType);
 
             // spawn left
-            highlightLocation = new Vector3(selectedCharacter.transform.position.x - i,
-                selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+            ProcessSpawnHighlightTileRequest(
+                xOffset: -i,
+                yOffset: 0,
+                reuseOldTargetHighlights,
+                actionType);
         }
+    }
+
+    private void ProcessSpawnHighlightTileRequest(int xOffset, int yOffset, bool reuseOldTargetHighlights, ActionType actionType)
+    {
+        
+        Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x + xOffset,
+                selectedCharacter.transform.position.y + yOffset, selectedCharacter.transform.position.z);
+
+        // DONT SPAWN IF OUTSIDE LEVEL BOUNDS
+        if (highlightLocation.x < levelLeftBorder.xCoord)
+            return;
+        if (highlightLocation.x > levelRightBorder.xCoord)
+            return;
+        if (highlightLocation.y < levelBottomBorder.yCoord)
+            return;
+        if (highlightLocation.y > levelTopBorder.yCoord)
+            return;
+
+        SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
     }
 
     private void HideActionRange()
@@ -544,7 +593,16 @@ public class GameManager : MonoBehaviour
                 if (xCoordinate == character.xCoord && yCoordinate == character.yCoord)
                 {
                     Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
-                    guideText.text = "Cannot move there!";
+                    UpdateGuideText("Cannot move there!");
+                    return;
+                }
+            }
+            foreach (Obstacle obstacle in allObstacles)
+            {
+                if (xCoordinate == obstacle.pos.x && yCoordinate == obstacle.pos.y)
+                {
+                    Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
+                    UpdateGuideText("Cannot move there!");
                     return;
                 }
             }
@@ -607,5 +665,20 @@ public class GameManager : MonoBehaviour
     {
         GameData.current = new GameData();
         SceneManager.LoadScene(0);
+    }
+
+    public bool IsTileOccupiedByObstacle(Vector2Int coord)
+    {
+        foreach (Obstacle obstacle in allObstacles)
+        {
+            Debug.Log("OBSTACLKAH POS " + obstacle.pos);
+            if (obstacle.pos.x == coord.x && obstacle.pos.y == coord.y)
+            {
+                Debug.Log(coord + " occuppied by obstacle");
+                return true;
+            }
+        }
+        Debug.Log("game manage " + coord + " not occupied by obstacle");
+        return false;
     }
 }

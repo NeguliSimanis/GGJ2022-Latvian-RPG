@@ -4,15 +4,24 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField]
+    SpriteRenderer obstacleSpriteRenderer;
+    [SerializeField]
+    Transform obstacleTransform;
+
+    public Vector2Int pos = new Vector2Int();
+
+
+    private void Start()
     {
-        
+        obstacleSpriteRenderer.sortingOrder = GameData.current.charactersSortingOrder -
+            (int)transform.position.y - 1;
+        GetPos();
     }
 
-    // Update is called once per frame
-    void Update()
+
+    public void GetPos()
     {
-        
+        pos = new Vector2Int((int)obstacleTransform.position.x, (int)obstacleTransform.position.y);
     }
 }

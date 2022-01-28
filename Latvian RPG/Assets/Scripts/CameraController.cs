@@ -26,7 +26,7 @@ public class CameraController : MonoBehaviour
         //    m_levelBounds = m_levelRenderer.bounds;
         //}
 
-        m_targetCamPosition = new Vector3(startTarget.position.x, startTarget.position.y, transform.position.z);
+        m_targetCamPosition = new Vector3(startTarget.position.x, startTarget.position.y+2, transform.position.z);
         m_prevCamPosition = transform.position;
         SetPosition(m_targetCamPosition, instant: true);
 

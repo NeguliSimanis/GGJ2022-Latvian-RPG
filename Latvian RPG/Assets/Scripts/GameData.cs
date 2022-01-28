@@ -10,6 +10,7 @@ public class GameData
     public int currentTurn = 1;
     public TurnType turnType = TurnType.Player;
     public float tileSize = 1f;
+    public int charactersSortingOrder = 3;
     #endregion
 
     #region NPC

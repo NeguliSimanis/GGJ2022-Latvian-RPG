@@ -35,8 +35,8 @@ public class TileHighlight : MonoBehaviour
     private GameObject marker;
     private GameManager gameManager;
 
-    int xCoord;
-    int yCoord;
+    public int xCoord;
+    public int yCoord;
 
     private void Start()
     {
