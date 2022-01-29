@@ -13,13 +13,34 @@ public class GameData
     public int charactersSortingOrder = 3;
     #endregion
 
-    #region NPC
+    #region TURNDURATION
     public float npcMoveDuration = 0.6f;
     public float npcActionDuration = 0.9f;
+    public float playerMoveDuration = 0.3f;
     #endregion
 
     #region XP BALANCE
     public int defaultLevelExp = 10; // how much xp is required to reach LV 2
     public float expIncrease = 1.1f;  // how fast xp requirement grows
+    #endregion
+
+    #region MOON BALANCE
+    public int currMoonPoints = 0;
+    public int pointsRequiredPhase1 = 1;
+    public int pointsRequiredPhase2 = 35;
+    public int pointsRequiredPhase3 = 100;
+
+    public int killPointsReward = 100;
+    public int levelUpPointsReward = 20;
+    public int healPointsReward = 5;
+    public int recruitPointsReward = 20;
+    /*
+     * Kill - 10 dark points
+     * Level up choice - 20 dark/light points
+     * Recruit - 20 light points 
+     * Heal - 5 light points
+     * Victory - 100 light/dark points
+     */
+            
     #endregion
 }

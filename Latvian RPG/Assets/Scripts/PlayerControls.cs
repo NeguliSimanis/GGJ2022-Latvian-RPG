@@ -19,10 +19,16 @@ public enum CharType
     Neutral
 }
 
+/// <summary>
+/// Action that gives regular exp and/or moon points
+/// </summary>
 public enum ExpAction
 {
     Kill,
-    Hire
+    Hire,
+    Heal,
+    LevelUpDark,
+    LevelUpLight
 }
 
 public class PlayerControls : MonoBehaviour
@@ -133,12 +139,11 @@ public class PlayerControls : MonoBehaviour
         int walkedTiles = Mathf.Abs(xDiff) + Mathf.Abs(yDiff);
         Debug.Log("walked " + walkedTiles + " TILES ");
 
-        tilesWalked += walkedTiles;
+        //tilesWalked += walkedTiles;
 
         // MOVE CHARACTER
-        transform.position = new Vector3((float)(targetX), (float)targetY, transform.position.z);
-
-        UpdateCoordAndSortOrder();
+        StartCoroutine(MoveCloserToTarget(new Vector2Int(targetX, targetY)));
+        //transform.position = new Vector3((float)(targetX), (float)targetY, transform.position.z);
     }
 
     private bool IsTileFree(int x, int y)
@@ -153,13 +158,13 @@ public class PlayerControls : MonoBehaviour
         return true;
     }
 
-    public void RandomMoveNPC()
+    public bool RandomMoveNPC()
     {
         bool targetPositionFound = false;
         int directionCount = Direction.GetNames(typeof(Direction)).Length - 1;
         Direction direction = (Direction)Random.Range(0, directionCount);
         Vector3Int targetPosition = new Vector3Int(xCoord, yCoord - 1, 0); ;
-        int whileCounter = 10;
+        int whileCounter = 5;
 
         /// WHAT IF SURROUNDED?
         while (!targetPositionFound)
@@ -182,12 +187,13 @@ public class PlayerControls : MonoBehaviour
             targetPositionFound = IsTileFree(targetPosition.x, targetPosition.y);
             whileCounter--;
             if (whileCounter < 0)
-                return;
+                return false;
         }
         
         MoveCharacterOneTile(direction);
         tilesWalked++;
         gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
+        return true;
     }
 
     public void MoveCharacterOneTile(Direction moveDirection)
@@ -287,7 +293,39 @@ public class PlayerControls : MonoBehaviour
     {
         stats.expRequired = (int)(1.1f * stats.expRequired);
         stats.level++;
-        gameManager.popupManager.UpdateGuideText(name + "reached level " + stats.level + "!");
+        //gameManager.popupManager.UpdateGuideText(name + "reached level " + stats.level + "!");
+        ChooseLevelUpStats();
+        StartCoroutine(ShowLevelUpPopupAfterDelay(0.8f));
+    }
+
+    private void ChooseLevelUpStats()
+    {
+        // choose dark stats
+        //  life 0.3
+        //  offense 0.7
+        if (Random.Range(0, 1f) > 0.7f)
+            stats.darkLevelUpStat = CharStat.life;
+        else
+            stats.darkLevelUpStat = CharStat.offense;
+
+
+        // choose light stats
+        //  mana
+        //  defense,
+        //  speed
+        float lightRNG = Random.Range(0, 1f);
+        if (lightRNG < 0.6f)
+            stats.lightLevelUpStat = CharStat.defense;
+        else if (lightRNG >= 0.6f && lightRNG < 0.99f)
+            stats.lightLevelUpStat = CharStat.mana;
+        else
+            stats.lightLevelUpStat = CharStat.speed;
+    }
+
+    private IEnumerator ShowLevelUpPopupAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        gameManager.popupManager.ShowLevelUpPopup(this);
     }
 
     private void Die(PlayerControls murderer)
@@ -384,10 +422,45 @@ public class PlayerControls : MonoBehaviour
         {
             stats.currMana = stats.maxMana;
         }
-        
 
         // HUD
         StartCoroutine(UpdateManaBarWithDelay());
 
+    }
+
+    private IEnumerator MoveCloserToTarget(Vector2Int target)
+    {
+        Debug.Log("MOVING CLOSER TO TARGET");
+        while (tilesWalked < playerSpeed)
+        {
+            yield return new WaitForSeconds(GameData.current.playerMoveDuration);
+            // FURTHER ON X AXIS - move closer on X axis
+            if (Mathf.Abs(target.x - xCoord) >
+                Mathf.Abs(target.y - yCoord))
+            {
+                if (target.x > xCoord)
+                {
+                    MoveCharacterOneTile(Direction.Right);
+                }
+                else if (target.x < xCoord)
+                {
+                    MoveCharacterOneTile(Direction.Left);
+                }
+            }
+            // FURTHER ON Y AXIS - move closer on Y axis
+            else
+            {
+                if (target.y > yCoord)
+                {
+                    MoveCharacterOneTile(Direction.Up);
+                }
+                else if (target.y < yCoord)
+                {
+                    MoveCharacterOneTile(Direction.Down);
+                }
+            }
+            tilesWalked++;
+
+        }
     }
 }

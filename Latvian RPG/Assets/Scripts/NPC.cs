@@ -141,10 +141,12 @@ public class NPC : MonoBehaviour
     {
         DisplayWalkRange();
         yield return new WaitForSeconds(delayBeforeActionStart);
-        while (npcControls.tilesWalked < npcControls.playerSpeed)
+        int whileCounter = 10;
+        while (npcControls.tilesWalked < npcControls.playerSpeed && whileCounter > 0)
         {
-            npcControls.RandomMoveNPC();
-            yield return new WaitForSeconds(GameData.current.npcMoveDuration);
+            if (npcControls.RandomMoveNPC())
+                yield return new WaitForSeconds(GameData.current.npcMoveDuration);
+            whileCounter--;
         }
         EndTurn();
     }

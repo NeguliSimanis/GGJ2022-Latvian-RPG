@@ -43,7 +43,6 @@ public class GameManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] Button endTurnButton;
-    [SerializeField] Text currentTurnText;
 
     [SerializeField] Button skillButton;
     Text skillButtonText;
@@ -307,7 +306,7 @@ public class GameManager : MonoBehaviour
         {
             if (actionType != ActionType.Walk)
                 break;
-            if (character.xCoord == (int)highlightLocation.x && character.yCoord == (int)highlightLocation.y)
+            if (!character.isDead && character.xCoord == (int)highlightLocation.x && character.yCoord == (int)highlightLocation.y)
                 return;
         }
 
@@ -627,8 +626,8 @@ public class GameManager : MonoBehaviour
                     return;
                 }
             }
-            selectedCharacter.TeleportCharacter(xCoordinate, yCoordinate);
             HideActionRange();
+            selectedCharacter.TeleportCharacter(xCoordinate, yCoordinate);
             UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
             DisplayActionRange(ActionType.Walk);
             return;
@@ -678,7 +677,6 @@ public class GameManager : MonoBehaviour
     }
 
 
-
     public void RestartGame()
     {
         GameData.current = new GameData();
@@ -688,7 +686,6 @@ public class GameManager : MonoBehaviour
 
     public bool IsTileAllowedForNPC(Vector2Int coord)
     {
-        
         foreach (Vector2Int currCoord in allowedWalkCoordsNPC)
         {
             if (currCoord == coord)
@@ -732,6 +729,26 @@ public class GameManager : MonoBehaviour
                         character.RegenMana();
                     break;
             }
+        }
+    }
+
+    public void Victory()
+    {
+        StartCoroutine(DisplayVictoryAfterDelay(0.5f));
+    }
+
+    private IEnumerator DisplayVictoryAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (GameData.current.currMoonPoints < 0)
+        {
+            popupManager.ShowDarkVictory();
+            Debug.Log("VICTORY dark");
+        }
+        else if (GameData.current.currMoonPoints > 0)
+        {
+            popupManager.ShowLightVictory();
+            Debug.Log("VICTORY light");
         }
     }
 }

@@ -16,12 +16,28 @@ public enum Character
     Dog
 }
 
+public enum CharStat
+{
+    offense,
+    defense,
+    speed,
+    life,
+    mana
+}
+
 public class CharacterStats
 {
+    // game progress
+    public int lightPoints;
+    public int darkPoints;
+
     // level
     public int level;
     public int currExp;
     public int expRequired; // xp required ot lv up
+
+    public CharStat darkLevelUpStat;
+    public CharStat lightLevelUpStat;
 
     // combat
     public float maxLife;
@@ -54,16 +70,19 @@ public class CharacterStats
 
         manaRegen = 1;
 
+        lightPoints = 0;
+        darkPoints = 0;
+
         switch (newCharacter)
         {
             case Character.Luna:
-                GenerateVarna();
+                GenerateMedusa();
                 break;
             case Character.Crow:
-                GenerateSiksparnis();
+                GenerateCrow();
                 break;
             case Character.Dog:
-                GenerateNave();
+                GenerateDog();
                 break;
             default:
                 Debug.Log("CHARACTER NOT DEFINIED");
@@ -71,7 +90,7 @@ public class CharacterStats
         }
     }
 
-    private void GenerateVarna()
+    private void GenerateMedusa()
     {
 
         // combat
@@ -97,7 +116,7 @@ public class CharacterStats
         name = "Luna";
     }
 
-    private void GenerateSiksparnis()
+    private void GenerateCrow()
     {
         // combat
         maxLife = 10;
@@ -117,7 +136,7 @@ public class CharacterStats
     }    
     
     
-    private void GenerateNave()
+    private void GenerateDog()
     {
         // combat
         maxLife = 10;
@@ -134,5 +153,76 @@ public class CharacterStats
         alignment = Alignment.Might;
         bio = "Avatar of Death";
         name = "Nave";
+    }
+
+    public int GetStatIncreaseAmount(CharStat stat)
+    {
+        int amount = 0;
+        switch (stat)
+        {
+            case CharStat.life:
+                amount = Random.Range(2, 4);
+                break;
+            case CharStat.offense:
+                amount = Random.Range(1, 3);
+                break;
+            case CharStat.defense:
+                amount = Random.Range(1, 3);
+                break;
+            case CharStat.mana:
+                amount = Random.Range(2, 4);
+                break;
+            case CharStat.speed:
+                amount = 1;
+                break;
+        }
+        return amount;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expAction"></param>
+    /// <returns>true if game won</returns>
+    public bool UpdateProgressToGameVictory(ExpAction expAction)
+    {
+        int amount = 0;
+        bool isDarkAction = true;
+        switch(expAction)
+        {
+            case ExpAction.Heal:
+                amount = GameData.current.healPointsReward;
+                isDarkAction = false;
+                break;
+            case ExpAction.Hire:
+                amount = GameData.current.recruitPointsReward;
+                isDarkAction = false;
+                break;
+            case ExpAction.Kill:
+                amount = GameData.current.killPointsReward;
+                isDarkAction = true;
+                break;
+            case ExpAction.LevelUpDark:
+                amount = GameData.current.levelUpPointsReward;
+                isDarkAction = true;
+                break;
+            case ExpAction.LevelUpLight:
+                amount = GameData.current.levelUpPointsReward;
+                isDarkAction = false;
+                break;
+        }
+        if (isDarkAction)
+        {
+            GameData.current.currMoonPoints -= amount;
+        }
+        else
+            GameData.current.currMoonPoints += amount;
+
+        if (GameData.current.currMoonPoints >= GameData.current.pointsRequiredPhase3 ||
+            GameData.current.currMoonPoints <= -GameData.current.pointsRequiredPhase3)
+        {
+            return true;
+        }
+        return false;
     }
 }

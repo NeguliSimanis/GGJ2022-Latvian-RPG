@@ -11,8 +11,10 @@ public class CameraController : MonoBehaviour
 
     [SerializeField] private Renderer m_levelRenderer;
     [SerializeField] private Bounds m_levelBounds;
-    [SerializeField] private float m_cameraSpeed = 0.1f;
+    [SerializeField] private float m_cameraSpeed;
     [SerializeField, Tooltip("Percent of screen size"), Range(0f, 50f)] private float m_screenDragBounds = 5f;
+
+    private float keyboardSpeedMultiplier = 6f;
 
     private Vector3 m_targetCamPosition;
     private Vector3 m_prevCamPosition;
@@ -35,30 +37,30 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        //Vector3 dir = Vector3.zero;
+        Vector3 dir = Vector3.zero;
 
         //if (mouseMove)
         //{
         //    dir += GetMouseInput();
         //}
 
-        //if (keyboardMove)
-        //{
-        //    dir += GetKeyboardInput();
-        //}
+        if (keyboardMove)
+        {
+            dir += GetKeyboardInput();
+        }
 
-        //if (dir.magnitude > m_cameraSpeed)
-        //{
-        //    dir = dir.normalized * m_cameraSpeed;
-        //}
+        if (dir.magnitude > m_cameraSpeed)
+        {
+            dir = dir.normalized * m_cameraSpeed;
+        }
 
-        //if (dir.magnitude > 0f)
-        //{
-        //    m_targetCamPosition = transform.position + dir;
-        //}
+        if (dir.magnitude > 0f)
+        {
+            m_targetCamPosition = transform.position + dir;
+        }
 
-        //m_targetCamPosition.x = Mathf.Clamp(m_targetCamPosition.x, m_levelBounds.min.x + cam.orthographicSize * cam.aspect, m_levelBounds.max.x - cam.orthographicSize * cam.aspect);
-        //m_targetCamPosition.y = Mathf.Clamp(m_targetCamPosition.y, m_levelBounds.min.y + cam.orthographicSize, m_levelBounds.max.y - cam.orthographicSize);
+        m_targetCamPosition.x = Mathf.Clamp(m_targetCamPosition.x, m_levelBounds.min.x + cam.orthographicSize * cam.aspect, m_levelBounds.max.x - cam.orthographicSize * cam.aspect);
+        m_targetCamPosition.y = Mathf.Clamp(m_targetCamPosition.y, m_levelBounds.min.y + cam.orthographicSize, m_levelBounds.max.y - cam.orthographicSize);
     }
 
     private void LateUpdate()
@@ -106,28 +108,28 @@ public class CameraController : MonoBehaviour
         return dir;
     }
 
-    //private Vector3 GetKeyboardInput()
-    //{
-    //    Vector3 dir = Vector3.zero;
+    private Vector3 GetKeyboardInput()
+    {
+        Vector3 dir = Vector3.zero;
 
-    //    if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-    //    {
-    //        dir.y += m_cameraSpeed;
-    //    }
-    //    else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-    //    {
-    //        dir.y -= m_cameraSpeed;
-    //    }
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        {
+            dir.y += m_cameraSpeed * keyboardSpeedMultiplier;
+        }
+        else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        {
+            dir.y -= m_cameraSpeed * keyboardSpeedMultiplier;
+        }
 
-    //    if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-    //    {
-    //        dir.x -= m_cameraSpeed;
-    //    }
-    //    else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-    //    {
-    //        dir.x += m_cameraSpeed;
-    //    }
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        {
+            dir.x -= m_cameraSpeed * keyboardSpeedMultiplier;
+        }
+        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        {
+            dir.x += m_cameraSpeed * keyboardSpeedMultiplier;
+        }
 
-    //    return dir;
-    //}
+        return dir;
+    }
 }
