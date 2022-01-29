@@ -63,4 +63,24 @@ public static class MathUtils
         }
     }
 
+    public static float CalculateDamage(float rawDamage, int defense, int offense)
+    {
+        float damageMultiplier = 1;
+        
+        // For each 10 points of defense above offense, incoming damage reduced by 10%
+        // 100+ defense = incoming damage heals lol
+        if (defense >= offense)
+        {
+            damageMultiplier = (1f - 0.01f*(defense - offense));
+        }
+        // For each 10 points of offense above defense, damage dealt increased by 10%
+        else
+        {
+            damageMultiplier = 1 + 0.01f * (offense - defense);
+        }
+
+        float finalDamage = rawDamage * damageMultiplier;
+        return finalDamage;
+    }
+
 }

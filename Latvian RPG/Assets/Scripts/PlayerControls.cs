@@ -129,6 +129,8 @@ public class PlayerControls : MonoBehaviour
 
     private bool IsTileFree(int x, int y)
     {
+        if (!gameManager.IsTileAllowedForNPC(new Vector2Int(x, y)))
+            return false;
         foreach (PlayerControls character in gameManager.allCharacters)
         {
             if (character.xCoord == x && character.yCoord == y)
@@ -217,6 +219,12 @@ public class PlayerControls : MonoBehaviour
     public float TakeDamage(float amount, PlayerControls damageSource)
     {
         float damageDealt = amount;
+
+        // DAMAGING 
+        if (amount < 0)
+        {
+            damageDealt = MathUtils.CalculateDamage(amount, this.stats.defense, damageSource.stats.offense);
+        }
         stats.currLife += damageDealt;
 
         // ANIMATIONS

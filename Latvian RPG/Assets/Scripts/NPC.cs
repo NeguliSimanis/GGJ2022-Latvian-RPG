@@ -47,7 +47,7 @@ public class NPC : MonoBehaviour
             EndTurn();
             return;
         }
-        CheckForNearbyObstructions();
+       // CheckForNearbyObstructions();
         SetBehaviour();
 
         switch(behaviour)
@@ -171,6 +171,7 @@ public class NPC : MonoBehaviour
             }
             else
             {
+                Debug.Log(npcControls.name + "should END TURN DUDE");
                 EndTurn();
             }
             yield break;
@@ -180,6 +181,7 @@ public class NPC : MonoBehaviour
         if (!IsTargetInSkillRange(target:closestPlayer, skill: selectedSkill))
         {
             Debug.Log("TARGET NOT IN SKILL RANGE");
+            DisplayWalkRange();
             StartCoroutine(MoveCloserToTarget(target: new Vector2Int(closestPlayer.xCoord, closestPlayer.yCoord)));
             yield return new WaitForSeconds(delayBeforeActionStart*1.1f);
             StartCoroutine(AttackIfPossible(target: closestPlayer));
@@ -200,10 +202,6 @@ public class NPC : MonoBehaviour
     private IEnumerator MoveCloserToTarget(Vector2Int target, bool endTurnAfter = false)
     {
         Debug.Log("MOVING CLOSER TO TARGET");
-
-
-        DisplayWalkRange();
-
         while (npcControls.tilesWalked < npcControls.playerSpeed)
         {
             yield return new WaitForSeconds(delayBeforeActionStart);
@@ -265,8 +263,8 @@ public class NPC : MonoBehaviour
 
     private void Flee()
     {
-        Debug.Log("FLEEEING (OBSTACLE AVOIDANCE NOT TAKEN INTO ACCOUNT)");
         Debug.Log("FLEEING ENEMY COORD = " + npcControls.xCoord + "." + npcControls.yCoord);
+        DisplayWalkRange();
 
         int xMin = npcControls.xCoord - npcControls.playerSpeed;
         int xMax = npcControls.xCoord + npcControls.playerSpeed;
@@ -286,7 +284,8 @@ public class NPC : MonoBehaviour
             if (player.type == CharType.Player)
             {
                 // 2. Current safe space not safe after all - find a new one
-                if (!IsCoordinateSafeFromPlayer(player, safestCoord))
+                if (!IsCoordinateSafeFromPlayer(player, safestCoord)
+                    || !gameManager.IsTileAllowedForNPC(safestCoord))
                 {
                     safeSpaceFound = false;
 
@@ -299,7 +298,8 @@ public class NPC : MonoBehaviour
                         {
                             coordToCheck = new Vector2Int(xCoord, yCoord);
                             // 2.2 SAFE SPACE FOUND!
-                            if (IsCoordinateSafeFromPlayer(player, coordToCheck))
+                            if (IsCoordinateSafeFromPlayer(player, coordToCheck)
+                                && gameManager.IsTileAllowedForNPC(coordToCheck))
                             {
                                 safestCoord = coordToCheck;
                                 safeSpaceFound = true;
@@ -319,9 +319,9 @@ public class NPC : MonoBehaviour
         else
         {
             // 5. No safe place exists - skip movement 
-
+            Debug.Log("NO SAFE SPACE FOUND!!!");
             // 6. No safe place exists & enough mana - suicide attack
-            HuntPlayer(suicideHunt:true);
+           StartCoroutine(HuntPlayer(suicideHunt:true));
         }
     }
 

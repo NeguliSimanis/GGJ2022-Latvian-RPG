@@ -42,7 +42,6 @@ public class GameManager : MonoBehaviour
     CameraController cameraController;
 
     [Header("UI")]
-    [SerializeField] GameObject charInfoPanel;
     [SerializeField] Button endTurnButton;
     [SerializeField] Text currentTurnText;
     [SerializeField] Text guideText;
@@ -57,6 +56,7 @@ public class GameManager : MonoBehaviour
     public List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
     public PlayerControls selectedCharacter;
     private bool isAnyCharSelected = false;
+    public List<Vector2Int> allowedWalkCoordsNPC = new List<Vector2Int>();
     #endregion
 
     #region SKILLS
@@ -203,10 +203,15 @@ public class GameManager : MonoBehaviour
 
         if (GameData.current.turnType != TurnType.Player)
         {
-            Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
-            selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+            allowedWalkCoordsNPC.Clear();
 
+            // spawn a tile below the npc
+            if (actionType == ActionType.Walk)
+            {
+                Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
+                selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
+                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
+            }
         }
 
         for (int i = 1; i < actionRange + 1; i++)
@@ -291,6 +296,24 @@ public class GameManager : MonoBehaviour
         if (highlightLocation.y > levelTopBorder.yCoord)
             return;
 
+        // DONT SPAWN IF ON TOP OF OBStacle        
+        foreach (Obstacle obstacle in allObstacles)
+        {
+            if (obstacle.pos.x == (int)highlightLocation.x && obstacle.pos.y == (int)highlightLocation.y)
+                return;
+        }
+
+
+        // DONT SPAWN ON TOP OF CHAR IF THAT'S MOVE ACTION
+        foreach (PlayerControls character in allCharacters)
+        {
+            if (actionType != ActionType.Walk)
+                break;
+            if (character.xCoord == (int)highlightLocation.x && character.yCoord == (int)highlightLocation.y)
+                return;
+        }
+
+        allowedWalkCoordsNPC.Add(new Vector2Int((int)highlightLocation.x, (int)highlightLocation.y));
         SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
     }
 
@@ -567,10 +590,7 @@ public class GameManager : MonoBehaviour
     /// <param name="toggledByMouse"></param>
     public void ToggleCharInfoPanel(bool toggledByMouse = false)
     {
-        if (!toggledByMouse)
-            charInfoPanel.SetActive(!charInfoPanel.activeInHierarchy);
-        else
-            charInfoPanel.SetActive(true);
+        popupManager.ShowCharPopup(selectedCharacter);
     }
 
     /// <summary>
@@ -667,11 +687,24 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
+
+    public bool IsTileAllowedForNPC(Vector2Int coord)
+    {
+        
+        foreach (Vector2Int currCoord in allowedWalkCoordsNPC)
+        {
+            if (currCoord == coord)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public bool IsTileOccupiedByObstacle(Vector2Int coord)
     {
         foreach (Obstacle obstacle in allObstacles)
         {
-            Debug.Log("OBSTACLKAH POS " + obstacle.pos);
             if (obstacle.pos.x == coord.x && obstacle.pos.y == coord.y)
             {
                 Debug.Log(coord + " occuppied by obstacle");

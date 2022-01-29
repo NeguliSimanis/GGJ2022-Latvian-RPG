@@ -48,6 +48,9 @@ public class CharacterStats
         currExp = 0;
         expRequired = GameData.current.defaultLevelExp; // xp required ot lv up
 
+        offense = 10;
+        defense = 10;
+
         switch (newCharacter)
         {
             case Character.Varna:
@@ -67,15 +70,13 @@ public class CharacterStats
 
     private void GenerateVarna()
     {
+
         // combat
         maxLife = 10;
         currLife = maxLife;
 
         maxMana = 10;
         currMana = maxMana;
-
-        offense = 10;
-        defense = 6;
 
         speed = 2; // number of tiles that char can walk in single turn
 
@@ -96,9 +97,6 @@ public class CharacterStats
         maxMana = 10;
         currMana = maxMana;
 
-        offense = 7;
-        defense = 8;
-
         speed = 2; // number of tiles that char can walk in single turn
 
         skills = new List<Skill>();
@@ -118,9 +116,6 @@ public class CharacterStats
 
         maxMana = 1;
         currMana = maxMana;
-
-        offense = 7;
-        defense = 8;
 
         speed = 2; // number of tiles that char can walk in single turn
 
