@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public enum Direction
 {
@@ -16,6 +17,12 @@ public enum CharType
     Player,
     Enemy,
     Neutral
+}
+
+public enum ExpAction
+{
+    Kill,
+    Hire
 }
 
 public class PlayerControls : MonoBehaviour
@@ -50,9 +57,16 @@ public class PlayerControls : MonoBehaviour
     Image manaBar;
     [SerializeField]
     Image lifeBar;
+    [SerializeField]
+    TMP_Text charAnimatedText;
+    [SerializeField]
+    Animator charTextAnimator;
+
     #endregion
 
     [Header("VISUAL")]
+    [SerializeField]
+    public Sprite bigCharSprite;
     [SerializeField]
     private SpriteRenderer spriteRenderer;
     private int defaultSortingOrder;
@@ -224,27 +238,30 @@ public class PlayerControls : MonoBehaviour
         if (amount < 0)
         {
             damageDealt = MathUtils.CalculateDamage(amount, this.stats.defense, damageSource.stats.offense);
+            hurtAnimator.SetTrigger("hurt");
         }
         stats.currLife += damageDealt;
 
         // ANIMATIONS
-        hurtAnimator.SetTrigger("hurt");
         Debug.Log(gameObject.name + " takes " + damageDealt + " damage (remaining hp: " + stats.currLife + ")" );
 
         // COMBAT LOG
         if (type == CharType.Player || type == CharType.Enemy)
-        gameManager.UpdateGuideText(
+        gameManager.popupManager.UpdateGuideText(
             damageSource.name + " dealt " + -damageDealt + " damage to " + name + "!");
 
         else
         {
-            gameManager.UpdateGuideText(
+            gameManager.popupManager.UpdateGuideText(
             damageSource.name + " dealt " + -damageDealt + " damage to " + name + "! " + name + " becomes an enemy!");
             type = CharType.Enemy;
         }
         // DEATH
         if (stats.currLife <= 0)
+        {
+            damageSource.GainExp(ExpAction.Kill);
             Die(damageSource);
+        }
 
         // UPDATE HUD BARS
         StartCoroutine(UpdateLifeBarWithDelay());
@@ -252,9 +269,30 @@ public class PlayerControls : MonoBehaviour
         return damageDealt;
     }
 
+    public void GainExp(ExpAction expAction)
+    {
+        switch(expAction)
+        {
+            case ExpAction.Kill:
+                stats.currExp += 10;
+                break;
+        }
+        if (stats.currExp >= stats.expRequired)
+        {
+            LevelUp();
+        }
+    }
+
+    private void LevelUp()
+    {
+        stats.expRequired = (int)(1.1f * stats.expRequired);
+        stats.level++;
+        gameManager.popupManager.UpdateGuideText(name + "reached level " + stats.level + "!");
+    }
+
     private void Die(PlayerControls murderer)
     {
-        gameManager.UpdateGuideText(
+        gameManager.popupManager.UpdateGuideText(
             murderer.name + " killed " + name + "!");
         isDead = true;
         Debug.Log(this.name + " IS DEAD");
@@ -309,7 +347,7 @@ public class PlayerControls : MonoBehaviour
                 {
                     if (skilly.skillRange >= longestSkill.skillRange)
                     {
-                        Debug.Log("______________________________________________" + skilly.name + " has longer range than " + longestSkill.name);
+                        //Debug.Log("______________________________________________" + skilly.name + " has longer range than " + longestSkill.name);
                         longestSkill = skilly;
                     }
                 }
@@ -329,5 +367,27 @@ public class PlayerControls : MonoBehaviour
         {
             spriteRenderer.sortingOrder = defaultSortingOrder + 9;
         }
+    }
+
+    public void RegenMana()
+    {
+        if (stats.currMana < stats.maxMana)
+        {
+            // UI
+            charAnimatedText.text = "+" + stats.manaRegen + " mana";
+            charTextAnimator.SetTrigger("appear");
+        }
+
+        // ADD MANA
+        stats.currMana += stats.manaRegen;
+        if (stats.currMana > stats.maxMana)
+        {
+            stats.currMana = stats.maxMana;
+        }
+        
+
+        // HUD
+        StartCoroutine(UpdateManaBarWithDelay());
+
     }
 }

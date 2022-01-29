@@ -37,14 +37,13 @@ public class GameManager : MonoBehaviour
 {
 
     TurnManager turnManager;
-    PopupManager popupManager;
+    public PopupManager popupManager;
     [SerializeField]
     CameraController cameraController;
 
     [Header("UI")]
     [SerializeField] Button endTurnButton;
     [SerializeField] Text currentTurnText;
-    [SerializeField] Text guideText;
 
     [SerializeField] Button skillButton;
     Text skillButtonText;
@@ -126,16 +125,15 @@ public class GameManager : MonoBehaviour
             switch (character.type)
             {
                 case CharType.Enemy:
-                    guideText.text = character.name + " (Enemy)";
+                    popupManager.UpdateGuideText(character.name + " (Enemy)");
                     break;
                 case CharType.Player:
-                    guideText.text = character.name;
+                    popupManager.UpdateGuideText(character.name);
                     break;
                 case CharType.Neutral:
-                    guideText.text = character.name + " (Neutral)";
+                    popupManager.UpdateGuideText(character.name + " (Neutral)");
                     break;
             }
-
         }
     }
 
@@ -156,7 +154,7 @@ public class GameManager : MonoBehaviour
         {
             if (selectedCharacter.hasUsedSkillThisTurn)
             {
-                guideText.text = selectedCharacter.name + " can only act once per turn!";
+                popupManager.UpdateGuideText(selectedCharacter.name + " can only act once per turn!");
                 return;
             }
             selectedSkill = selectedCharacter.stats.skills[0];
@@ -178,7 +176,7 @@ public class GameManager : MonoBehaviour
         int actionRange;
         if (actionType == ActionType.UseCombatSkill)
         {
-            guideText.text = "Use " + selectedSkill.name;
+            popupManager.UpdateGuideText("Use " + selectedSkill.name);
             actionRange = selectedSkill.skillRange;
         }
         else
@@ -187,9 +185,9 @@ public class GameManager : MonoBehaviour
             if (charType == CharType.Player)
             {
                 if (speedLeft > 0)
-                    guideText.text = "Select Destination";
+                    popupManager.UpdateGuideText("Select Destination");
                 else
-                    guideText.text = "No moves left";
+                    popupManager.UpdateGuideText("No moves left");
             }
             actionRange = speedLeft;
         }
@@ -387,7 +385,9 @@ public class GameManager : MonoBehaviour
 
     public void UpdateRemainingMovesText(int remainingMoves)
     {
-        guideText.text = "Remaining moves: " + (remainingMoves).ToString();
+        if (GameData.current.turnType != TurnType.Player)
+            return;
+        popupManager.UpdateGuideText("Remaining moves: " + (remainingMoves).ToString());
     }
 
 
@@ -491,19 +491,20 @@ public class GameManager : MonoBehaviour
         // SHOW CONFIRMATION POPUP
         if (GameData.current.turnType == TurnType.Player)
         {
-            if (!popupManager.isWarningPopupActive && CanPlayerPartyAct())
-            {
-                popupManager.ShowWarningPopup(true);
-                return;
-            }
-            else
-            {
-                popupManager.ShowWarningPopup(false);
-            }
+            //if (!popupManager.isWarningPopupActive && CanPlayerPartyAct())
+            //{
+            //    popupManager.ShowWarningPopup(true);
+            //    return;
+            //}
+            //else
+            //{
+            //    popupManager.ShowWarningPopup(false);
+            //}
         }
 
         // START NEW TURN
         turnManager.StartNewTurn();
+        ShowManaRegenTexts();
 
         // HIDE IRRELEVANT UI
         HideActionRange();
@@ -613,7 +614,7 @@ public class GameManager : MonoBehaviour
                 if (xCoordinate == character.xCoord && yCoordinate == character.yCoord)
                 {
                     Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
-                    UpdateGuideText("Cannot move there!");
+                    popupManager.UpdateGuideText("Cannot move there!");
                     return;
                 }
             }
@@ -622,7 +623,7 @@ public class GameManager : MonoBehaviour
                 if (xCoordinate == obstacle.pos.x && yCoordinate == obstacle.pos.y)
                 {
                     Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
-                    UpdateGuideText("Cannot move there!");
+                    popupManager.UpdateGuideText("Cannot move there!");
                     return;
                 }
             }
@@ -652,13 +653,13 @@ public class GameManager : MonoBehaviour
         if (!targetViable)
         {
             Debug.Log("NOOO TARGET AT CH" + xCoordinate + ":" + yCoordinate);
-            guideText.text = "Invalid target";
+            popupManager.UpdateGuideText("Invalid target");
             return;
         }
         // 2 - check if enough mana
         if (selectedCharacter.stats.currMana < selectedSkill.manaCost)
         {
-            guideText.text = "Not enough mana!";
+            popupManager.UpdateGuideText("Not enough mana!");
             return;
         }
 
@@ -676,10 +677,7 @@ public class GameManager : MonoBehaviour
             
     }
 
-    public void UpdateGuideText(string newText)
-    {
-        guideText.text = newText;
-    }
+
 
     public void RestartGame()
     {
@@ -713,5 +711,27 @@ public class GameManager : MonoBehaviour
         }
         Debug.Log("game manage " + coord + " not occupied by obstacle");
         return false;
+    }
+
+    public void ShowManaRegenTexts()
+    {
+        foreach (PlayerControls character in allCharacters)
+        {
+            switch (GameData.current.turnType)
+            {
+                case TurnType.Neutral:
+                    if (character.type == CharType.Neutral)
+                        character.RegenMana();
+                    break;
+                case TurnType.Enemy:
+                    if (character.type == CharType.Enemy)
+                        character.RegenMana();
+                    break;
+                case TurnType.Player:
+                    if (character.type == CharType.Player)
+                        character.RegenMana();
+                    break;
+            }
+        }
     }
 }

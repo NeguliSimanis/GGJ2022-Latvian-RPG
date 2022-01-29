@@ -43,19 +43,12 @@ public class CharacterSelectArea : MonoBehaviour
 
     private void OnMouseDown()
     {
+        
         if (characterController.type != CharType.Player)
             return;
-        if (characterSelectedCount != 0 && gameManager.selectedCharacter == characterController)
-        {
-            gameManager.ToggleCharInfoPanel(true);
-        }
-        else
-        {
-
             gameManager.SelectCharacter(characterController);
             characterFrame.SetActive(characterController.characterIsSelected);
-        }
-        characterSelectedCount++;
+        //characterSelectedCount++;
     }
 
 }

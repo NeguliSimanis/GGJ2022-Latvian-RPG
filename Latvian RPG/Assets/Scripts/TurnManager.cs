@@ -22,9 +22,12 @@ public class TurnManager : MonoBehaviour
     private Text turnText;
 
     private float turnTextDuration = 2f;
+    private GameManager gameManager;
+
 
     private void Start()
     {
+        gameManager = gameObject.GetComponent<GameManager>();
         turnAnimatorObject.SetActive(false);
     }
 
@@ -51,7 +54,8 @@ public class TurnManager : MonoBehaviour
                 newTurnText = "Your Turn";
                 break;
         }
-        StartCoroutine(ShowTurnTextForSeconds(newTurnText));
+        gameManager.popupManager.UpdateGuideText(newTurnText);
+        //StartCoroutine(ShowTurnTextForSeconds(newTurnText));
     }
 
     private IEnumerator ShowTurnTextForSeconds(string newTurnText)

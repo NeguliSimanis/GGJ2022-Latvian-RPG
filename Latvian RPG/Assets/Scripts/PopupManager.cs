@@ -23,6 +23,8 @@ public class PopupManager : MonoBehaviour
     [SerializeField]
     Button restartGameButton;
 
+    [SerializeField] Text guideText;
+
     [Header("Character popup")]
     [SerializeField]
     GameObject charPopup;
@@ -55,6 +57,8 @@ public class PopupManager : MonoBehaviour
 
     [SerializeField]
     Text speedText;
+    [SerializeField]
+    Text levelText;
 
 
 
@@ -105,6 +109,11 @@ public class PopupManager : MonoBehaviour
         gameLostPanel.SetActive(true);
     }
 
+    public void UpdateGuideText(string newText)
+    {
+        guideText.text = newText;
+    }
+
 
     public void ShowCharPopup(PlayerControls playerControls, bool show = true)
     {
@@ -118,7 +127,8 @@ public class PopupManager : MonoBehaviour
         /// REPLACE THIS STUFF WITH TEXTMESHJ
         charName.text = playerControls.stats.name;
          charBioText.text = playerControls.stats.bio;
-         //charPopupImage.image;
+         
+        charPopupImage.sprite = playerControls.bigCharSprite;
 
         // stats
          expText.text = "exp: " + playerControls.stats.currExp.ToString();
@@ -130,5 +140,19 @@ public class PopupManager : MonoBehaviour
          manaText.text = "Mana: " + playerControls.stats.currMana.ToString() + "/" + playerControls.stats.maxMana.ToString();
 
         speedText.text = "Speed: " + playerControls.stats.speed;
+
+        switch (playerControls.type)
+        {
+            case CharType.Enemy:
+                levelText.text = "Level " + playerControls.stats.level + " Enemy";
+                break;
+            case CharType.Player:
+                levelText.text = "Level " + playerControls.stats.level;
+                break;
+            case CharType.Neutral:
+                levelText.text = "Level " + playerControls.stats.level + " Neutral";
+                break;
+        }
+        
     }
 }

@@ -11,9 +11,9 @@ public enum Alignment
 
 public enum Character
 {
-    Varna,
-    Siksparnis,
-    Nave
+    Luna,
+    Crow,
+    Dog
 }
 
 public class CharacterStats
@@ -29,6 +29,7 @@ public class CharacterStats
 
     public float maxMana;
     public float currMana;
+    public float manaRegen;
 
     public int offense;
     public int defense;
@@ -51,15 +52,17 @@ public class CharacterStats
         offense = 10;
         defense = 10;
 
+        manaRegen = 1;
+
         switch (newCharacter)
         {
-            case Character.Varna:
+            case Character.Luna:
                 GenerateVarna();
                 break;
-            case Character.Siksparnis:
+            case Character.Crow:
                 GenerateSiksparnis();
                 break;
-            case Character.Nave:
+            case Character.Dog:
                 GenerateNave();
                 break;
             default:
@@ -84,8 +87,14 @@ public class CharacterStats
 
         // flair
         alignment = Alignment.Piety;
-        bio = "Half-woman, half-crow, Varna roams the lands in search of vengeance";
-        name = "Varna";
+        bio = "I swore to become her Umbral Champion or die trying. \n " +
+            "And all throughout this time, she has done nothing short of killing me.\n " +
+            "Years of incessant war have shattered my beauty and my soul.\n " +
+            "The scales once so iridescent, now are as bleak as dust surrounding us.\n " +
+            "I am covered in feathers, like a hideous, overgrown chicken.\n " +
+            "And the joy of combat and screams of the dying sooth my soul no more.\n " +
+            "She uses each waking moment to tear me down and corrupt me.\n ";
+        name = "Luna";
     }
 
     private void GenerateSiksparnis()
@@ -114,7 +123,7 @@ public class CharacterStats
         maxLife = 10;
         currLife = maxLife;
 
-        maxMana = 1;
+        maxMana = 10;
         currMana = maxMana;
 
         speed = 2; // number of tiles that char can walk in single turn

@@ -19,7 +19,7 @@ public class GameData
     #endregion
 
     #region XP BALANCE
-    public int defaultLevelExp = 100; // how much xp is required to reach LV 2
+    public int defaultLevelExp = 10; // how much xp is required to reach LV 2
     public float expIncrease = 1.1f;  // how fast xp requirement grows
     #endregion
 }
