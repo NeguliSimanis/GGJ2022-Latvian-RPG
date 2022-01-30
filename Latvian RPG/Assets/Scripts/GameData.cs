@@ -18,6 +18,11 @@ public class GameData
     public float npcMoveDuration = 0.5f;
     public float npcActionDuration = 0.9f;
     public float playerMoveDuration = 0.35f;
+
+    public float playerTurnTimer = 15f;
+    public float playerTurnIncrease = 4f;
+    public float playerTurnEndTime;
+    public float playerTurnStartTime;
     #endregion
 
     #region XP BALANCE
@@ -31,8 +36,8 @@ public class GameData
     public int pointsRequiredPhase2 = 35;
     public int pointsRequiredPhase3 = 60;
 
-    public int killPointsReward = 3;
-    public int levelUpPointsReward = 50;
+    public int killPointsReward = 5;
+    public int levelUpPointsReward = 35;
     public int healPointsReward = 5;
     public int recruitPointsReward = 20;
     /*

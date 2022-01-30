@@ -1186,6 +1186,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: InfoButton
       objectReference: {fileID: 0}
+    - target: {fileID: 4844289000550222724, guid: fa1d7b6817bae2f4fa14f038506f5ad5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa1d7b6817bae2f4fa14f038506f5ad5, type: 3}
 --- !u!4 &3565658480352263062 stripped

@@ -218,6 +218,7 @@ public class CharacterStats
         else
             GameData.current.currMoonPoints += amount;
 
+        Debug.Log("completed dark action " + isDarkAction + " worth " + amount);
         if (GameData.current.currMoonPoints >= GameData.current.pointsRequiredPhase3 ||
             GameData.current.currMoonPoints <= -GameData.current.pointsRequiredPhase3)
         {

@@ -41,9 +41,16 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     CameraController cameraController;
     public AudioManager audioManager;
-    
+
 
     [Header("UI")]
+    [SerializeField]
+    GameObject turnTimerObject;
+    [SerializeField]
+    Image turnTimerFill1;
+    [SerializeField]
+    Image turnTimerFill2;
+
     [SerializeField] Button endTurnButton;
 
     [SerializeField] Button skillButton;
@@ -92,6 +99,31 @@ public class GameManager : MonoBehaviour
     {
         turnManager = gameObject.GetComponent<TurnManager>();
         popupManager = gameObject.GetComponent<PopupManager>();
+    }
+
+    public void StartGame()
+    {
+        GameData.current.gameStarted = true;
+        GameData.current.playerTurnStartTime = Time.time;
+        GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer + 2f;
+    }
+
+    private void ShowTurnTimerBar(bool show = true)
+    {
+        turnTimerObject.SetActive(show);
+        if (show)
+        {
+            GameData.current.playerTurnStartTime = Time.time;
+            GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer;
+        }
+    }
+
+    private void UpdateTurnTimeBar()
+    {
+        turnTimerFill1.fillAmount = Mathf.InverseLerp(GameData.current.playerTurnEndTime, GameData.current.playerTurnStartTime, Time.time);
+        turnTimerFill2.fillAmount = Mathf.InverseLerp(GameData.current.playerTurnEndTime, GameData.current.playerTurnStartTime, Time.time);
+            //(GameData.current.playerTurnTimer / (Time.time - GameData.current.playerTurnStartTime));
+            //(stats.currLife * 1f) / stats.maxLife;
     }
 
     private void Start()
@@ -392,6 +424,12 @@ public class GameManager : MonoBehaviour
             return;
         if (GameData.current.turnType != TurnType.Player)
             return;
+        UpdateTurnTimeBar();
+        if(Time.time > GameData.current.playerTurnEndTime)
+        {
+            EndTurn();
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.C))
         {
             ToggleCharInfoPanel();
@@ -499,8 +537,9 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    private void EndGame()
+    private void LoseGame()
     {
+        audioManager.PlayDefeatSFX();
         popupManager.DisplayGameLostPopup();
     }
 
@@ -510,7 +549,7 @@ public class GameManager : MonoBehaviour
         if (!CheckForAlivePlayers())
         {
             Debug.Log("game should end");
-            EndGame();
+            LoseGame();
             return;
         }
 
@@ -560,7 +599,8 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-        // SHOW CHAR UI IF PLAYER TURN
+            // SHOW CHAR UI IF PLAYER TURN
+            ShowTurnTimerBar(true);
             ShowSkillButton(true);
             DisplayActionRange(ActionType.Walk);
             UpdateRemainingMovesText(selectedCharacter.playerSpeed);
@@ -569,6 +609,7 @@ public class GameManager : MonoBehaviour
         // MAKE NEUTRAL/ENEMY CHARS ACT
         if (GameData.current.turnType == TurnType.Player)
             return;
+        ShowTurnTimerBar(false);
         for (int i = 0; i < allCharacters.Count; i++)
         {
             if ((allCharacters[i].type == CharType.Neutral &&
@@ -768,11 +809,13 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         if (GameData.current.currMoonPoints < 0)
         {
+            audioManager.PlayDarkVictorySFX();
             popupManager.ShowDarkVictory();
             Debug.Log("VICTORY dark");
         }
         else if (GameData.current.currMoonPoints > 0)
         {
+            audioManager.PlayLightVictorySFX();
             popupManager.ShowLightVictory();
             Debug.Log("VICTORY light");
         }

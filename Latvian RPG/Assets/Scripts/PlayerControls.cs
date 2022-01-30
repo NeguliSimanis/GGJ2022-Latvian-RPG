@@ -260,25 +260,26 @@ public class PlayerControls : MonoBehaviour
             gameManager.audioManager.PlayAttackSound();
             hurtAnimator.SetTrigger("hurt");
         }
+        // HEALING
+        else if (amount > 0)
+        {
+            gameManager.popupManager.UpdateGuideText(damageSource.name + " is healed!");
+            gameManager.audioManager.PlayUtilitySFX();
+        }
         stats.currLife += damageDealt;
 
         Debug.Log(gameObject.name + " takes " + damageDealt + " damage (remaining hp: " + stats.currLife + ")" );
 
-        // COMBAT LOG - healing from hp pack
-        if (damageSource == this)
-        {
-            gameManager.popupManager.UpdateGuideText(
-            damageSource.name + " is healed!");
-        }
+
         // COMBAT LOG - taking damage
-        else if (type == CharType.Player || type == CharType.Enemy)
+        if (type == CharType.Player || type == CharType.Enemy)
         gameManager.popupManager.UpdateGuideText(
             damageSource.name + " dealt " + -damageDealt + " damage to " + name + "!");
 
         else
         {
             gameManager.popupManager.UpdateGuideText(
-            damageSource.name + " dealt " + -damageDealt + " damage to " + name + "! " + name + " becomes an enemy!");
+            name + " becomes an enemy!");
             type = CharType.Enemy;
         }
         // DEATH
@@ -300,6 +301,7 @@ public class PlayerControls : MonoBehaviour
         {
             case ExpAction.Kill:
                 stats.currExp += 10;
+                stats.UpdateProgressToGameVictory(ExpAction.Kill);
                 break;
         }
         if (stats.currExp >= stats.expRequired)
@@ -312,7 +314,9 @@ public class PlayerControls : MonoBehaviour
     {
         stats.expRequired = (int)(1.1f * stats.expRequired);
         stats.level++;
+        GameData.current.playerTurnEndTime += 15f;
         //gameManager.popupManager.UpdateGuideText(name + "reached level " + stats.level + "!");
+        gameManager.audioManager.PlayLevelupSFX();
         ChooseLevelUpStats();
         StartCoroutine(ShowLevelUpPopupAfterDelay(0.8f));
     }

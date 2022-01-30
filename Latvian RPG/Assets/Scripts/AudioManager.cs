@@ -95,4 +95,30 @@ public class AudioManager : MonoBehaviour
     {
         audioSource.PlayOneShot(enemyTurnSFX, sfxVolume);
     }
+
+    public void PlayLightVictorySFX()
+    {
+        audioSource.PlayOneShot(lightVictorySFX, sfxVolume);
+    }
+
+    public void PlayDarkVictorySFX()
+    {
+        Debug.Log("DARK FS");
+        audioSource.PlayOneShot(darkVictorySFX, sfxVolume * 1.5f);
+    }
+
+
+    //public static IEnumerator FadeToDifferentMusic(float duration, float targetVolume, AudioClip targetMusic)
+    //{
+    //    float currentTime = 0;
+    //    float start = audioSource.volume;
+
+    //    while (currentTime < duration)
+    //    {
+    //        currentTime += Time.deltaTime;
+    //        audioSource.volume = Mathf.Lerp(start, targetVolume, currentTime / duration);
+    //        yield return null;
+    //    }
+    //    yield break;
+    //}
 }

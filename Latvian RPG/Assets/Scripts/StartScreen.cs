@@ -5,6 +5,8 @@ using UnityEngine;
 public class StartScreen : MonoBehaviour
 {
     [SerializeField]
+    GameManager gameManager;
+    [SerializeField]
     GameObject[] startSreenObjects;
 
     [SerializeField]
@@ -75,7 +77,7 @@ public class StartScreen : MonoBehaviour
 
     private void EndCutScenes()
     {
-        GameData.current.gameStarted = true;
+        gameManager.StartGame();
         gameObject.SetActive(false);
     }
 

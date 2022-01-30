@@ -47,6 +47,7 @@ MonoBehaviour:
   xCoord: 0
   yCoord: 0
   consumed: 0
+  spriteRenderer: {fileID: 5649603144337569542}
 --- !u!1 &5649603144337569540
 GameObject:
   m_ObjectHideFlags: 0
