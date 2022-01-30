@@ -31,6 +31,8 @@ public class CharacterSelectArea : MonoBehaviour
 
     private void OnMouseOver()
     {
+        if (GameData.current.turnType == TurnType.Player)
+            gameManager.HighlightChar(characterController);
         selectCharAnimation.SetActive(true);
         gameManager.ProcessShowCharNameRequest(characterController);
     }

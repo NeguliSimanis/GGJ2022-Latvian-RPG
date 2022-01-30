@@ -18,4 +18,17 @@ public class Skill : MonoBehaviour
     public string skillName;
     public int skillRange;
     public SkillType[] type;
+    public string description;
+
+    public string GetDescription()
+    {
+        string totalDescription;
+
+        totalDescription = description
+            + "\n \n Base damage: " + (int) skillDamage
+            + "\n Mana cost: " + (int)manaCost
+            + "\n Range: " + skillRange;
+         
+        return totalDescription;
+    }
 }

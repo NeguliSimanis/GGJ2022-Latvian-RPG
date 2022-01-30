@@ -106,13 +106,9 @@ public class CharacterStats
 
         // flair
         alignment = Alignment.Piety;
-        bio = "I swore to become her Umbral Champion or die trying. \n " +
-            "And all throughout this time, she has done nothing short of killing me.\n " +
-            "Years of incessant war have shattered my beauty and my soul.\n " +
-            "The scales once so iridescent, now are as bleak as dust surrounding us.\n " +
-            "I am covered in feathers, like a hideous, overgrown chicken.\n " +
-            "And the joy of combat and screams of the dying sooth my soul no more.\n " +
-            "She uses each waking moment to tear me down and corrupt me.\n ";
+        bio = "They say, one punch of her fist was enough to break the neck of a tiger." +
+            "While not untrue, her true strength always laid in her throws." +
+            "She once defended a caravan from marauders by throwing one of the wagons at them.";
         name = "Luna";
     }
 
@@ -132,7 +128,7 @@ public class CharacterStats
         // flair
         alignment = Alignment.Might;
         bio = "Angry bat boy";
-        name = "Siksparnis";
+        name = "Koyanagi";
     }    
     
     
@@ -152,7 +148,7 @@ public class CharacterStats
         // flair
         alignment = Alignment.Might;
         bio = "Avatar of Death";
-        name = "Nave";
+        name = "Winston";
     }
 
     public int GetStatIncreaseAmount(CharStat stat)

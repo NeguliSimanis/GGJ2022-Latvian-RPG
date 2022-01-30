@@ -76,6 +76,10 @@ public class TileHighlight : MonoBehaviour
         {
             gameManager.ProcessInteractionRequest(xCoord, yCoord, tileActionType);
         }
+        else if (!allowInteraction)
+        {
+            gameManager.HighlightChar(gameManager.selectedChar);
+        }
     }
 
 

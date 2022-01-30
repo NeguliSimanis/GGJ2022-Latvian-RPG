@@ -29,7 +29,7 @@ public class HighlightTileObject
 
     public void ShowTile(ActionType actionType, bool show, bool allowInteraction = true)
     {
-        tileHighlight.EnableTile(actionType, show);
+        tileHighlight.EnableTile(actionType, show, allowInteraction);
     }
 }
 
@@ -61,7 +61,8 @@ public class GameManager : MonoBehaviour
 
     #region CHAR MANAGEMENT
     public List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
-    public PlayerControls selectedCharacter;
+    public PlayerControls selectedChar;
+    public PlayerControls highlightedChar;
     private bool isAnyCharSelected = false;
     public List<Vector2Int> allowedWalkCoordsNPC = new List<Vector2Int>();
     #endregion
@@ -95,6 +96,23 @@ public class GameManager : MonoBehaviour
         GetComponents();
     }
 
+    public void HighlightChar(PlayerControls charToHighlight, bool highlight = true)
+    {
+        if (!GameData.current.gameStarted)
+            return;
+        if (!highlight)
+        {
+            highlightedChar = selectedChar;
+        }
+        else
+        {
+            highlightedChar = charToHighlight;
+            
+        }
+        popupManager.UpdateCharButton(highlightedChar);
+        Debug.Log(highlightedChar + " HIGHLIGHTED");
+    }
+
     private void GetComponents()
     {
         turnManager = gameObject.GetComponent<TurnManager>();
@@ -105,7 +123,16 @@ public class GameManager : MonoBehaviour
     {
         GameData.current.gameStarted = true;
         GameData.current.playerTurnStartTime = Time.time;
-        GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer + 2f;
+        GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer + 4f;
+        foreach(PlayerControls playerControls in allCharacters)
+        {
+            if (playerControls.type == CharType.Player)
+            {
+                HighlightChar(playerControls);
+                return;
+            }
+        }
+       
     }
 
     private void ShowTurnTimerBar(bool show = true)
@@ -209,12 +236,12 @@ public class GameManager : MonoBehaviour
 
         if (skillSelected)
         {
-            if (selectedCharacter.hasUsedSkillThisTurn)
+            if (selectedChar.hasUsedSkillThisTurn)
             {
-                popupManager.UpdateGuideText(selectedCharacter.name + " can only act once per turn!");
+                popupManager.UpdateGuideText(selectedChar.name + " can only act once per turn!");
                 return;
             }
-            selectedSkill = selectedCharacter.stats.skills[0];
+            selectedSkill = selectedChar.stats.skills[0];
             skillButtonImage.color = skillButtonSelectedColor;
             DisplayActionRange();
         }
@@ -228,7 +255,7 @@ public class GameManager : MonoBehaviour
     public void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill, CharType charType = CharType.Player)
     {
         // show the char sprite above the tile sprites
-        selectedCharacter.SetToDefaultSortOrder(defaultOrder: false);
+        selectedChar.SetToDefaultSortOrder(defaultOrder: false);
 
         int actionRange;
         if (actionType == ActionType.UseCombatSkill)
@@ -238,7 +265,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            int speedLeft = selectedCharacter.playerSpeed - selectedCharacter.tilesWalked;
+            int speedLeft = selectedChar.playerSpeed - selectedChar.tilesWalked;
             if (charType == CharType.Player)
             {
                 if (speedLeft > 0)
@@ -262,10 +289,10 @@ public class GameManager : MonoBehaviour
         }
 
         // spawn a tile below the character
-        if (actionType == ActionType.Walk && selectedCharacter.tilesWalked < selectedCharacter.playerSpeed)
+        if (actionType == ActionType.Walk && selectedChar.tilesWalked < selectedChar.playerSpeed)
         {
-            Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
-            selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
+            Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x,
+            selectedChar.transform.position.y, selectedChar.transform.position.z);
             SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType, allowInteraction: false);
         }
 
@@ -338,8 +365,8 @@ public class GameManager : MonoBehaviour
     private void ProcessSpawnHighlightTileRequest(int xOffset, int yOffset, bool reuseOldTargetHighlights, ActionType actionType)
     {
         
-        Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x + xOffset,
-                selectedCharacter.transform.position.y + yOffset, selectedCharacter.transform.position.z);
+        Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x + xOffset,
+                selectedChar.transform.position.y + yOffset, selectedChar.transform.position.z);
 
         // DONT SPAWN IF OUTSIDE LEVEL BOUNDS
         if (highlightLocation.x < levelLeftBorder.xCoord)
@@ -375,7 +402,7 @@ public class GameManager : MonoBehaviour
     public void HideActionRange()
     {
         if (isAnyCharSelected)
-            UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
+            UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.tilesWalked);
         if (skillSelected)
             skillButtonImage.color = skillButtonDefaultColor;
 
@@ -477,7 +504,7 @@ public class GameManager : MonoBehaviour
                 character.SelectCharacter(true);
                 UpdateRemainingMovesText(character.playerSpeed - character.tilesWalked);
                 characterSelected = true;
-                selectedCharacter = characterToSelect;
+                selectedChar = characterToSelect;
                 HideActionRange();
                 if (character.type != CharType.Player)
                 {
@@ -499,7 +526,7 @@ public class GameManager : MonoBehaviour
     {
         skillButton.gameObject.SetActive(show);
         if (show)
-            skillButtonText.text = selectedCharacter.stats.skills[0].name;
+            skillButtonText.text = selectedChar.stats.skills[0].name;
     }
 
     /// <summary>
@@ -520,8 +547,8 @@ public class GameManager : MonoBehaviour
     private void MoveCameraToPlayer()
     {
         cameraController.SetPosition(new Vector3(
-            selectedCharacter.transform.position.x,
-            selectedCharacter.transform.position.y+1,
+            selectedChar.transform.position.x,
+            selectedChar.transform.position.y+1,
             cameraController.transform.position.z));
     }
 
@@ -576,9 +603,15 @@ public class GameManager : MonoBehaviour
         HideActionRange();
         ShowSkillButton(false);
         if (GameData.current.turnType != TurnType.Player)
+        {
+            popupManager.charButton.gameObject.SetActive(false);
             ShowEndTurnButton(false);
+        }
         else
+        {
+            popupManager.charButton.gameObject.SetActive(true);
             ShowEndTurnButton(true);
+        }
        
         // RESET CHARACTER STATS
         foreach (PlayerControls character in allCharacters)
@@ -603,7 +636,7 @@ public class GameManager : MonoBehaviour
             ShowTurnTimerBar(true);
             ShowSkillButton(true);
             DisplayActionRange(ActionType.Walk);
-            UpdateRemainingMovesText(selectedCharacter.playerSpeed);
+            UpdateRemainingMovesText(selectedChar.playerSpeed);
         }
 
         // MAKE NEUTRAL/ENEMY CHARS ACT
@@ -659,7 +692,7 @@ public class GameManager : MonoBehaviour
     /// <param name="toggledByMouse"></param>
     public void ToggleCharInfoPanel(bool toggledByMouse = false)
     {
-        popupManager.ShowCharPopup(selectedCharacter);
+        popupManager.ShowCharPopup(selectedChar);
     }
 
     /// <summary>
@@ -695,8 +728,8 @@ public class GameManager : MonoBehaviour
                     return;
                 }
             }
-            selectedCharacter.TeleportPlayerCharacter(xCoordinate, yCoordinate);
-            UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
+            selectedChar.TeleportPlayerCharacter(xCoordinate, yCoordinate);
+            UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.tilesWalked);
             return;
         }
 
@@ -723,7 +756,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         // 2 - check if enough mana
-        if (selectedCharacter.stats.currMana < selectedSkill.manaCost)
+        if (selectedChar.stats.currMana < selectedSkill.manaCost)
         {
             popupManager.UpdateGuideText("Not enough mana!");
             return;
@@ -735,11 +768,11 @@ public class GameManager : MonoBehaviour
 
 
         // 3 - apply skill effect
-        float damageDealt = target.TakeDamage(-selectedSkill.skillDamage, selectedCharacter);
-        selectedCharacter.hasUsedSkillThisTurn = true;
+        float damageDealt = target.TakeDamage(-selectedSkill.skillDamage, selectedChar);
+        selectedChar.hasUsedSkillThisTurn = true;
 
         // 4 - remove spent mana
-        selectedCharacter.SpendMana(selectedSkill.manaCost);
+        selectedChar.SpendMana(selectedSkill.manaCost);
             
     }
 

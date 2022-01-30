@@ -5,7 +5,7 @@ public class PopupManager : MonoBehaviour
 {
     GameManager gameManager;
 
-    
+
     [HideInInspector]
     public bool isWarningPopupActive = false;
 
@@ -25,6 +25,14 @@ public class PopupManager : MonoBehaviour
     Button restartGameButton;
 
     [SerializeField] Text guideText;
+
+    #region CHAR butt
+    [Header("Char  PORTRAIT")]
+    public Button charButton;
+    [SerializeField]
+    Image charPortrait;
+    PlayerControls charToShow;
+    #endregion
 
     #region CHARACTER POPUP
     [Header("Character popup")]
@@ -80,12 +88,20 @@ public class PopupManager : MonoBehaviour
     [SerializeField]
     Button levelUpButtonLight;
     [SerializeField]
+    Image levelUp1StatImage;
+    [SerializeField]
     Text levelUpButt1Text;
+    [SerializeField]
+    Text levelUpExplanation1;
 
     [SerializeField]
     Button levelUpButtonDark;
     [SerializeField]
+    Image levelUp2StatImage;
+    [SerializeField]
     Text levelUpButt2Text;
+    [SerializeField]
+    Text levelUpExplanation2;
     #endregion
 
     #region GAME OVER 
@@ -114,6 +130,21 @@ public class PopupManager : MonoBehaviour
     Sprite darkMoon2;
     #endregion
 
+
+    #region STAT ICONS
+    [Header("STAT ICONS")]
+    [SerializeField]
+    Sprite speedIcon;
+    [SerializeField]
+    Sprite lifeIcon;
+    [SerializeField]
+    Sprite manaIcon;
+    [SerializeField]
+    Sprite defenseIcon;
+    [SerializeField]
+    Sprite offenseIcon;
+    #endregion
+
     private void Awake()
     {
         gameManager = gameObject.GetComponent<GameManager>();
@@ -122,7 +153,7 @@ public class PopupManager : MonoBehaviour
         ShowLevelUpPopup(new PlayerControls(), false);
         ShowWarningPopup(false);
         DisplayGameLostPopup(false);
-        ShowCharPopup( new PlayerControls(), false);
+        ShowCharPopup(new PlayerControls(), false);
 
         startScreen.SetActive(true);
         darkVictoryScreen.SetActive(false);
@@ -133,10 +164,16 @@ public class PopupManager : MonoBehaviour
     private void AddButtListeners()
     {
         levelUpButtonLight.onClick.AddListener(LightLevelUp);
-        levelUpButtonDark.onClick.AddListener(DarkLevelUp); 
+        levelUpButtonDark.onClick.AddListener(DarkLevelUp);
         confirmEndTurnButton.onClick.AddListener(ConfirmEndTurn);
         cancelEndTurnButton.onClick.AddListener(CancelEndTurn);
+        charButton.onClick.AddListener(CharButtonPressed);
         //restartGameButton.onClick.AddListener(RestartGame);
+    }
+
+    void CharButtonPressed()
+    {
+        ShowCharPopup(charToShow, true);
     }
 
     private void LightLevelUp()
@@ -158,7 +195,13 @@ public class PopupManager : MonoBehaviour
                 playerToLevel.stats.maxMana += lightStatIncrease;
                 break;
         }
-        
+
+    }
+
+    public void UpdateCharButton(PlayerControls playerControls)
+    {
+        charPortrait.sprite = playerControls.charPortrait;
+        charToShow = playerControls;
     }
 
     private void DarkLevelUp()
@@ -255,6 +298,7 @@ public class PopupManager : MonoBehaviour
             charPopup.SetActive(false);
             return;
         }
+        GameData.current.playerTurnEndTime += 20f;
         charPopup.SetActive(true);
 
         SetMooningLevelHUD();
@@ -314,23 +358,33 @@ public class PopupManager : MonoBehaviour
         switch (player.stats.lightLevelUpStat)
         {
             case CharStat.defense:
-                levelUpButt1Text.text = "+ " + lightStatIncrease + " defense (light)";
+                levelUpButt1Text.text = lightStatIncrease.ToString();
+                levelUpExplanation1.text = "defense\n\n+20 lightness";
+                levelUp1StatImage.sprite = defenseIcon;
                 break;
             case CharStat.speed:
-                levelUpButt1Text.text = "+ " + lightStatIncrease + " speed (light)";
+                levelUpButt1Text.text = lightStatIncrease.ToString();
+                levelUpExplanation1.text = "speed\n\n+20 lightness";
+                levelUp1StatImage.sprite = speedIcon;
                 break;
             case CharStat.mana:
-                levelUpButt1Text.text = "+ " + lightStatIncrease + " mana (light)";
+                levelUpButt1Text.text = lightStatIncrease.ToString();
+                levelUpExplanation1.text = "mana\n\n+20 lightness";
+                levelUp1StatImage.sprite = manaIcon;
                 break;
         }
 
         switch (player.stats.darkLevelUpStat)
         {
             case CharStat.offense:
-                levelUpButt2Text.text = "+ " + darkStatIncrease + " offense (dark)";
+                levelUpButt2Text.text = darkStatIncrease.ToString();
+                levelUpExplanation2.text = "offense\n\n+20 darkness";
+                levelUp2StatImage.sprite = offenseIcon;
                 break;
             case CharStat.life:
-                levelUpButt2Text.text = "+ " + darkStatIncrease + " life (dark)";
+                levelUpButt2Text.text = darkStatIncrease.ToString();
+                levelUpExplanation2.text = "life\n\n+20 darkness";
+                levelUp2StatImage.sprite = lifeIcon;
                 break;
         }
     }

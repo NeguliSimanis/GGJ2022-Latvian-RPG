@@ -1050,6 +1050,7 @@ MonoBehaviour:
   lifeBar: {fileID: 8303973664308921568}
   charAnimatedText: {fileID: 18592943004397382}
   charTextAnimator: {fileID: 158528853262942026}
+  charPortrait: {fileID: 21300000, guid: 6b3fe07c24a250b40bdedcc14fea9f24, type: 3}
   bigCharSprite: {fileID: 21300000, guid: f5422923507d2094e9f934d9c5eabd8d, type: 3}
   spriteRenderer: {fileID: 5263861361188574545}
   hurtAnimator: {fileID: 7913881009425419282}

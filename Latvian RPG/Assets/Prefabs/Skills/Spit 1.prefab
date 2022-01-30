@@ -43,9 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c34369e6c218c4aacb27bdcfa07139, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillDamage: 4
+  skillDamage: 5
   manaCost: 3
   skillName: Spit
   skillRange: 2
   type: 00000000
-  description: Deals small amount of damage in medium range

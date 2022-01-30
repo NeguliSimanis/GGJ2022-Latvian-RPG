@@ -67,11 +67,10 @@ public class PlayerControls : MonoBehaviour
     TMP_Text charAnimatedText;
     [SerializeField]
     Animator charTextAnimator;
-
     #endregion
 
     [Header("VISUAL")]
-    [SerializeField]
+    public Sprite charPortrait;
     public Sprite bigCharSprite;
     [SerializeField]
     private SpriteRenderer spriteRenderer;
