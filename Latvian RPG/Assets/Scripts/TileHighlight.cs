@@ -5,6 +5,7 @@ using UnityEngine;
 public class TileHighlight : MonoBehaviour
 {
     public bool active;
+    public bool allowInteraction;
     public ActionType tileActionType;
 
     private Color transparent = new Color(1, 1, 1, 0);
@@ -71,7 +72,7 @@ public class TileHighlight : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (active)
+        if (active && allowInteraction)
         {
             gameManager.ProcessInteractionRequest(xCoord, yCoord, tileActionType);
         }
@@ -85,6 +86,8 @@ public class TileHighlight : MonoBehaviour
     private void MarkTile(bool mark)
     {
         marker.SetActive(mark);
+        if (!allowInteraction)
+            return;
         switch (tileActionType)
         {
             case ActionType.UseCombatSkill:
@@ -102,8 +105,9 @@ public class TileHighlight : MonoBehaviour
         }
     }
 
-    public void EnableTile(ActionType actionType, bool show = true)
+    public void EnableTile(ActionType actionType, bool show = true, bool allowInteracting = true)
     {
+        allowInteraction = allowInteracting;
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         active = show;
         if (!show)

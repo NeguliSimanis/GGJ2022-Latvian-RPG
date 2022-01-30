@@ -7,6 +7,7 @@ public class GameData
     public static GameData current;
 
     #region GENERAL
+    public bool gameStarted = false;
     public int currentTurn = 1;
     public TurnType turnType = TurnType.Player;
     public float tileSize = 1f;
@@ -14,9 +15,9 @@ public class GameData
     #endregion
 
     #region TURNDURATION
-    public float npcMoveDuration = 0.6f;
+    public float npcMoveDuration = 0.5f;
     public float npcActionDuration = 0.9f;
-    public float playerMoveDuration = 0.3f;
+    public float playerMoveDuration = 0.35f;
     #endregion
 
     #region XP BALANCE
@@ -28,10 +29,10 @@ public class GameData
     public int currMoonPoints = 0;
     public int pointsRequiredPhase1 = 1;
     public int pointsRequiredPhase2 = 35;
-    public int pointsRequiredPhase3 = 100;
+    public int pointsRequiredPhase3 = 60;
 
-    public int killPointsReward = 100;
-    public int levelUpPointsReward = 20;
+    public int killPointsReward = 3;
+    public int levelUpPointsReward = 50;
     public int healPointsReward = 5;
     public int recruitPointsReward = 20;
     /*

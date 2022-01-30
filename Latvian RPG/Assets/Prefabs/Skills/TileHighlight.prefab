@@ -97,13 +97,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   active: 1
+  allowInteraction: 0
+  tileActionType: 0
   attackHighlightColor: {r: 0.9811321, g: 0.254539, b: 0.254539, a: 0.9372549}
   attackDefaultColor: {r: 1, g: 0.29803923, b: 0.29803923, a: 0.5372549}
-  moveHighlightColor: {r: 0.33819866, g: 0.754717, b: 0.39306328, a: 0.70980394}
-  moveDefaultColor: {r: 0.3372549, g: 0.7529412, b: 0.39215687, a: 0.54509807}
+  moveHighlightColor: {r: 1, g: 1, b: 1, a: 0.70980394}
+  moveDefaultColor: {r: 1, g: 1, b: 1, a: 0.54509807}
   interactHighlightColor: {r: 1, g: 0.82689804, b: 0, a: 0.74509805}
   interactDefaultColor: {r: 1, g: 0.827451, b: 0, a: 0.44705883}
   marker: {fileID: 170659840012717515}
+  xCoord: 0
+  yCoord: 0
 --- !u!61 &2157206496298226645
 BoxCollider2D:
   m_ObjectHideFlags: 0

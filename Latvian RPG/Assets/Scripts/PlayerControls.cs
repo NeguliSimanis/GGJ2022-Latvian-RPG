@@ -127,7 +127,7 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    public void TeleportCharacter (int targetX, int targetY)
+    public void TeleportPlayerCharacter (int targetX, int targetY)
     {
         int currX = (int)transform.position.x;
         int currY = (int)transform.position.y;
@@ -142,7 +142,8 @@ public class PlayerControls : MonoBehaviour
         //tilesWalked += walkedTiles;
 
         // MOVE CHARACTER
-        StartCoroutine(MoveCloserToTarget(new Vector2Int(targetX, targetY)));
+        StartCoroutine(MovePlayerCloserToTarget(new Vector2Int(targetX, targetY),walkedTiles));
+        
         //transform.position = new Vector3((float)(targetX), (float)targetY, transform.position.z);
     }
 
@@ -214,7 +215,19 @@ public class PlayerControls : MonoBehaviour
                 transform.position = new Vector3(transform.position.x + GameData.current.tileSize, transform.position.y, transform.position.z);
                 break;
         }
+        gameManager.audioManager.PlayStepSound();
         UpdateCoordAndSortOrder();
+        if (type == CharType.Player)
+        {
+            if (gameManager.CheckForHealthPack(new Vector2Int(xCoord, yCoord)))
+                ConsumeHealthPack();
+        }
+    }
+
+    private void ConsumeHealthPack()
+    {
+        float healAmount = stats.maxLife -= stats.currLife;
+        TakeDamage(healAmount, damageSource: this);
     }
 
     public void SelectCharacter(bool select)
@@ -244,15 +257,21 @@ public class PlayerControls : MonoBehaviour
         if (amount < 0)
         {
             damageDealt = MathUtils.CalculateDamage(amount, this.stats.defense, damageSource.stats.offense);
+            gameManager.audioManager.PlayAttackSound();
             hurtAnimator.SetTrigger("hurt");
         }
         stats.currLife += damageDealt;
 
-        // ANIMATIONS
         Debug.Log(gameObject.name + " takes " + damageDealt + " damage (remaining hp: " + stats.currLife + ")" );
 
-        // COMBAT LOG
-        if (type == CharType.Player || type == CharType.Enemy)
+        // COMBAT LOG - healing from hp pack
+        if (damageSource == this)
+        {
+            gameManager.popupManager.UpdateGuideText(
+            damageSource.name + " is healed!");
+        }
+        // COMBAT LOG - taking damage
+        else if (type == CharType.Player || type == CharType.Enemy)
         gameManager.popupManager.UpdateGuideText(
             damageSource.name + " dealt " + -damageDealt + " damage to " + name + "!");
 
@@ -428,10 +447,9 @@ public class PlayerControls : MonoBehaviour
 
     }
 
-    private IEnumerator MoveCloserToTarget(Vector2Int target)
+    private IEnumerator MovePlayerCloserToTarget(Vector2Int target, int distance)
     {
-        Debug.Log("MOVING CLOSER TO TARGET");
-        while (tilesWalked < playerSpeed)
+        while (distance > 0)
         {
             yield return new WaitForSeconds(GameData.current.playerMoveDuration);
             // FURTHER ON X AXIS - move closer on X axis
@@ -460,7 +478,11 @@ public class PlayerControls : MonoBehaviour
                 }
             }
             tilesWalked++;
-
+            distance--;
         }
+        Debug.Log("walk over");
+        yield return new WaitForSeconds(GameData.current.playerMoveDuration*0.8f);
+        gameManager.HideActionRange();
+        gameManager.DisplayActionRange(ActionType.Walk);
     }
 }

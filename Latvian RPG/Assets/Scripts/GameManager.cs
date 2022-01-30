@@ -27,7 +27,7 @@ public class HighlightTileObject
         tileHighlight = highlightObject.GetComponent<TileHighlight>();
     }
 
-    public void ShowTile(ActionType actionType, bool show)
+    public void ShowTile(ActionType actionType, bool show, bool allowInteraction = true)
     {
         tileHighlight.EnableTile(actionType, show);
     }
@@ -40,6 +40,8 @@ public class GameManager : MonoBehaviour
     public PopupManager popupManager;
     [SerializeField]
     CameraController cameraController;
+    public AudioManager audioManager;
+    
 
     [Header("UI")]
     [SerializeField] Button endTurnButton;
@@ -76,6 +78,7 @@ public class GameManager : MonoBehaviour
     public LevelBounds levelLeftBorder;
     [HideInInspector]
     public List<Obstacle> allObstacles = new List<Obstacle>();
+    public List<Healing> healthPacks = new List<Healing>();
     #endregion
 
     private void Awake()
@@ -106,11 +109,34 @@ public class GameManager : MonoBehaviour
         {
             allObstacles.Add(obstacle);
         }
-
+        FindHealthPacks();
         // INITIALIZE BUTTONS
         endTurnButton.onClick.AddListener(EndTurn);
         InitializeSkillButton();
     }
+
+    private void FindHealthPacks()
+    {
+        foreach (Healing healing in FindObjectsOfType<Healing>())
+        {
+            healthPacks.Add(healing);
+        }
+    }
+
+    public bool CheckForHealthPack(Vector2Int coord)
+    {
+        foreach (Healing healing in healthPacks)
+        {
+            if (coord.x == healing.xCoord && coord.y == healing.yCoord)
+            {
+                healing.consumed = true;
+                healing.gameObject.SetActive(false);
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private void ShowEndTurnButton(bool show = true)
     {
@@ -201,14 +227,14 @@ public class GameManager : MonoBehaviour
         if (GameData.current.turnType != TurnType.Player)
         {
             allowedWalkCoordsNPC.Clear();
+        }
 
-            // spawn a tile below the npc
-            if (actionType == ActionType.Walk)
-            {
-                Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
-                selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
-                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
-            }
+        // spawn a tile below the character
+        if (actionType == ActionType.Walk && selectedCharacter.tilesWalked < selectedCharacter.playerSpeed)
+        {
+            Vector3 highlightLocation = new Vector3(selectedCharacter.transform.position.x,
+            selectedCharacter.transform.position.y, selectedCharacter.transform.position.z);
+            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType, allowInteraction: false);
         }
 
         for (int i = 1; i < actionRange + 1; i++)
@@ -314,7 +340,7 @@ public class GameManager : MonoBehaviour
         SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
     }
 
-    private void HideActionRange()
+    public void HideActionRange()
     {
         if (isAnyCharSelected)
             UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
@@ -331,7 +357,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void SpawnHighlightTile(Vector3 highLightLocation, bool oldHighlightsExist, ActionType actionType)
+    private void SpawnHighlightTile(Vector3 highLightLocation, bool oldHighlightsExist, ActionType actionType, bool allowInteraction = true)
     {
         bool createNewHighLights = true;
         targetHighlightCounter++;
@@ -348,12 +374,12 @@ public class GameManager : MonoBehaviour
                 newHighlight.name = "highlight" + targetHighlightCounter.ToString();
                 HighlightTileObject highlightTileObject = new HighlightTileObject(targetHighlightCounter, newHighlight);
                 skillHighlights.Add(highlightTileObject);
-                highlightTileObject.ShowTile(actionType, true);
+                highlightTileObject.ShowTile(actionType, true, allowInteraction);
                 break;
 
 
             case false:
-                skillHighlights[targetHighlightCounter - 1].ShowTile(actionType, true);
+                skillHighlights[targetHighlightCounter - 1].ShowTile(actionType, true, allowInteraction);
                 skillHighlights[targetHighlightCounter - 1].highlightObject.transform.position = highLightLocation;
                 break;
         }
@@ -362,6 +388,8 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (!GameData.current.gameStarted)
+            return;
         if (GameData.current.turnType != TurnType.Player)
             return;
         if (Input.GetKeyDown(KeyCode.C))
@@ -626,10 +654,8 @@ public class GameManager : MonoBehaviour
                     return;
                 }
             }
-            HideActionRange();
-            selectedCharacter.TeleportCharacter(xCoordinate, yCoordinate);
+            selectedCharacter.TeleportPlayerCharacter(xCoordinate, yCoordinate);
             UpdateRemainingMovesText(selectedCharacter.playerSpeed - selectedCharacter.tilesWalked);
-            DisplayActionRange(ActionType.Walk);
             return;
         }
 

@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 91a2a3a5b90c5054db50ed2a6568636c
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Syne Mono
+  fontNames:
+  - Syne Mono
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 4a36c1f63ffb12c44b1f11530630f38e, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
