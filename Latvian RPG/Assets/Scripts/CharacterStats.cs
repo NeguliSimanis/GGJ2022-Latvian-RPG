@@ -13,7 +13,9 @@ public enum Character
 {
     Luna,
     Crow,
-    Dog
+    Dog,
+    Wolf,
+    Goat
 }
 
 public enum CharStat
@@ -84,6 +86,12 @@ public class CharacterStats
             case Character.Dog:
                 GenerateDog();
                 break;
+            case Character.Wolf:
+                GenerateWolf();
+                break;
+            case Character.Goat:
+                GenerateGoat();
+                break;
             default:
                 Debug.Log("CHARACTER NOT DEFINIED");
                 break;
@@ -106,9 +114,10 @@ public class CharacterStats
 
         // flair
         alignment = Alignment.Piety;
-        bio = "They say, one punch of her fist was enough to break the neck of a tiger." +
-            "While not untrue, her true strength always laid in her throws." +
-            "She once defended a caravan from marauders by throwing one of the wagons at them.";
+        bio = "She used to be a queen beloved by her people!" +
+            "Benevolent and righteous, she was." +
+            "Ah, how quickly the righteous turn on their friends and slaughter them." +
+            "";
         name = "Luna";
     }
 
@@ -127,11 +136,56 @@ public class CharacterStats
 
         // flair
         alignment = Alignment.Might;
-        bio = "Angry bat boy";
+        bio = "They say after the battle of Tripeak, there were no survivors." +
+            "This is false.Before you is the child that survived the flames and blades." +
+            "But will it survive you ?";
         name = "Koyanagi";
-    }    
-    
-    
+    }
+
+    private void GenerateWolf()
+    {
+        // combat
+        maxLife = 10;
+        currLife = maxLife;
+
+        maxMana = 10;
+        currMana = maxMana;
+
+        speed = 2; // number of tiles that char can walk in single turn
+
+        skills = new List<Skill>();
+
+        // flair
+        alignment = Alignment.Might;
+        bio = "Take heed, a great general is before you!" +
+            "His armies dead, his land barren and his children murdered by their mother." +
+            "For even a great general can be defeated, if a God craves for a tragedy.";
+        name = "Cellach";
+    }
+
+
+
+    private void GenerateGoat()
+    {
+        // combat
+        maxLife = 10;
+        currLife = maxLife;
+
+        maxMana = 10;
+        currMana = maxMana;
+
+        speed = 2; // number of tiles that char can walk in single turn
+
+        skills = new List<Skill>();
+
+        // flair
+        alignment = Alignment.Might;
+        bio = "Oh, you found one of my favorites!" +
+            "Many are those, who reach me through their might or cunning, great people of war and politics." +
+            "This one raised entire forests and gave shelter to men and beast alike, after a calamity struck their land." +
+            "";
+        name = "Zurabi";
+    }
     private void GenerateDog()
     {
         // combat
@@ -147,7 +201,9 @@ public class CharacterStats
 
         // flair
         alignment = Alignment.Might;
-        bio = "Avatar of Death";
+        bio = "Oh, I remember him! His true death was quite the spectacle. " +
+            "He stood alone against an entire army and held that bridge for three days!" +
+            "It took seventeen arrows to take him down, what a man!";
         name = "Winston";
     }
 

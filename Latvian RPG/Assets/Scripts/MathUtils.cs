@@ -4,6 +4,11 @@ using UnityEngine;
 
 public static class MathUtils
 {
+    public static bool FastApproximately(float a, float b, float threshold)
+    {
+        return ((a - b) < 0 ? ((a - b) * -1) : (a - b)) <= threshold;
+    }
+
     public static bool IsVector2Closer(Vector2Int vector2, Vector2Int vector1, Vector2Int source)
     {
         int diff1 = Mathf.Abs(vector1.x - source.x) + Mathf.Abs(vector1.y - source.y);

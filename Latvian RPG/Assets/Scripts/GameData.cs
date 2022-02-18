@@ -6,6 +6,10 @@ public class GameData
 {
     public static GameData current;
 
+    #region TESTING
+    public bool isTestingMode = true; // turned on for testing game
+    #endregion
+
     #region GENERAL
     public bool gameStarted = false;
     public int currentTurn = 1;
@@ -37,9 +41,9 @@ public class GameData
     public int pointsRequiredPhase3 = 100;
 
     public int killPointsReward = 5;
-    public int levelUpPointsReward = 35;
+    public int levelUpPointsReward = 30;
     public int healPointsReward = 5;
-    public int recruitPointsReward = 20;
+    public int recruitPointsReward = 10;
     /*
      * Kill - 10 dark points
      * Level up choice - 20 dark/light points

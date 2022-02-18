@@ -106,6 +106,12 @@ public class TileHighlight : MonoBehaviour
                 else
                     spriteRenderer.color = moveDefaultColor;
                 break;
+            default:
+                if (mark)
+                    spriteRenderer.color = interactHighlightColor;
+                else
+                    spriteRenderer.color = interactDefaultColor;
+                break;
         }
     }
 
@@ -134,6 +140,9 @@ public class TileHighlight : MonoBehaviour
             case ActionType.UseCombatSkill:
                 Debug.Log("use combat skill");
                 spriteRenderer.color = attackDefaultColor;
+                break;
+            default:
+                spriteRenderer.color = interactDefaultColor;
                 break;
         }
     }

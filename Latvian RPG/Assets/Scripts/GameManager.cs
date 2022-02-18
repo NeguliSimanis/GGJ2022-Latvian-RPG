@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Diagnostics;
+
 
 public enum ActionType
 {
     UseCombatSkill,
-    Walk
+    Walk,
+    UseUtilitySkill,
 }
 
 public class HighlightTileObject
@@ -54,7 +57,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button endTurnButton;
 
     [SerializeField] Button skillButton;
+    [SerializeField] SkillButton skillButtonControls;
     Text skillButtonText;
+    Image skillButtonImage;
+
+    [SerializeField] Button skillButton2;
+    [SerializeField] SkillButton skillButtonControls2;
+    Text skillButtonText2;
+    Image skillButtonImage2;
 
     [SerializeField] GameObject targetHighlight;
     List<HighlightTileObject> skillHighlights = new List<HighlightTileObject>();
@@ -72,7 +82,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public Skill selectedSkill;
     private int targetHighlightCounter = 0;
-    Image skillButtonImage;
+
 
     Color skillButtonDefaultColor = Color.white;
     Color skillButtonSelectedColor = Color.red;
@@ -98,6 +108,8 @@ public class GameManager : MonoBehaviour
 
     public void HighlightChar(PlayerControls charToHighlight, bool highlight = true)
     {
+        // UNHIGHLIGHT THE PREVIOUSLY HIGHLIGHTED CHARACTER
+        highlightedChar.charMarker.AnimateMarker(false);
         if (!GameData.current.gameStarted)
             return;
         if (!highlight)
@@ -107,10 +119,9 @@ public class GameManager : MonoBehaviour
         else
         {
             highlightedChar = charToHighlight;
-            
         }
+        charToHighlight.charMarker.AnimateMarker(highlight);
         popupManager.UpdateCharButton(highlightedChar);
-        Debug.Log(highlightedChar + " HIGHLIGHTED");
     }
 
     private void GetComponents()
@@ -124,15 +135,16 @@ public class GameManager : MonoBehaviour
         GameData.current.gameStarted = true;
         GameData.current.playerTurnStartTime = Time.time;
         GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer + 4f;
-        foreach(PlayerControls playerControls in allCharacters)
+        foreach (PlayerControls playerControls in allCharacters)
         {
             if (playerControls.type == CharType.Player)
             {
+                highlightedChar = playerControls;
                 HighlightChar(playerControls);
+                SelectCharacter(playerControls);
                 return;
             }
         }
-       
     }
 
     private void ShowTurnTimerBar(bool show = true)
@@ -149,8 +161,8 @@ public class GameManager : MonoBehaviour
     {
         turnTimerFill1.fillAmount = Mathf.InverseLerp(GameData.current.playerTurnEndTime, GameData.current.playerTurnStartTime, Time.time);
         turnTimerFill2.fillAmount = Mathf.InverseLerp(GameData.current.playerTurnEndTime, GameData.current.playerTurnStartTime, Time.time);
-            //(GameData.current.playerTurnTimer / (Time.time - GameData.current.playerTurnStartTime));
-            //(stats.currLife * 1f) / stats.maxLife;
+        //(GameData.current.playerTurnTimer / (Time.time - GameData.current.playerTurnStartTime));
+        //(stats.currLife * 1f) / stats.maxLife;
     }
 
     private void Start()
@@ -159,6 +171,7 @@ public class GameManager : MonoBehaviour
         foreach (PlayerControls character in FindObjectsOfType<PlayerControls>())
         {
             allCharacters.Add(character);
+            UnityEngine.Debug.Log("adding " + character.name);
             NPC npcController = character.GetComponent<NPC>();
             npcController.gameManager = this;
             npcController.npcControls = character;
@@ -223,17 +236,53 @@ public class GameManager : MonoBehaviour
 
     private void InitializeSkillButton()
     {
-        skillButton.onClick.AddListener(SelectSkill);
+        skillButton.onClick.AddListener((delegate { SelectSkill(1); }));
         skillButtonText = skillButton.transform.GetChild(0).GetComponent<Text>();
         skillButtonImage = skillButton.gameObject.GetComponent<Image>();
         skillButton.gameObject.SetActive(false);
+
+        skillButton2.onClick.AddListener((delegate { SelectSkill(2); }));
+        skillButtonText2 = skillButton2.transform.GetChild(0).GetComponent<Text>();
+        skillButtonImage2 = skillButton2.gameObject.GetComponent<Image>();
+        skillButton2.gameObject.SetActive(false);
     }
 
-    private void SelectSkill()
+    private void SelectSkill(int skillID = 0)
     {
+        UnityEngine.Debug.Log(skillID);
         skillSelected = !skillSelected;
         HideActionRange();
-
+        // FIRST BUTTON
+        if (skillID == 1)
+        {
+            if (skillSelected)
+            {
+                if (selectedChar.hasUsedSkillThisTurn)
+                {
+                    popupManager.UpdateGuideText(selectedChar.name + " can only act once per turn!");
+                    return;
+                }
+                selectedSkill = selectedChar.stats.skills[0];
+                skillButtonImage.color = skillButtonSelectedColor;
+                skillButtonImage2.color = skillButtonDefaultColor;
+                if (selectedSkill.type[0] == SkillType.Damage)
+                    DisplayActionRange();
+                else
+                {
+                    DisplayActionRange(ActionType.UseUtilitySkill);
+                }
+            }
+            else
+            {
+                UnityEngine.Debug.Log("display walk");
+                skillButtonImage.color = skillButtonDefaultColor;
+                DisplayActionRange(ActionType.Walk);
+            }
+        }
+        if (skillID != 2)
+            return;
+        UnityEngine.Debug.Log("here");
+        // SECOND BUTTON
         if (skillSelected)
         {
             if (selectedChar.hasUsedSkillThisTurn)
@@ -241,26 +290,35 @@ public class GameManager : MonoBehaviour
                 popupManager.UpdateGuideText(selectedChar.name + " can only act once per turn!");
                 return;
             }
-            selectedSkill = selectedChar.stats.skills[0];
-            skillButtonImage.color = skillButtonSelectedColor;
-            DisplayActionRange();
+            selectedSkill = selectedChar.stats.skills[1];
+            skillButtonImage2.color = skillButtonSelectedColor;
+            skillButtonImage.color = skillButtonDefaultColor;
+            if (selectedSkill.type[0] == SkillType.Damage)
+                DisplayActionRange();
+            else
+            {
+                DisplayActionRange(ActionType.UseUtilitySkill);
+            }
         }
         else
         {
-            skillButtonImage.color = skillButtonDefaultColor;
+            UnityEngine.Debug.Log("display walk");
+            skillButtonImage2.color = skillButtonDefaultColor;
             DisplayActionRange(ActionType.Walk);
         }
     }
 
     public void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill, CharType charType = CharType.Player)
     {
+        
         // show the char sprite above the tile sprites
         selectedChar.SetToDefaultSortOrder(defaultOrder: false);
 
         int actionRange;
-        if (actionType == ActionType.UseCombatSkill)
+        if (actionType == ActionType.UseCombatSkill || actionType == ActionType.UseUtilitySkill)
         {
             popupManager.UpdateGuideText("Use " + selectedSkill.name);
+            UnityEngine.Debug.Log("Use " + selectedSkill.name);
             actionRange = selectedSkill.skillRange;
         }
         else
@@ -275,6 +333,7 @@ public class GameManager : MonoBehaviour
             }
             actionRange = speedLeft;
         }
+        UnityEngine.Debug.Log("display " + actionType + ". Range =" + actionRange);
 
         bool reuseOldTargetHighlights = false;
         targetHighlightCounter = 0;
@@ -282,7 +341,7 @@ public class GameManager : MonoBehaviour
         {
             reuseOldTargetHighlights = true;
         }
-
+        
         if (GameData.current.turnType != TurnType.Player)
         {
             allowedWalkCoordsNPC.Clear();
@@ -364,7 +423,7 @@ public class GameManager : MonoBehaviour
 
     private void ProcessSpawnHighlightTileRequest(int xOffset, int yOffset, bool reuseOldTargetHighlights, ActionType actionType)
     {
-        
+
         Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x + xOffset,
                 selectedChar.transform.position.y + yOffset, selectedChar.transform.position.z);
 
@@ -401,10 +460,18 @@ public class GameManager : MonoBehaviour
 
     public void HideActionRange()
     {
-        if (isAnyCharSelected)
-            UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.tilesWalked);
+        UnityEngine.Debug.Log("HIDING ACTION RANGE!");
+        StackTrace stackTrace = new StackTrace();
+
+        // get calling method name
+        UnityEngine.Debug.Log(stackTrace.GetFrame(1).GetMethod().Name);
+        //if (isAnyCharSelected)
+        //    UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.tilesWalked);
         if (skillSelected)
+        {
             skillButtonImage.color = skillButtonDefaultColor;
+            skillButtonImage2.color = skillButtonDefaultColor;
+        }
 
         foreach (HighlightTileObject skillHighlight in skillHighlights)
         {
@@ -452,7 +519,7 @@ public class GameManager : MonoBehaviour
         if (GameData.current.turnType != TurnType.Player)
             return;
         UpdateTurnTimeBar();
-        if(Time.time > GameData.current.playerTurnEndTime)
+        if (Time.time > GameData.current.playerTurnEndTime)
         {
             EndTurn();
             return;
@@ -519,14 +586,22 @@ public class GameManager : MonoBehaviour
                 character.SelectCharacter(false);
             }
         }
+        
         return characterSelected;
     }
 
     private void ShowSkillButton(bool show = true)
     {
         skillButton.gameObject.SetActive(show);
+        skillButton2.gameObject.SetActive(show);
+
         if (show)
+        {
             skillButtonText.text = selectedChar.stats.skills[0].name;
+            skillButtonText2.text = selectedChar.stats.skills[1].name;
+            skillButtonControls.skill = selectedChar.stats.skills[0];
+            skillButtonControls2.skill = selectedChar.stats.skills[1];
+        }
     }
 
     /// <summary>
@@ -548,7 +623,7 @@ public class GameManager : MonoBehaviour
     {
         cameraController.SetPosition(new Vector3(
             selectedChar.transform.position.x,
-            selectedChar.transform.position.y+1,
+            selectedChar.transform.position.y + 1,
             cameraController.transform.position.z));
     }
 
@@ -575,7 +650,7 @@ public class GameManager : MonoBehaviour
         // CHECK IF ANY PLAYERS ARE ALIVE
         if (!CheckForAlivePlayers())
         {
-            Debug.Log("game should end");
+            UnityEngine.Debug.Log("game should end");
             LoseGame();
             return;
         }
@@ -612,7 +687,7 @@ public class GameManager : MonoBehaviour
             popupManager.charButton.gameObject.SetActive(true);
             ShowEndTurnButton(true);
         }
-       
+
         // RESET CHARACTER STATS
         foreach (PlayerControls character in allCharacters)
         {
@@ -624,8 +699,10 @@ public class GameManager : MonoBehaviour
         {
             foreach (PlayerControls character in allCharacters)
             {
-                if (character.type == CharType.Player)
+                if (character.type == CharType.Player
+                    && !character.isDead)
                 {
+                    HighlightChar(character);
                     SelectCharacter(character);
                     MoveCameraToPlayer();
                     break;
@@ -704,6 +781,8 @@ public class GameManager : MonoBehaviour
     {
         if (GameData.current.turnType != TurnType.Player)
             return;
+        if (!GameData.current.gameStarted)
+            return;
 
         // WALK INTERACTION
         if (actionType == ActionType.Walk)
@@ -714,7 +793,7 @@ public class GameManager : MonoBehaviour
             {
                 if (xCoordinate == character.xCoord && yCoordinate == character.yCoord)
                 {
-                    Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
+                    UnityEngine.Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
                     popupManager.UpdateGuideText("Cannot move there!");
                     return;
                 }
@@ -723,7 +802,7 @@ public class GameManager : MonoBehaviour
             {
                 if (xCoordinate == obstacle.pos.x && yCoordinate == obstacle.pos.y)
                 {
-                    Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
+                    UnityEngine.Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
                     popupManager.UpdateGuideText("Cannot move there!");
                     return;
                 }
@@ -743,7 +822,7 @@ public class GameManager : MonoBehaviour
         {
             if (xCoordinate == character.xCoord && yCoordinate == character.yCoord)
             {
-                Debug.Log("TARGET ACQUIRED AT " + xCoordinate + ":" + yCoordinate);
+                UnityEngine.Debug.Log("TARGET ACQUIRED AT " + xCoordinate + ":" + yCoordinate);
                 target = character;
                 targetViable = true;
 
@@ -751,7 +830,7 @@ public class GameManager : MonoBehaviour
         }
         if (!targetViable)
         {
-            Debug.Log("NOOO TARGET AT CH" + xCoordinate + ":" + yCoordinate);
+            UnityEngine.Debug.Log("NOOO TARGET AT CH" + xCoordinate + ":" + yCoordinate);
             popupManager.UpdateGuideText("Invalid target");
             return;
         }
@@ -768,12 +847,20 @@ public class GameManager : MonoBehaviour
 
 
         // 3 - apply skill effect
-        float damageDealt = target.TakeDamage(-selectedSkill.skillDamage, selectedChar);
+        if (selectedSkill.type[0] == SkillType.Damage)
+            target.TakeDamage(-selectedSkill.skillDamage, selectedChar);
+        else if (selectedSkill.type[0] == SkillType.Recruit)
+        {
+            selectedChar.GainExp(ExpAction.Hire);
+            target.Convert(CharType.Player);
+        }
+        else if (selectedSkill.type[0] == SkillType.Buff)
+            target.AddMana(selectedSkill.skillDamage, true);
         selectedChar.hasUsedSkillThisTurn = true;
 
         // 4 - remove spent mana
         selectedChar.SpendMana(selectedSkill.manaCost);
-            
+
     }
 
 
@@ -802,11 +889,11 @@ public class GameManager : MonoBehaviour
         {
             if (obstacle.pos.x == coord.x && obstacle.pos.y == coord.y)
             {
-                Debug.Log(coord + " occuppied by obstacle");
+                UnityEngine.Debug.Log(coord + " occuppied by obstacle");
                 return true;
             }
         }
-        Debug.Log("game manage " + coord + " not occupied by obstacle");
+        UnityEngine.Debug.Log("game manage " + coord + " not occupied by obstacle");
         return false;
     }
 
@@ -844,13 +931,13 @@ public class GameManager : MonoBehaviour
         {
             audioManager.PlayDarkVictorySFX();
             popupManager.ShowDarkVictory();
-            Debug.Log("VICTORY dark");
+            UnityEngine.Debug.Log("VICTORY dark");
         }
         else if (GameData.current.currMoonPoints > 0)
         {
             audioManager.PlayLightVictorySFX();
             popupManager.ShowLightVictory();
-            Debug.Log("VICTORY light");
+            UnityEngine.Debug.Log("VICTORY light");
         }
     }
 }

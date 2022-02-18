@@ -33,7 +33,7 @@ public enum ExpAction
 
 public class PlayerControls : MonoBehaviour
 {
-    
+    public bool hasActedThisTurn = false;
     public CharType type;
     [HideInInspector]
     public bool isDead = false;
@@ -61,8 +61,12 @@ public class PlayerControls : MonoBehaviour
     [Header("HUD")]
     [SerializeField]
     Image manaBar;
+    Image manaBarBG;
+    Color manaColor;
     [SerializeField]
     Image lifeBar;
+    Color lifeColor;
+    Image lifeBarBG;
     [SerializeField]
     TMP_Text charAnimatedText;
     [SerializeField]
@@ -70,10 +74,10 @@ public class PlayerControls : MonoBehaviour
     #endregion
 
     [Header("VISUAL")]
+    public CharacterMarker charMarker;
     public Sprite charPortrait;
     public Sprite bigCharSprite;
-    [SerializeField]
-    private SpriteRenderer spriteRenderer;
+    public SpriteRenderer spriteRenderer;
     private int defaultSortingOrder;
     private int startingSortingOrder;
 
@@ -95,8 +99,99 @@ public class PlayerControls : MonoBehaviour
         characterIsSelected = false;
         defaultSortingOrder = spriteRenderer.sortingOrder;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+        charMarker.UpdateMarkerColor(type);
+
+        InitializePlayerStatUI();
     }
 
+    private void InitializePlayerStatUI()
+    {
+        lifeBarBG = lifeBar.transform.parent.GetChild(0).gameObject.GetComponent<Image>();
+        manaBarBG = manaBar.transform.parent.GetChild(0).gameObject.GetComponent<Image>();
+
+        manaColor = manaBar.color;
+        lifeColor = lifeBar.color;
+
+        // Fade in character stats
+        lifeBarBG.color = new Color(1, 1, 1, 0);
+        manaBarBG.color = new Color(1, 1, 1, 0);
+        FadeImage(lifeBar, fadeFromTransparent: true, fadeSpeed: 0.01f, 
+            startColor: new Color(lifeColor.a, lifeColor.b, lifeColor.g, 0),
+            endColor: new Color(lifeColor.a, lifeColor.b, lifeColor.g, 0.3f));
+        FadeImage(manaBar, fadeFromTransparent: true, fadeSpeed: 0.02f,
+            startColor: new Color(manaColor.a, manaColor.b, manaColor.g, 0),
+            endColor: new Color(manaColor.a, manaColor.b, manaColor.g, 0.3f));
+        //FadeImage(lifeBarBG, fadeIn: true, fadeSpeed: 0.02f,
+        //    startColor: new Color(1,1,1,0),
+        //    endColor: new Color(1, 1, 1, 1));
+        //FadeImage(manaBarBG, fadeIn: true, fadeSpeed: 0.02f,
+        //    startColor: new Color(1, 1, 1, 0),
+        //    endColor: new Color(1, 1, 1, 1));
+    }
+
+    private void FadeImage(Image imageToFade, float fadeSpeed, Color startColor, Color endColor, bool fadeFromTransparent)
+    {
+        if (!fadeFromTransparent)
+        {
+            StartCoroutine(VisualUtils.FadeImage(fadeSpeed, imageToFade, imageToFade.color, new Color(1, 1, 1, 0)));
+        }
+        else 
+        {
+            StartCoroutine(VisualUtils.FadeImage(fadeSpeed, imageToFade, 
+                startColor: startColor, 
+                endColor: endColor));
+        }
+    }
+
+    public void Convert(CharType targetType)
+    {
+        if (type == CharType.Player)
+        {
+            gameManager.popupManager.UpdateGuideText(this.name + " already is in your party!");
+            return;
+        }
+        switch (targetType)
+        {
+            case CharType.Player:
+                type = CharType.Player;
+                gameManager.popupManager.UpdateGuideText(this.name + " joins you!");
+                gameManager.audioManager.PlayUtilitySFX();
+                GameData.current.currMoonPoints += GameData.current.recruitPointsReward;
+                charMarker.UpdateMarkerColor(type);
+                break;
+            default:
+                Debug.Log("THIS IS NOT IMPLEMENTED");
+                break;
+        }
+    }
+
+    public void AddMana(float amount, bool addedBySkill)
+    {
+        if (stats.currMana < stats.maxMana)
+        {
+            // UI
+            charAnimatedText.text = "+" + amount + " mana";
+            charTextAnimator.SetTrigger("appear");
+
+            if (addedBySkill)
+            {
+                GameData.current.currMoonPoints += GameData.current.healPointsReward;
+                gameManager.audioManager.PlayUtilitySFX();
+            }
+            // HUD
+            StartCoroutine(ShowManaBarForXSeconds(3f));
+            StartCoroutine(UpdateStatBarWithDelay(false));
+        }
+
+        // ADD MANA
+        stats.currMana += amount;
+        if (stats.currMana > stats.maxMana)
+        {
+            stats.currMana = stats.maxMana;
+        }
+
+       
+    }
 
     public void ManagePlayerMovement()
     {
@@ -232,7 +327,7 @@ public class PlayerControls : MonoBehaviour
     public void SelectCharacter(bool select)
     {
         characterIsSelected = select;
-        characterSelector.characterFrame.SetActive(select);
+        //characterSelector.characterFrame.SetActive(select);
     }
 
     public void UpdateCoordAndSortOrder()
@@ -289,7 +384,8 @@ public class PlayerControls : MonoBehaviour
         }
 
         // UPDATE HUD BARS
-        StartCoroutine(UpdateLifeBarWithDelay());
+        StartCoroutine(ShowLifeBarForXSeconds(3f));
+        StartCoroutine(UpdateStatBarWithDelay(isLifeBar: true));
 
         return damageDealt;
     }
@@ -301,6 +397,10 @@ public class PlayerControls : MonoBehaviour
             case ExpAction.Kill:
                 stats.currExp += 10;
                 stats.UpdateProgressToGameVictory(ExpAction.Kill);
+                break;
+            case ExpAction.Hire:
+                stats.currExp += 7;
+                stats.UpdateProgressToGameVictory(ExpAction.Hire);
                 break;
         }
         if (stats.currExp >= stats.expRequired)
@@ -376,24 +476,59 @@ public class PlayerControls : MonoBehaviour
             return false;
     }
 
-    private IEnumerator UpdateLifeBarWithDelay()
+    private IEnumerator UpdateStatBarWithDelay(bool isLifeBar)
     {
-        yield return new WaitForSeconds(0.5f);
-        Debug.Log("LIFEBAR YPDATE " + stats.currLife + " out of " + stats.maxLife + " lidf");
-        lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
+        yield return new WaitForSeconds(0.2f);
+        float targetFill = (stats.currLife * 1f) / stats.maxLife;
+        if (!isLifeBar)
+            targetFill = (stats.currMana * 1f) / stats.currMana;
+        int safetyCounter = 1000;
+        float fillSpeed = 0.01f;
+
+        if (targetFill > lifeBar.fillAmount && isLifeBar)
+            fillSpeed *= -1;
+        if (targetFill > manaBar.fillAmount && !isLifeBar)
+            fillSpeed *= -1;
+
+        if (isLifeBar)
+        {
+            while (!MathUtils.FastApproximately(lifeBar.fillAmount, targetFill, 0.001f))
+            {
+                lifeBar.fillAmount -= fillSpeed;
+                yield return new WaitForSeconds(0.01f);
+                safetyCounter--;
+                if (safetyCounter < 0)
+                    break;
+            }
+            lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
+        }
+        else
+        {
+            while (!MathUtils.FastApproximately(manaBar.fillAmount, targetFill, 0.001f))
+            {
+                manaBar.fillAmount -= fillSpeed;
+                yield return new WaitForSeconds(0.01f);
+                safetyCounter--;
+                if (safetyCounter < 0)
+                    break;
+            }
+            manaBar.fillAmount = (stats.currMana * 1f) / stats.currMana;
+        }
     }
 
     public void SpendMana(float amount)
     {
         stats.currMana -= amount;
-        StartCoroutine(UpdateManaBarWithDelay());
+        StartCoroutine(ShowManaBarForXSeconds(3f));
+        StartCoroutine(UpdateStatBarWithDelay(false));
     }
 
-    private IEnumerator UpdateManaBarWithDelay()
-    {
-        yield return new WaitForSeconds(0.5f);
-        manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
-    }
+    //private IEnumerator UpdateManaBarWithDelay()
+    //{
+    //    StartCoroutine(ShowManaBarForXSeconds(3f));
+    //    yield return new WaitForSeconds(0.5f);
+    //    manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
+    //}
 
     public Skill GetLongestRangeDamageSkill()
     {
@@ -427,26 +562,14 @@ public class PlayerControls : MonoBehaviour
         {
             spriteRenderer.sortingOrder = defaultSortingOrder + 9;
         }
+        charMarker.UpdateSortingOrder(spriteRenderer);
     }
 
     public void RegenMana()
     {
-        if (stats.currMana < stats.maxMana)
-        {
-            // UI
-            charAnimatedText.text = "+" + stats.manaRegen + " mana";
-            charTextAnimator.SetTrigger("appear");
-        }
-
-        // ADD MANA
-        stats.currMana += stats.manaRegen;
-        if (stats.currMana > stats.maxMana)
-        {
-            stats.currMana = stats.maxMana;
-        }
-
-        // HUD
-        StartCoroutine(UpdateManaBarWithDelay());
+       
+        AddMana(stats.manaRegen, false);
+       
 
     }
 
@@ -487,5 +610,48 @@ public class PlayerControls : MonoBehaviour
         yield return new WaitForSeconds(GameData.current.playerMoveDuration*0.8f);
         gameManager.HideActionRange();
         gameManager.DisplayActionRange(ActionType.Walk);
+    }
+
+
+    private IEnumerator ShowLifeBarForXSeconds(float xSeconds)
+    {
+
+        StartCoroutine(VisualUtils.FadeImage(
+          fadeSpeed: 0.03f,
+          imageToFade: lifeBar,
+              startColor: lifeBar.color,
+              endColor: lifeColor));
+
+
+        yield return new WaitForSeconds(xSeconds);
+
+
+        StartCoroutine(VisualUtils.FadeImage(
+           fadeSpeed: 0.04f,
+           imageToFade: lifeBar,
+               startColor: lifeColor,
+               endColor: new Color(lifeColor.r, lifeColor.g, lifeColor.b, 0.3f)));
+
+    }
+
+    private IEnumerator ShowManaBarForXSeconds(float xSeconds)
+    {
+        Debug.Log("Mana color start" + manaBar.color);
+        Debug.Log("mana color " + manaColor);
+
+        StartCoroutine(VisualUtils.FadeImage(
+            fadeSpeed: 0.03f, 
+            imageToFade: manaBar,
+                startColor: manaBar.color,
+                endColor: manaColor));
+
+        yield return new WaitForSeconds(xSeconds);
+        Debug.Log("mana color continue");
+        StartCoroutine(VisualUtils.FadeImage(
+            fadeSpeed: 0.04f,
+            imageToFade: manaBar,
+                startColor: manaColor,
+                endColor: new Color(manaColor.r, manaColor.g, manaColor.b, 0.3f)));
+
     }
 }

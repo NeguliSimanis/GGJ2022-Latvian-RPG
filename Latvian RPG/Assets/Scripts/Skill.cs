@@ -24,10 +24,19 @@ public class Skill : MonoBehaviour
     {
         string totalDescription;
 
-        totalDescription = description
-            + "\n \n Base damage: " + (int) skillDamage
-            + "\n Mana cost: " + (int)manaCost
-            + "\n Range: " + skillRange;
+        if (type[0] == SkillType.Recruit)
+        {
+            totalDescription = description 
+                 + "\n Mana cost: " + (int)manaCost
+                + "\n Range: " + skillRange;
+        }
+        else
+        {
+            totalDescription = description
+                + "\n \n Base damage: " + (int)skillDamage
+                + "\n Mana cost: " + (int)manaCost
+                + "\n Range: " + skillRange;
+        }
          
         return totalDescription;
     }

@@ -47,7 +47,9 @@ public class NPC : MonoBehaviour
             EndTurn();
             return;
         }
-       // CheckForNearbyObstructions();
+        // CheckForNearbyObstructions();
+        gameManager.HighlightChar(npcControls, highlight: true);
+
         SetBehaviour();
 
         switch(behaviour)
@@ -238,7 +240,7 @@ public class NPC : MonoBehaviour
         }
         if (endTurnAfter)
         {
-            yield return new WaitForSeconds(GameData.current.npcMoveDuration);
+            yield return new WaitForSeconds(GameData.current.npcMoveDuration*1.1f);
             EndTurn();
         }
     }
@@ -375,7 +377,7 @@ public class NPC : MonoBehaviour
         bool anyPlayerFound = false;
         foreach (PlayerControls player in gameManager.allCharacters)
         {
-            if (player.type == CharType.Player)
+            if (player.type == CharType.Player && !player.isDead)
             {
                 if (!anyPlayerFound)
                 {
@@ -393,6 +395,27 @@ public class NPC : MonoBehaviour
 
     private bool IsTargetInSkillRange(PlayerControls target, Skill skill)
     {
+        #region
+        /*
+         *      x = target, coordinate 2.2
+         *      0 = source, coordinate 0.0
+         *      1 = tiles within 2 tile range
+         *      
+         *      
+         *      _ _ 1 _ x 
+         *      _ 1 1 1 _
+         *      1 1 0 1 1  
+         *      _ 1 1 1 _  
+         *      _ _ 1 _ _  
+         *
+         * 
+         *      xDiff = abs(2-0) = 2
+         *      xDiff = abs(2-0) = 2
+         *      sum = 4
+         *      
+         *      yup seems correct
+         */
+        #endregion
         int xDiff = Mathf.Abs(target.xCoord - npcControls.xCoord);
         int yDiff = Mathf.Abs(target.yCoord - npcControls.yCoord);
         if (xDiff + yDiff <= skill.skillRange)
@@ -434,6 +457,7 @@ public class NPC : MonoBehaviour
                 allCharsDead = false;
                 if (npcControls.stats.currMana < skill.manaCost)
                 {
+                    gameManager.HideActionRange();
                     SetBehaviour(Behaviour.Flee);
                     Flee();
                     yield break;
@@ -482,6 +506,7 @@ public class NPC : MonoBehaviour
     private void EndTurn()
     {
         npcSpriteRenderer.sortingOrder = defaultSortingOrder;
+        gameManager.HighlightChar(npcControls, highlight: false);
         gameManager.ProcessEndCharMove(npcControls.type, id);
     }
 }

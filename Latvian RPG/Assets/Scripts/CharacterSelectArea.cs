@@ -16,7 +16,7 @@ public class CharacterSelectArea : MonoBehaviour
     [SerializeField]
     GameObject selectCharAnimation;
     [SerializeField]
-    public GameObject characterFrame; // displayed when character selected
+    public CharacterMarker charMarker; // displayed when character selected
 
     int characterSelectedCount = 0; // how many times char has been selected
 
@@ -26,13 +26,11 @@ public class CharacterSelectArea : MonoBehaviour
         spriteRenderer.color = defaultCharColor;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         selectCharAnimation.SetActive(false);
-        characterFrame.SetActive(characterController.characterIsSelected);
     }
 
     private void OnMouseOver()
     {
-        if (GameData.current.turnType == TurnType.Player)
-            gameManager.HighlightChar(characterController);
+        
         selectCharAnimation.SetActive(true);
         gameManager.ProcessShowCharNameRequest(characterController);
     }
@@ -45,11 +43,13 @@ public class CharacterSelectArea : MonoBehaviour
 
     private void OnMouseDown()
     {
-        
+
+        gameManager.HighlightChar(characterController);
         if (characterController.type != CharType.Player)
             return;
-            gameManager.SelectCharacter(characterController);
-            characterFrame.SetActive(characterController.characterIsSelected);
+        Debug.Log("mOUSE OAWEKLAHFAL;SFK");
+        gameManager.SelectCharacter(characterController);
+            //characterFrame.SetActive(characterController.characterIsSelected);
         //characterSelectedCount++;
     }
 

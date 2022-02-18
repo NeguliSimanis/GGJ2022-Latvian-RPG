@@ -337,6 +337,8 @@ public class PopupManager : MonoBehaviour
 
     public void ShowLevelUpPopup(PlayerControls player, bool show = true)
     {
+        if (player.type != CharType.Player)
+            return;
         if (!show)
         {
             levelUpPopup.SetActive(false);

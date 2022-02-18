@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7225139782170318055}
   - component: {fileID: 2076941935685868744}
   m_Layer: 0
-  m_Name: Spit
+  m_Name: Inspire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skillDamage: 5
-  manaCost: 3
-  skillName: Spit
+  manaCost: 1
+  skillName: Inspire
   skillRange: 2
-  type: 00000000
+  type: 02000000
+  description: Adds mana to target. Gain Lightness points
