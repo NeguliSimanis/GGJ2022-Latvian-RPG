@@ -481,7 +481,7 @@ public class PlayerControls : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         float targetFill = (stats.currLife * 1f) / stats.maxLife;
         if (!isLifeBar)
-            targetFill = (stats.currMana * 1f) / stats.currMana;
+            targetFill = (stats.currMana * 1f) / stats.maxMana;
         int safetyCounter = 1000;
         float fillSpeed = 0.01f;
 
@@ -504,15 +504,18 @@ public class PlayerControls : MonoBehaviour
         }
         else
         {
+            Debug.Log("MANA SATGJH " + manaBar.fillAmount + ". target: " + targetFill);
             while (!MathUtils.FastApproximately(manaBar.fillAmount, targetFill, 0.001f))
             {
+                
+
                 manaBar.fillAmount -= fillSpeed;
                 yield return new WaitForSeconds(0.01f);
                 safetyCounter--;
                 if (safetyCounter < 0)
                     break;
             }
-            manaBar.fillAmount = (stats.currMana * 1f) / stats.currMana;
+            manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
         }
     }
 
@@ -636,9 +639,6 @@ public class PlayerControls : MonoBehaviour
 
     private IEnumerator ShowManaBarForXSeconds(float xSeconds)
     {
-        Debug.Log("Mana color start" + manaBar.color);
-        Debug.Log("mana color " + manaColor);
-
         StartCoroutine(VisualUtils.FadeImage(
             fadeSpeed: 0.03f, 
             imageToFade: manaBar,
@@ -646,7 +646,7 @@ public class PlayerControls : MonoBehaviour
                 endColor: manaColor));
 
         yield return new WaitForSeconds(xSeconds);
-        Debug.Log("mana color continue");
+
         StartCoroutine(VisualUtils.FadeImage(
             fadeSpeed: 0.04f,
             imageToFade: manaBar,

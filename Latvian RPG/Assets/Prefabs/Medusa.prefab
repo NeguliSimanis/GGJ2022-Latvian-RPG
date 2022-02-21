@@ -543,7 +543,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 5263861361776117320}
   selectCharAnimation: {fileID: 5263861361883099716}
-  characterFrame: {fileID: 0}
+  charMarker: {fileID: 0}
 --- !u!95 &7913881009425419282
 Animator:
   serializedVersion: 3
