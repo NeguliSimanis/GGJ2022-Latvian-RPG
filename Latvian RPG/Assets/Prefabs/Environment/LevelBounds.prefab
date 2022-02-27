@@ -68,7 +68,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -218157303
-  m_SortingLayer: -2
+  m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 9cce4d3899f0fec4dbe2901bcbd81934, type: 3}
   m_Color: {r: 0.745283, g: 0.27069238, b: 0.27069238, a: 1}
@@ -94,7 +94,7 @@ GameObject:
   m_Layer: 0
   m_Name: LevelBounds
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

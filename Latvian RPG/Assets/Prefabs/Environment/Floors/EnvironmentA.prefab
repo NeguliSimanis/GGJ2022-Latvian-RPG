@@ -1259,6 +1259,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4568654058478110077}
     m_Modifications:
+    - target: {fileID: 1184802353608069378, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
+        type: 3}
+      propertyPath: direction
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3072104634121426677, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1318,6 +1323,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LevelBoundsBottom
+      objectReference: {fileID: 0}
+    - target: {fileID: 3072104634121426678, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
+        type: 3}
+      propertyPath: m_TagString
+      value: BottomBorder
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8ee1ada43249f0418a40d2f73fcd1ba, type: 3}
@@ -1393,6 +1403,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LevelBoundsTop
+      objectReference: {fileID: 0}
+    - target: {fileID: 3072104634121426678, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
+        type: 3}
+      propertyPath: m_TagString
+      value: TopBorder
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8ee1ada43249f0418a40d2f73fcd1ba, type: 3}
@@ -1484,6 +1499,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4568654058478110077}
     m_Modifications:
+    - target: {fileID: 1184802353608069378, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
+        type: 3}
+      propertyPath: direction
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3072104634121426677, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1543,6 +1563,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LevelBoundsLeft
+      objectReference: {fileID: 0}
+    - target: {fileID: 3072104634121426678, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
+        type: 3}
+      propertyPath: m_TagString
+      value: LeftBorder
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8ee1ada43249f0418a40d2f73fcd1ba, type: 3}
@@ -1731,6 +1756,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4568654058478110077}
     m_Modifications:
+    - target: {fileID: 1184802353608069378, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
+        type: 3}
+      propertyPath: direction
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3072104634121426677, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1790,6 +1820,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LevelBoundsRight
+      objectReference: {fileID: 0}
+    - target: {fileID: 3072104634121426678, guid: d8ee1ada43249f0418a40d2f73fcd1ba,
+        type: 3}
+      propertyPath: m_TagString
+      value: RightBorder
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8ee1ada43249f0418a40d2f73fcd1ba, type: 3}

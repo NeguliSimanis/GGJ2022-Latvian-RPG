@@ -6,6 +6,10 @@ TagManager:
   tags:
   - GameManager
   - AttackArea
+  - TopBorder
+  - BottomBorder
+  - RightBorder
+  - LeftBorder
   layers:
   - Default
   - TransparentFX

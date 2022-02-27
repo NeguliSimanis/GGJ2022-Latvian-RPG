@@ -183,26 +183,25 @@ public class GameManager : MonoBehaviour
             npcController.gameManager = this;
             npcController.npcControls = character;
         }
-
-        foreach (Obstacle obstacle in FindObjectsOfType<Obstacle>())
-        {
-            allObstacles.Add(obstacle);
-        }
-        FindLevelObjects();
+        FindFloorObstacles();
+        FindFloorObjects();
         // INITIALIZE BUTTONS
         endTurnButton.onClick.AddListener(EndTurn);
         InitializeSkillButton();
     }
 
-    private void FindLevelObjects()
+    private void FindFloorObstacles()
+    {
+        foreach (Obstacle obstacle in FindObjectsOfType<Obstacle>())
+        {
+            allObstacles.Add(obstacle);
+        }
+    }
+    private void FindFloorObjects()
     {
         foreach (InteractableObject interObject in FindObjectsOfType<InteractableObject>())
         {
             levelObjects.Add(interObject);
-            if (interObject.objType == ObjectType.LevelExit)
-            {
-                UnityEngine.Debug.Log("what the fuck");
-            }
         }
     }
 
@@ -1012,7 +1011,12 @@ public class GameManager : MonoBehaviour
         GameObject newFloor = Instantiate(dungeonFloors[newFloorID]);
         currFloor = newFloor;
 
+        levelObjects.Clear();
+        FindFloorObjects();
 
 
+        // FIND OBSTACLES
+        allObstacles.Clear();
+        FindFloorObstacles();
     }
 }
