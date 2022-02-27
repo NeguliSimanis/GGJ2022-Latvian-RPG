@@ -18,6 +18,10 @@ public class GameData
     public int charactersSortingOrder = 3;
     #endregion
 
+    #region DUNGEON
+    public int dungeonFloor = -1;
+    #endregion
+
     #region TURNDURATION
     public float npcMoveDuration = 0.5f;
     public float npcActionDuration = 0.9f;

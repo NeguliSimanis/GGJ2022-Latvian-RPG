@@ -70,6 +70,8 @@ public class GameManager : MonoBehaviour
     List<HighlightTileObject> skillHighlights = new List<HighlightTileObject>();
 
     #region CHAR MANAGEMENT
+    [SerializeField]
+    private GameObject[] npcRoster;
     public List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
     public PlayerControls selectedChar;
     public PlayerControls highlightedChar;
@@ -91,7 +93,9 @@ public class GameManager : MonoBehaviour
     #region ENVIRONMENT
     [Header("ENVIRONMENT")]
     [SerializeField]
-    private DungeonFloor currDungeonFloor;
+    private GameObject [] dungeonFloors;
+    [SerializeField]
+    private GameObject currFloor;
     public LevelBounds levelTopBorder;
     public LevelBounds levelBottomBorder;
     public LevelBounds levelRightBorder;
@@ -147,6 +151,7 @@ public class GameManager : MonoBehaviour
                 return;
             }
         }
+        SpawnNewFloor();
     }
 
     private void ShowTurnTimerBar(bool show = true)
@@ -244,9 +249,10 @@ public class GameManager : MonoBehaviour
 
     public void MovePlayerToFloorStartingPoint()
     {
+        Transform levelStartPoint = currFloor.GetComponent<DungeonFloor>().levelStartPoint;
         Vector2Int startingPoint = new Vector2Int(
-            (int)currDungeonFloor.levelStartPoint.position.x,
-            (int)currDungeonFloor.levelStartPoint.position.y);
+            (int)levelStartPoint.position.x,
+            (int)levelStartPoint.position.y);
 
         Debug.Log("start poi " + startingPoint);
         foreach (PlayerControls curPlayer in allCharacters)
@@ -987,5 +993,26 @@ public class GameManager : MonoBehaviour
             popupManager.ShowLightVictory();
             UnityEngine.Debug.Log("VICTORY light");
         }
+    }
+
+    public void SpawnNewFloor()
+    {
+        Debug.Log("dungeon length " + dungeonFloors.Length);
+        if (GameData.current.dungeonFloor == -1)
+        {
+            Debug.Log("yay");
+            return;
+        }
+        Destroy(currFloor);
+        int newFloorID = GameData.current.dungeonFloor;
+        if (newFloorID >= dungeonFloors.Length)
+        {
+            newFloorID = dungeonFloors.Length - 1;
+        }
+        GameObject newFloor = Instantiate(dungeonFloors[newFloorID]);
+        currFloor = newFloor;
+
+
+
     }
 }

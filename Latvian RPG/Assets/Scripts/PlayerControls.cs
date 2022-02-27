@@ -336,7 +336,8 @@ public class PlayerControls : MonoBehaviour
 
     private void EnterNextLevel()
     {
-        Debug.Log("SHOULD GO TO NEW LEVEL");
+        GameData.current.dungeonFloor++;
+
         // FADE TRANSITION?
 
         // ANIMATE TEXT - NEW LEVEL REACHED
@@ -344,17 +345,12 @@ public class PlayerControls : MonoBehaviour
         // DELETE EXISTING NPC CHARACTERS
         gameManager.RemoveOldNPCs();
 
-        // MOVE main PLAYER CHAR TO NEW POSITION
-
         // SPAWN NEW LEVEL PREFAB
+        gameManager.SpawnNewFloor();
 
         // MOVE OTHER PLAYER CHARS TO NEW POS
+        // MOVE main PLAYER CHAR TO NEW POSITION
         gameManager.MovePlayerToFloorStartingPoint();
-
-        
-
-        
-        
     }
 
     private void ConsumeHealthPack()

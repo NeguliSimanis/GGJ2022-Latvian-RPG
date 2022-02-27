@@ -5,4 +5,5 @@ using UnityEngine;
 public class DungeonFloor : MonoBehaviour
 {
     public Transform levelStartPoint;
+    public Transform[] spawnPoints;
 }
