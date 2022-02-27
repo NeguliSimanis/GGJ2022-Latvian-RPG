@@ -68,7 +68,7 @@ public class PlayerControls : MonoBehaviour
     Color lifeColor;
     Image lifeBarBG;
     [SerializeField]
-    TMP_Text charAnimatedText;
+    Text charAnimatedText;
     [SerializeField]
     Animator charTextAnimator;
     #endregion
@@ -221,7 +221,7 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    public void TeleportPlayerCharacter (int targetX, int targetY)
+    public void TeleportPlayerCharacter (int targetX, int targetY, bool instantTeleport = false)
     {
         int currX = (int)transform.position.x;
         int currY = (int)transform.position.y;
@@ -231,9 +231,16 @@ public class PlayerControls : MonoBehaviour
         int yDiff = targetY - currY;
 
         int walkedTiles = Mathf.Abs(xDiff) + Mathf.Abs(yDiff);
-        Debug.Log("walked " + walkedTiles + " TILES ");
 
-        //tilesWalked += walkedTiles;
+        if (instantTeleport)
+        {
+            Debug.Log("should teleport");
+            transform.position = new Vector3(targetX, targetY, transform.position.z);   
+            UpdateCoordAndSortOrder();
+            gameManager.HideActionRange();
+            gameManager.DisplayActionRange(ActionType.Walk);
+            return;
+        }
 
         // MOVE CHARACTER
         StartCoroutine(MovePlayerCloserToTarget(new Vector2Int(targetX, targetY),walkedTiles));
@@ -313,13 +320,46 @@ public class PlayerControls : MonoBehaviour
         UpdateCoordAndSortOrder();
         if (type == CharType.Player)
         {
-            if (gameManager.CheckForHealthPack(new Vector2Int(xCoord, yCoord)))
-                ConsumeHealthPack();
+            switch (gameManager.CheckInteractableObject(new Vector2Int(xCoord, yCoord)))
+            {
+                case ObjectType.HealingPotion:
+                    ConsumeHealthPack();
+                    break;
+                case ObjectType.LevelExit:
+                    EnterNextLevel();
+                    break;
+                case ObjectType.Undefined:
+                    break;
+            }
         }
+    }
+
+    private void EnterNextLevel()
+    {
+        Debug.Log("SHOULD GO TO NEW LEVEL");
+        // FADE TRANSITION?
+
+        // ANIMATE TEXT - NEW LEVEL REACHED
+
+        // DELETE EXISTING NPC CHARACTERS
+        gameManager.RemoveOldNPCs();
+
+        // MOVE main PLAYER CHAR TO NEW POSITION
+
+        // SPAWN NEW LEVEL PREFAB
+
+        // MOVE OTHER PLAYER CHARS TO NEW POS
+        gameManager.MovePlayerToFloorStartingPoint();
+
+        
+
+        
+        
     }
 
     private void ConsumeHealthPack()
     {
+        Debug.Log("consuming hp");
         float healAmount = stats.maxLife -= stats.currLife;
         TakeDamage(healAmount, damageSource: this);
     }

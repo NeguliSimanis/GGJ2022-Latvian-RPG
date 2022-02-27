@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System.Diagnostics;
+//using System.Diagnostics;
 
 
 public enum ActionType
@@ -90,13 +90,15 @@ public class GameManager : MonoBehaviour
 
     #region ENVIRONMENT
     [Header("ENVIRONMENT")]
+    [SerializeField]
+    private DungeonFloor currDungeonFloor;
     public LevelBounds levelTopBorder;
     public LevelBounds levelBottomBorder;
     public LevelBounds levelRightBorder;
     public LevelBounds levelLeftBorder;
     [HideInInspector]
     public List<Obstacle> allObstacles = new List<Obstacle>();
-    public List<Healing> healthPacks = new List<Healing>();
+    public List<InteractableObject> levelObjects = new List<InteractableObject>();
     #endregion
 
     private void Awake()
@@ -181,32 +183,81 @@ public class GameManager : MonoBehaviour
         {
             allObstacles.Add(obstacle);
         }
-        FindHealthPacks();
+        FindLevelObjects();
         // INITIALIZE BUTTONS
         endTurnButton.onClick.AddListener(EndTurn);
         InitializeSkillButton();
     }
 
-    private void FindHealthPacks()
+    private void FindLevelObjects()
     {
-        foreach (Healing healing in FindObjectsOfType<Healing>())
+        foreach (InteractableObject interObject in FindObjectsOfType<InteractableObject>())
         {
-            healthPacks.Add(healing);
+            levelObjects.Add(interObject);
+            if (interObject.objType == ObjectType.LevelExit)
+            {
+                UnityEngine.Debug.Log("what the fuck");
+            }
         }
     }
 
-    public bool CheckForHealthPack(Vector2Int coord)
+    public ObjectType CheckInteractableObject(Vector2Int coord)
     {
-        foreach (Healing healing in healthPacks)
+        foreach (InteractableObject iObject in levelObjects)
         {
-            if (coord.x == healing.xCoord && coord.y == healing.yCoord)
+            if (coord.x == iObject.xCoord && coord.y == iObject.yCoord)
             {
-                healing.consumed = true;
-                healing.gameObject.SetActive(false);
-                return true;
+                if (iObject.objType == ObjectType.HealingPotion)
+                {
+                    iObject.consumed = true;
+                    iObject.gameObject.SetActive(false);
+                    return ObjectType.HealingPotion;
+                }
+                else
+                {
+                    return ObjectType.LevelExit;
+                }
             }
         }
-        return false;
+        return ObjectType.Undefined;
+    }
+
+    /// <summary>
+    /// REMOVE CHARS THAT STAY IN OLD LEVEL
+    /// </summary>
+    public void RemoveOldNPCs()
+    {
+        int listLength = allCharacters.Count;
+        for (int i = 0; i < listLength; i++)
+        {
+            if (allCharacters[i].type != CharType.Player)
+            {
+                PlayerControls removeThis = allCharacters[i];
+                allCharacters.Remove(removeThis);
+                UnityEngine.Debug.Log("removing " + removeThis.name);
+                Destroy(removeThis.gameObject);
+                listLength--;
+                i--;
+            }
+        }
+    }
+
+    public void MovePlayerToFloorStartingPoint()
+    {
+        Vector2Int startingPoint = new Vector2Int(
+            (int)currDungeonFloor.levelStartPoint.position.x,
+            (int)currDungeonFloor.levelStartPoint.position.y);
+
+        Debug.Log("start poi " + startingPoint);
+        foreach (PlayerControls curPlayer in allCharacters)
+        {
+            if (curPlayer.type == CharType.Player)
+            curPlayer.TeleportPlayerCharacter(startingPoint.x, startingPoint.y, instantTeleport: true);
+        }
+        // move camera
+        MoveCameraToPlayer();
+        
+        
     }
 
 
@@ -461,11 +512,7 @@ public class GameManager : MonoBehaviour
 
     public void HideActionRange()
     {
-        UnityEngine.Debug.Log("HIDING ACTION RANGE!");
-        StackTrace stackTrace = new StackTrace();
 
-        // get calling method name
-        UnityEngine.Debug.Log(stackTrace.GetFrame(1).GetMethod().Name);
         //if (isAnyCharSelected)
         //    UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.tilesWalked);
         if (skillSelected)

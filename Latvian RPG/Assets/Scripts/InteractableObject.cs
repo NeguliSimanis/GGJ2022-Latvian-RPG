@@ -2,11 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Healing : MonoBehaviour
+public enum ObjectType
+{
+    HealingPotion,
+    LevelExit,
+    Undefined
+}
+
+public class InteractableObject : MonoBehaviour
 {
     public int xCoord;
     public int yCoord;
     public bool consumed = false;
+    public ObjectType objType = ObjectType.HealingPotion;
     [SerializeField]
     SpriteRenderer spriteRenderer;
 

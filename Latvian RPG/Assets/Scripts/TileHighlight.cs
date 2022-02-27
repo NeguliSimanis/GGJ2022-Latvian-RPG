@@ -31,6 +31,7 @@ public class TileHighlight : MonoBehaviour
 
 
     private SpriteRenderer spriteRenderer;
+    private int defaultSortingOrder;
 
     [SerializeField]
     private GameObject marker;
@@ -44,6 +45,7 @@ public class TileHighlight : MonoBehaviour
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         marker.SetActive(false);
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+        defaultSortingOrder = spriteRenderer.sortingOrder;
         UpdateCoord();
     }
     private void OnMouseOver()
@@ -59,6 +61,14 @@ public class TileHighlight : MonoBehaviour
     {
         xCoord = (int)transform.position.x;
         yCoord = (int)transform.position.y;
+    }
+
+    public void SetDefaultSortingOrder(bool defaultOrder)
+    {
+        if (defaultOrder)
+            spriteRenderer.sortingOrder = defaultSortingOrder;
+        else
+            spriteRenderer.sortingOrder = -300;
     }
 
     private void OnMouseExit()
@@ -130,6 +140,9 @@ public class TileHighlight : MonoBehaviour
         {
             gameObject.SetActive(true);
         }
+
+        SetDefaultSortingOrder(allowInteracting);
+
 
         tileActionType = actionType;
         switch (tileActionType)
