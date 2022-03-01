@@ -15,7 +15,8 @@ public enum Character
     Crow,
     Dog,
     Wolf,
-    Goat
+    Goat,
+    Undefined
 }
 
 public enum CharStat

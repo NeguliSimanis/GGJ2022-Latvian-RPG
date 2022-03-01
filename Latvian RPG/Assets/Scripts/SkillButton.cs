@@ -52,6 +52,10 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
             ShowSkillInfo(false);
     }
 
+    /// <summary>
+    /// Displays skill info when cursor over button
+    /// </summary>
+    /// <param name="eventData"></param>
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (GameData.current.gameStarted && GameData.current.turnType == TurnType.Player)

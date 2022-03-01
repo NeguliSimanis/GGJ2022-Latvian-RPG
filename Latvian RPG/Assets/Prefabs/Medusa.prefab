@@ -518,7 +518,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasActedThisTurn: 0
-  type: 0
+  type: 1
   isDead: 0
   hasUsedSkillThisTurn: 0
   xCoord: 0

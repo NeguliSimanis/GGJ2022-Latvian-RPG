@@ -44,8 +44,7 @@ public class PlayerControls : MonoBehaviour
     public int yCoord;
 
     public NPC npcController;
-    [SerializeField]
-    private Character character;
+    public Character character;
     public CharacterStats stats;
     public int playerSpeed; // how many tiles can char move in single turn
     public int tilesWalked = 0;

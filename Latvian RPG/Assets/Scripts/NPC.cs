@@ -440,6 +440,7 @@ public class NPC : MonoBehaviour
     private IEnumerator UseDamageSkillOnTarget(PlayerControls target, Skill skill)
     {
         yield return new WaitForSeconds(GameData.current.npcActionDuration * 1);
+        gameManager.HideActionRange();
         gameManager.DisplayActionRange(ActionType.UseCombatSkill, CharType.Enemy);
         yield return new WaitForSeconds(GameData.current.npcActionDuration * 3);
         target.TakeDamage(amount: -skill.skillDamage, damageSource: npcControls);

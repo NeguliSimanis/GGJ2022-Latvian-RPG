@@ -59,6 +59,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaa90fc7c19fa3449834c589ba83a837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  npcRooster:
+  - {fileID: 5263861361776117321, guid: e98d6f82a69a0e94da5f12471fa15c97, type: 3}
+  - {fileID: 5263861361776117321, guid: a039031493ba29548a6d5ceede2a5db2, type: 3}
+  - {fileID: 5263861361776117321, guid: d10d6fa9a3c904f448bbebdb6ee65e47, type: 3}
+  - {fileID: 5263861361776117321, guid: 5a10c6f844f43174f91985db63830800, type: 3}
   levelStartPoint: {fileID: 4568654059785495962}
   spawnPoints:
   - {fileID: 4568654059590953417}
@@ -1792,7 +1797,7 @@ PrefabInstance:
     - target: {fileID: 8319247674051607361, guid: 163019ff9c814014883d1901e331b025,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8319247674051607361, guid: 163019ff9c814014883d1901e331b025,
         type: 3}

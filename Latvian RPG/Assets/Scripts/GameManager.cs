@@ -66,6 +66,8 @@ public class GameManager : MonoBehaviour
     Text skillButtonText2;
     Image skillButtonImage2;
 
+    int lastSelectedSkillButton = 0; // 0 - none , 1 - first , 2 - second
+
     [SerializeField] GameObject targetHighlight;
     List<HighlightTileObject> skillHighlights = new List<HighlightTileObject>();
 
@@ -96,9 +98,13 @@ public class GameManager : MonoBehaviour
     private GameObject [] dungeonFloors;
     [SerializeField]
     private GameObject currFloor;
+    [HideInInspector]
     public LevelBounds levelTopBorder;
+    [HideInInspector]
     public LevelBounds levelBottomBorder;
+    [HideInInspector]
     public LevelBounds levelRightBorder;
+    [HideInInspector]
     public LevelBounds levelLeftBorder;
     [HideInInspector]
     public List<Obstacle> allObstacles = new List<Obstacle>();
@@ -177,17 +183,22 @@ public class GameManager : MonoBehaviour
         // INITIALIZE CHARACTERS
         foreach (PlayerControls character in FindObjectsOfType<PlayerControls>())
         {
-            allCharacters.Add(character);
-            UnityEngine.Debug.Log("adding " + character.name);
-            NPC npcController = character.GetComponent<NPC>();
-            npcController.gameManager = this;
-            npcController.npcControls = character;
+            AddNewCharacter(character);
         }
         FindFloorObstacles();
         FindFloorObjects();
         // INITIALIZE BUTTONS
         endTurnButton.onClick.AddListener(EndTurn);
         InitializeSkillButton();
+    }
+
+    public void AddNewCharacter(PlayerControls character)
+    {
+        allCharacters.Add(character);
+        UnityEngine.Debug.Log("adding " + character.name);
+        NPC npcController = character.GetComponent<NPC>();
+        npcController.gameManager = this;
+        npcController.npcControls = character;
     }
 
     private void FindFloorObstacles()
@@ -306,8 +317,16 @@ public class GameManager : MonoBehaviour
     private void SelectSkill(int skillID = 0)
     {
         UnityEngine.Debug.Log(skillID);
+
+        // DETERMINE IF A BUTTON WAS SELECTED BEFORE
+        bool skillSelectedBefore = false; 
+        //if (lastSelectedSkillButton! = 0)
+
         skillSelected = !skillSelected;
         HideActionRange();
+
+
+
         // FIRST BUTTON
         if (skillID == 1)
         {
