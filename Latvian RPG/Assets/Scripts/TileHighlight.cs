@@ -151,7 +151,6 @@ public class TileHighlight : MonoBehaviour
                 spriteRenderer.color = moveDefaultColor;
                 break;
             case ActionType.UseCombatSkill:
-                Debug.Log("use combat skill");
                 spriteRenderer.color = attackDefaultColor;
                 break;
             default:

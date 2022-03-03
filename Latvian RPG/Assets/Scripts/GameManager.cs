@@ -318,69 +318,64 @@ public class GameManager : MonoBehaviour
     {
         UnityEngine.Debug.Log(skillID);
 
-        // DETERMINE IF A BUTTON WAS SELECTED BEFORE
-        bool skillSelectedBefore = false; 
-        //if (lastSelectedSkillButton! = 0)
-
-        skillSelected = !skillSelected;
         HideActionRange();
 
+        // DETERMINE IF A BUTTON WAS SELECTED BEFORE
 
+        if (skillSelected && lastSelectedSkillButton == skillID)
+        {
+            skillSelected = false;
+        }
+        else
+            skillSelected = true;
+        lastSelectedSkillButton = skillID;
+
+
+        // SKILL DESELECTED
+        if (!skillSelected)
+        {
+            skillButtonImage.color = skillButtonDefaultColor;
+            skillButtonImage2.color = skillButtonDefaultColor;
+            DisplayActionRange(ActionType.Walk);
+            UnityEngine.Debug.Log("display walk");
+            return;
+        }
+
+
+        if (selectedChar.hasUsedSkillThisTurn)
+        {
+            popupManager.UpdateGuideText(selectedChar.name + " can use skill only once per turn!");
+            return;
+        }
 
         // FIRST BUTTON
         if (skillID == 1)
         {
-            if (skillSelected)
-            {
-                if (selectedChar.hasUsedSkillThisTurn)
-                {
-                    popupManager.UpdateGuideText(selectedChar.name + " can only act once per turn!");
-                    return;
-                }
-                selectedSkill = selectedChar.stats.skills[0];
-                skillButtonImage.color = skillButtonSelectedColor;
-                skillButtonImage2.color = skillButtonDefaultColor;
-                if (selectedSkill.type[0] == SkillType.Damage)
-                    DisplayActionRange();
-                else
-                {
-                    DisplayActionRange(ActionType.UseUtilitySkill);
-                }
-            }
-            else
-            {
-                UnityEngine.Debug.Log("display walk");
-                skillButtonImage.color = skillButtonDefaultColor;
-                DisplayActionRange(ActionType.Walk);
-            }
-        }
-        if (skillID != 2)
-            return;
-        UnityEngine.Debug.Log("here");
-        // SECOND BUTTON
-        if (skillSelected)
-        {
-            if (selectedChar.hasUsedSkillThisTurn)
-            {
-                popupManager.UpdateGuideText(selectedChar.name + " can only act once per turn!");
-                return;
-            }
-            selectedSkill = selectedChar.stats.skills[1];
-            skillButtonImage2.color = skillButtonSelectedColor;
-            skillButtonImage.color = skillButtonDefaultColor;
+            selectedSkill = selectedChar.stats.skills[0];
+            skillButtonImage.color = skillButtonSelectedColor;
+            skillButtonImage2.color = skillButtonDefaultColor;
             if (selectedSkill.type[0] == SkillType.Damage)
                 DisplayActionRange();
             else
             {
                 DisplayActionRange(ActionType.UseUtilitySkill);
             }
+            
         }
+        if (skillID != 2)
+            return;
+
+        // SECOND BUTTON
+        selectedSkill = selectedChar.stats.skills[1];
+        skillButtonImage2.color = skillButtonSelectedColor;
+        skillButtonImage.color = skillButtonDefaultColor;
+        if (selectedSkill.type[0] == SkillType.Damage)
+            DisplayActionRange();
         else
         {
-            UnityEngine.Debug.Log("display walk");
-            skillButtonImage2.color = skillButtonDefaultColor;
-            DisplayActionRange(ActionType.Walk);
+            DisplayActionRange(ActionType.UseUtilitySkill);
         }
+        
     }
 
     public void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill, CharType charType = CharType.Player)
