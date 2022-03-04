@@ -42,7 +42,7 @@ public class GameData
     public int currMoonPoints = 0;
     public int pointsRequiredPhase1 = 1;
     public int pointsRequiredPhase2 = 35;
-    public int pointsRequiredPhase3 = 100;
+    public int pointsRequiredPhase3 = 190;
 
     public int killPointsReward = 5;
     public int levelUpPointsReward = 30;

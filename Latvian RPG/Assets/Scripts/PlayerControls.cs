@@ -114,7 +114,7 @@ public class PlayerControls : MonoBehaviour
         // Fade in character stats
         lifeBarBG.color = new Color(1, 1, 1, 0);
         manaBarBG.color = new Color(1, 1, 1, 0);
-        FadeImage(lifeBar, fadeFromTransparent: true, fadeSpeed: 0.01f, 
+        FadeImage(lifeBar, fadeFromTransparent: true, fadeSpeed: 0.01f,
             startColor: new Color(lifeColor.a, lifeColor.b, lifeColor.g, 0),
             endColor: new Color(lifeColor.a, lifeColor.b, lifeColor.g, 0.3f));
         FadeImage(manaBar, fadeFromTransparent: true, fadeSpeed: 0.02f,
@@ -134,10 +134,10 @@ public class PlayerControls : MonoBehaviour
         {
             StartCoroutine(VisualUtils.FadeImage(fadeSpeed, imageToFade, imageToFade.color, new Color(1, 1, 1, 0)));
         }
-        else 
+        else
         {
-            StartCoroutine(VisualUtils.FadeImage(fadeSpeed, imageToFade, 
-                startColor: startColor, 
+            StartCoroutine(VisualUtils.FadeImage(fadeSpeed, imageToFade,
+                startColor: startColor,
                 endColor: endColor));
         }
     }
@@ -152,16 +152,35 @@ public class PlayerControls : MonoBehaviour
         switch (targetType)
         {
             case CharType.Player:
-                type = CharType.Player;
-                gameManager.popupManager.UpdateGuideText(this.name + " joins you!");
-                gameManager.audioManager.PlayUtilitySFX();
-                GameData.current.currMoonPoints += GameData.current.recruitPointsReward;
-                charMarker.UpdateMarkerColor(type);
+                TryJoinPlayerParty();
                 break;
             default:
                 Debug.Log("THIS IS NOT IMPLEMENTED");
                 break;
         }
+    }
+
+    private void TryJoinPlayerParty()
+    {
+        int playerCharCount = 0;
+        foreach(PlayerControls character in gameManager.allCharacters)
+        {
+            if (character.type == CharType.Player)
+                playerCharCount++;
+        }
+        if (playerCharCount > 2)
+        {
+            gameManager.popupManager.UpdateGuideText("Cannot recruit more characters!");
+            return;
+        }
+
+        type = CharType.Player;
+        transform.parent = null;
+        gameManager.popupManager.UpdateGuideText(this.name + " joins you!");
+        gameManager.audioManager.PlayUtilitySFX();
+        
+        GameData.current.currMoonPoints += GameData.current.recruitPointsReward;
+        charMarker.UpdateMarkerColor(type);
     }
 
     public void AddMana(float amount, bool addedBySkill)

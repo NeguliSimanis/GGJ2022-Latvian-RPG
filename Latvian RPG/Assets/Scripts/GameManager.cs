@@ -263,12 +263,23 @@ public class GameManager : MonoBehaviour
         Vector2Int startingPoint = new Vector2Int(
             (int)levelStartPoint.position.x,
             (int)levelStartPoint.position.y);
+        Vector2Int startingPoint2 = new Vector2Int(startingPoint.x-1, startingPoint.y + 1);
+        Vector2Int startingPoint3 = new Vector2Int(startingPoint.x-1, startingPoint.y - 1);
 
         Debug.Log("start poi " + startingPoint);
+        int playerID = 0;
         foreach (PlayerControls curPlayer in allCharacters)
         {
             if (curPlayer.type == CharType.Player)
-            curPlayer.TeleportPlayerCharacter(startingPoint.x, startingPoint.y, instantTeleport: true);
+            {
+                Debug.Log("TELEPORTING " + curPlayer.name);
+                curPlayer.TeleportPlayerCharacter(startingPoint.x, startingPoint.y, instantTeleport: true);
+                if (playerID == 1)
+                    curPlayer.TeleportPlayerCharacter(startingPoint2.x, startingPoint2.y, instantTeleport: true);
+                if (playerID == 2)
+                    curPlayer.TeleportPlayerCharacter(startingPoint3.x, startingPoint3.y, instantTeleport: true);
+                playerID++;
+            }
         }
         // move camera
         MoveCameraToPlayer();
