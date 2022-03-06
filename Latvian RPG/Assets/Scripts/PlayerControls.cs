@@ -558,11 +558,8 @@ public class PlayerControls : MonoBehaviour
         }
         else
         {
-            Debug.Log("MANA SATGJH " + manaBar.fillAmount + ". target: " + targetFill);
             while (!MathUtils.FastApproximately(manaBar.fillAmount, targetFill, 0.001f))
             {
-                
-
                 manaBar.fillAmount -= fillSpeed;
                 yield return new WaitForSeconds(0.01f);
                 safetyCounter--;

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
-
+using System.Runtime.CompilerServices;
 public enum Behaviour
 {
     Patrol,
@@ -141,7 +141,7 @@ public class NPC : MonoBehaviour
     /// </summary>
     private IEnumerator Patrol()
     {
-        DisplayWalkRange();
+        DisplayNPCWalkRange();
         yield return new WaitForSeconds(delayBeforeActionStart);
         int whileCounter = 10;
         while (npcControls.tilesWalked < npcControls.playerSpeed && whileCounter > 0)
@@ -185,10 +185,12 @@ public class NPC : MonoBehaviour
         if (!IsTargetInSkillRange(target:closestPlayer, skill: selectedSkill))
         {
             Debug.Log("TARGET NOT IN SKILL RANGE");
-            DisplayWalkRange();
-            StartCoroutine(MoveCloserToTarget(target: new Vector2Int(closestPlayer.xCoord, closestPlayer.yCoord)));
-            yield return new WaitForSeconds(delayBeforeActionStart*1.1f);
-            StartCoroutine(AttackIfPossible(target: closestPlayer));
+            DisplayNPCWalkRange();
+            if (npcControls.tilesWalked < npcControls.stats.speed)
+                StartCoroutine(MoveCloserToTarget(
+                    target: new Vector2Int(closestPlayer.xCoord, closestPlayer.yCoord),
+                    endTurnAfter:false,
+                    attemptAttackAfter: true));
             yield break;
         }
         Debug.Log("BREAK 3 didnt WORK - target within damaging skill range");
@@ -197,16 +199,33 @@ public class NPC : MonoBehaviour
         yield break;
     }
 
-    private void DisplayWalkRange()
+    private void DisplayNPCWalkRange([CallerMemberName] string callerName = "")
     {
+        Debug.Log("DisplayNPCWalkRange called by " + callerName);
         npcSpriteRenderer.sortingOrder = defaultSortingOrder + 7;
         gameManager.DisplayActionRange(ActionType.Walk, npcControls.type);
     }
 
-    private IEnumerator MoveCloserToTarget(Vector2Int target, bool endTurnAfter = false)
+    private bool IsMyTurn()
     {
-        Debug.Log("MOVING CLOSER TO TARGET");
-        while (npcControls.tilesWalked < npcControls.playerSpeed)
+        if (GameData.current.turnType == TurnType.Enemy && npcControls.type == CharType.Enemy)
+        {
+            return true;
+        }
+        if (GameData.current.turnType == TurnType.Neutral && npcControls.type == CharType.Neutral)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private IEnumerator MoveCloserToTarget(Vector2Int target, bool endTurnAfter = false, bool attemptAttackAfter = false, [CallerMemberName] string callerName = "")
+    {
+        Debug.Log(npcControls.name + "MOVING CLOSER TO TARGET. Method called by " + callerName);
+        while (npcControls.tilesWalked < npcControls.playerSpeed)// && IsMyTurn())
         {
             yield return new WaitForSeconds(delayBeforeActionStart);
             // FURTHER ON X AXIS - move closer on X axis
@@ -236,7 +255,10 @@ public class NPC : MonoBehaviour
             }
             Debug.Log(npcControls.name + " MOVED TO " + npcControls.xCoord + "." + npcControls.yCoord + ". CURR TILES WALKED + " + npcControls.tilesWalked);
             npcControls.tilesWalked++;
-            
+        }
+        if (attemptAttackAfter)
+        {
+            StartCoroutine(AttackIfPossible(target: closestPlayer));
         }
         if (endTurnAfter)
         {
@@ -268,7 +290,7 @@ public class NPC : MonoBehaviour
     private void Flee()
     {
         Debug.Log("FLEEING ENEMY COORD = " + npcControls.xCoord + "." + npcControls.yCoord);
-        DisplayWalkRange();
+        DisplayNPCWalkRange();
 
         int xMin = npcControls.xCoord - npcControls.playerSpeed;
         int xMax = npcControls.xCoord + npcControls.playerSpeed;
@@ -390,6 +412,10 @@ public class NPC : MonoBehaviour
                 }
             }
         }
+        if (anyPlayerFound)
+        {
+            Debug.Log(npcControls.name + " found the closest character - " + closestPlayer.name + " at " + closestPlayer.xCoord + "." + closestPlayer.yCoord);
+        }
         return anyPlayerFound;
     }
 
@@ -425,14 +451,23 @@ public class NPC : MonoBehaviour
 
     private bool IsThisPlayerCloser(PlayerControls thisPlayer)
     {
+        Debug.Log("checking " + thisPlayer.name);
         int diffX = Mathf.Abs(npcControls.xCoord - closestPlayer.xCoord);
         int diffY = Mathf.Abs(npcControls.yCoord - closestPlayer.yCoord);
 
         int newDiffX = Mathf.Abs(npcControls.xCoord - thisPlayer.xCoord);
-        int newDiffY = Mathf.Abs(npcControls.xCoord - thisPlayer.xCoord);
+        int newDiffY = Mathf.Abs(npcControls.yCoord - thisPlayer.yCoord);
+
+        Debug.Log("NEW DIFFX" + newDiffX + ". NEW DIFFY " + newDiffY);
+        Debug.Log("old DIFFX" + diffX + ". old DIFFY " + diffY);
 
         if (newDiffX + newDiffY < diffX + diffY)
+        {
+            Debug.Log(npcControls.name + "(" + npcControls.xCoord + "." + npcControls.yCoord + " is closer to " +
+                thisPlayer.name + "(" + thisPlayer.xCoord + "." + thisPlayer.yCoord + " than " +
+                closestPlayer.name + "(" + closestPlayer.xCoord + "." + closestPlayer.yCoord);
             return true;
+        }
 
         return false;
     }
@@ -504,8 +539,9 @@ public class NPC : MonoBehaviour
         EndTurn();
     }
 
-    private void EndTurn()
+    private void EndTurn([CallerMemberName] string callerName = "")
     {
+        Debug.Log("end turn called by " + callerName);
         npcSpriteRenderer.sortingOrder = defaultSortingOrder;
         gameManager.HighlightChar(npcControls, highlight: false);
         gameManager.ProcessEndCharMove(npcControls.type, id);

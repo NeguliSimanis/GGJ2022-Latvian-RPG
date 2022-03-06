@@ -47,7 +47,6 @@ public class CharacterSelectArea : MonoBehaviour
         gameManager.HighlightChar(characterController);
         if (characterController.type != CharType.Player)
             return;
-        Debug.Log("mOUSE OAWEKLAHFAL;SFK");
         gameManager.SelectCharacter(characterController);
             //characterFrame.SetActive(characterController.characterIsSelected);
         //characterSelectedCount++;

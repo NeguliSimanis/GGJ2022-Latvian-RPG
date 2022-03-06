@@ -85,9 +85,9 @@ public class StartScreen : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void SkipScene()
+    private void SkipScene(bool skipToEnd = false)
     {
-        if (scene3Active)
+        if (scene3Active || skipToEnd)
         {
             StopCoroutine(PlayCutScene3());
             EndCutScenes();
@@ -111,6 +111,11 @@ public class StartScreen : MonoBehaviour
     {
         if (GameData.current.gameStarted)
             return;
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SkipScene(skipToEnd: true);
+            return;
+        }
         if (Input.anyKeyDown)
         {
             SkipScene();
