@@ -203,13 +203,20 @@ public class GameManager : MonoBehaviour
 
     private void FindFloorObstacles()
     {
+        allObstacles.Clear();
+        Debug.Log("CLEARING OBSTACLES");
         foreach (Obstacle obstacle in FindObjectsOfType<Obstacle>())
         {
             allObstacles.Add(obstacle);
         }
+        foreach(Obstacle obstacle in allObstacles)
+        {
+            Debug.Log("hey in " + obstacle.gameObject.name + " at " + obstacle.pos.x + "." + obstacle.pos.y);
+        }
     }
     private void FindFloorObjects()
     {
+        levelObjects.Clear();
         foreach (InteractableObject interObject in FindObjectsOfType<InteractableObject>())
         {
             levelObjects.Add(interObject);
@@ -926,15 +933,21 @@ public class GameManager : MonoBehaviour
 
         // 3 - apply skill effect
         if (selectedSkill.type[0] == SkillType.Damage)
+        {
             target.TakeDamage(-selectedSkill.skillDamage, selectedChar);
+            selectedChar.hasUsedSkillThisTurn = true;
+        }
         else if (selectedSkill.type[0] == SkillType.Recruit)
         {
-            selectedChar.GainExp(ExpAction.Hire);
-            target.Convert(CharType.Player);
+            if (target.Convert(CharType.Player))
+                selectedChar.GainExp(ExpAction.Hire);
         }
         else if (selectedSkill.type[0] == SkillType.Buff)
+        {
             target.AddMana(selectedSkill.skillDamage, true);
-        selectedChar.hasUsedSkillThisTurn = true;
+            selectedChar.hasUsedSkillThisTurn = true;
+        }
+        
 
         // 4 - remove spent mana
         selectedChar.SpendMana(selectedSkill.manaCost);
@@ -1027,7 +1040,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("yay");
             return;
         }
-        Destroy(currFloor);
+        DestroyImmediate(currFloor);
         int newFloorID = GameData.current.dungeonFloor;
         if (newFloorID >= dungeonFloors.Length)
         {
@@ -1041,7 +1054,6 @@ public class GameManager : MonoBehaviour
 
 
         // FIND OBSTACLES
-        allObstacles.Clear();
         FindFloorObstacles();
     }
 }

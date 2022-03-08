@@ -142,25 +142,27 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    public void Convert(CharType targetType)
+    public bool Convert(CharType targetType)
     {
         if (type == CharType.Player)
         {
             gameManager.popupManager.UpdateGuideText(this.name + " already is in your party!");
-            return;
+            return false;
         }
-        switch (targetType)
+
+        if (targetType == CharType.Player)
         {
-            case CharType.Player:
-                TryJoinPlayerParty();
-                break;
-            default:
-                Debug.Log("THIS IS NOT IMPLEMENTED");
-                break;
+            if (TryJoinPlayerParty())
+            {
+                hasUsedSkillThisTurn = true;
+                return true;
+            }
+            else return false;
         }
+        else return false;
     }
 
-    private void TryJoinPlayerParty()
+    private bool TryJoinPlayerParty()
     {
         int playerCharCount = 0;
         foreach(PlayerControls character in gameManager.allCharacters)
@@ -171,7 +173,7 @@ public class PlayerControls : MonoBehaviour
         if (playerCharCount > 2)
         {
             gameManager.popupManager.UpdateGuideText("Cannot recruit more characters!");
-            return;
+            return false;
         }
 
         type = CharType.Player;
@@ -181,6 +183,7 @@ public class PlayerControls : MonoBehaviour
         
         GameData.current.currMoonPoints += GameData.current.recruitPointsReward;
         charMarker.UpdateMarkerColor(type);
+        return true;
     }
 
     public void AddMana(float amount, bool addedBySkill)
@@ -509,6 +512,7 @@ public class PlayerControls : MonoBehaviour
         gameManager.popupManager.UpdateGuideText(
             murderer.name + " killed " + name + "!");
         isDead = true;
+        type = CharType.Neutral;
         Debug.Log(this.name + " IS DEAD");
         gameObject.SetActive(false);
     }
