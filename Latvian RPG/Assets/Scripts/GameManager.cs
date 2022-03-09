@@ -876,7 +876,7 @@ public class GameManager : MonoBehaviour
             // 1 - check if tile not occupied
             foreach (PlayerControls character in allCharacters)
             {
-                if (xCoordinate == character.xCoord && yCoordinate == character.yCoord)
+                if (xCoordinate == character.xCoord && yCoordinate == character.yCoord && !character.isDead)
                 {
                     UnityEngine.Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
                     popupManager.UpdateGuideText("Cannot move there!");

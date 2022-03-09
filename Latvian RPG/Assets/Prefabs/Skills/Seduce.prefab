@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skillDamage: 5
-  manaCost: 2
+  manaCost: 9
   skillName: Seduce
   skillRange: 1
   type: 01000000

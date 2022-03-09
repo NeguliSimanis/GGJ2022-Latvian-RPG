@@ -89,6 +89,8 @@ public class PlayerControls : MonoBehaviour
     {
         UpdateCoordAndSortOrder();
         stats = new CharacterStats(character);
+        if (type != CharType.Player)
+            UpdateStatsToCurrDungeonFloor();
         foreach (Skill newSkill in startingSkills)
         {
             stats.skills.Add(newSkill);
@@ -188,6 +190,8 @@ public class PlayerControls : MonoBehaviour
 
     public void AddMana(float amount, bool addedBySkill)
     {
+        if (isDead)
+            return;
         if (stats.currMana < stats.maxMana)
         {
             // UI
@@ -439,10 +443,12 @@ public class PlayerControls : MonoBehaviour
             damageSource.GainExp(ExpAction.Kill);
             Die(damageSource);
         }
-
-        // UPDATE HUD BARS
-        StartCoroutine(ShowLifeBarForXSeconds(3f));
-        StartCoroutine(UpdateStatBarWithDelay(isLifeBar: true));
+        else
+        {
+            // UPDATE HUD BARS
+            StartCoroutine(ShowLifeBarForXSeconds(3f));
+            StartCoroutine(UpdateStatBarWithDelay(isLifeBar: true));
+        }
 
         return damageDealt;
     }
@@ -540,7 +546,7 @@ public class PlayerControls : MonoBehaviour
         float targetFill = (stats.currLife * 1f) / stats.maxLife;
         if (!isLifeBar)
             targetFill = (stats.currMana * 1f) / stats.maxMana;
-        int safetyCounter = 1000;
+        int safetyCounter = 80;
         float fillSpeed = 0.01f;
 
         if (targetFill > lifeBar.fillAmount && isLifeBar)
@@ -550,9 +556,10 @@ public class PlayerControls : MonoBehaviour
 
         if (isLifeBar)
         {
+            fillSpeed *= stats.maxLife * 0.1f * 0.6f;
             while (!MathUtils.FastApproximately(lifeBar.fillAmount, targetFill, 0.001f))
             {
-                lifeBar.fillAmount -= fillSpeed;
+                lifeBar.fillAmount = lifeBar.fillAmount - (fillSpeed);
                 yield return new WaitForSeconds(0.01f);
                 safetyCounter--;
                 if (safetyCounter < 0)
@@ -562,9 +569,10 @@ public class PlayerControls : MonoBehaviour
         }
         else
         {
+            fillSpeed *= stats.maxMana * 0.1f * 0.6f;
             while (!MathUtils.FastApproximately(manaBar.fillAmount, targetFill, 0.001f))
             {
-                manaBar.fillAmount -= fillSpeed;
+                manaBar.fillAmount = manaBar.fillAmount - (fillSpeed);
                 yield return new WaitForSeconds(0.01f);
                 safetyCounter--;
                 if (safetyCounter < 0)
@@ -708,5 +716,30 @@ public class PlayerControls : MonoBehaviour
                 startColor: manaColor,
                 endColor: new Color(manaColor.r, manaColor.g, manaColor.b, 0.3f)));
 
+    }
+
+    private void UpdateStatsToCurrDungeonFloor()
+    {
+        Debug.Log("BIG SUCCESS");
+        int statIncrease = GameData.current.dungeonFloor;
+
+        int increaseRoll = Random.Range(0, (int)3);
+
+        switch (increaseRoll)
+        {
+            case 0:
+                stats.currLife += statIncrease;
+                stats.maxLife += statIncrease;
+                Debug.Log(name + " increased life");
+                break;
+            case 1:
+                stats.offense += statIncrease;
+                Debug.Log(name + " increased offense");
+                break;
+            case 2:
+                stats.defense += statIncrease;
+                Debug.Log(name + " increased defense");
+                break;
+        }
     }
 }

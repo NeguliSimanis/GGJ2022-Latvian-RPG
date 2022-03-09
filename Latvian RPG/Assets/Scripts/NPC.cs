@@ -28,6 +28,7 @@ public class NPC : MonoBehaviour
     public int id;
 
     private Dictionary<Direction, bool> occuppiedDirections = new Dictionary<Direction, bool>();
+    private bool hasUsedSkillThisTurn = false;
 
     private void Start()
     {
@@ -42,6 +43,7 @@ public class NPC : MonoBehaviour
 
     public void Act()
     {
+        hasUsedSkillThisTurn = false;
         if (npcControls.isDead)
         {
             EndTurn();
@@ -189,8 +191,10 @@ public class NPC : MonoBehaviour
             if (npcControls.tilesWalked < npcControls.stats.speed)
                 StartCoroutine(MoveCloserToTarget(
                     target: new Vector2Int(closestPlayer.xCoord, closestPlayer.yCoord),
-                    endTurnAfter:false,
+                    endTurnAfter: false,
                     attemptAttackAfter: true));
+            else
+                EndTurn();
             yield break;
         }
         Debug.Log("BREAK 3 didnt WORK - target within damaging skill range");
@@ -275,8 +279,9 @@ public class NPC : MonoBehaviour
     private IEnumerator AttackIfPossible(PlayerControls target)
     { 
             // CHECK IF IN SKILL RANGE NOW
-            if (IsTargetInSkillRange(target: target, skill: selectedSkill))
+            if (IsTargetInSkillRange(target: target, skill: selectedSkill) && !hasUsedSkillThisTurn)
             {
+                hasUsedSkillThisTurn = true;
                 StartCoroutine(UseDamageSkillOnTarget(target, selectedSkill));
                 yield break;
             }

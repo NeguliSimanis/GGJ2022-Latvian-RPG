@@ -315,7 +315,7 @@ public class PopupManager : MonoBehaviour
          offenseText.text = "Offense: " + playerControls.stats.offense.ToString();
          armorText.text = "Defense: " + playerControls.stats.defense.ToString();
 
-         lifeText.text = "Life: " + playerControls.stats.currLife.ToString() + "/" + playerControls.stats.maxLife.ToString();
+         lifeText.text = playerControls.stats.currLife.ToString() + "/" + playerControls.stats.maxLife.ToString();
          manaText.text = "Mana: " + playerControls.stats.currMana.ToString() + "/" + playerControls.stats.maxMana.ToString();
 
         speedText.text = "Speed: " + playerControls.stats.speed;

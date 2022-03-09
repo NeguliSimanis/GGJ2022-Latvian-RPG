@@ -79,7 +79,9 @@ public class DungeonFloor : MonoBehaviour
             if (npcObject.GetComponent<PlayerControls>().character == character)
             {
                 GameObject newNPC = Instantiate(npcObject, spawnTransform);
-                gameManager.AddNewCharacter(newNPC.GetComponent<PlayerControls>());
+                PlayerControls newNPCControls = newNPC.GetComponent<PlayerControls>();
+
+                gameManager.AddNewCharacter(newNPCControls);
                 return;
             }
         }
@@ -89,6 +91,8 @@ public class DungeonFloor : MonoBehaviour
     {
         int npcRoll = Random.Range(0, npcCount);
         GameObject newNPC = Instantiate(npcRooster[npcRoll], spawnTransform);
-        gameManager.AddNewCharacter(newNPC.GetComponent<PlayerControls>());
+        PlayerControls newNPCControls = newNPC.GetComponent<PlayerControls>();
+
+        gameManager.AddNewCharacter(newNPCControls);
     }
 }

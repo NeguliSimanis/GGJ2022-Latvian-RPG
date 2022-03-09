@@ -7475,8 +7475,8 @@ MonoBehaviour:
   allowedWalkCoordsNPC: []
   selectedSkill: {fileID: 0}
   dungeonFloors:
-  - {fileID: 4568654058478110076, guid: 8543b50d0dac7324b9ebd3290158a989, type: 3}
   - {fileID: 4568654058478110076, guid: 9dd90a01040137742b25cdae09cd5964, type: 3}
+  - {fileID: 4568654058478110076, guid: 8543b50d0dac7324b9ebd3290158a989, type: 3}
   currFloor: {fileID: 1104640800}
   levelTopBorder: {fileID: 0}
   levelBottomBorder: {fileID: 0}
