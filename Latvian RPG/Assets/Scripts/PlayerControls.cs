@@ -436,6 +436,7 @@ public class PlayerControls : MonoBehaviour
             gameManager.popupManager.UpdateGuideText(
             name + " becomes an enemy!");
             type = CharType.Enemy;
+            charMarker.UpdateMarkerColor(type);
         }
         // DEATH
         if (stats.currLife <= 0)
