@@ -205,14 +205,9 @@ public class GameManager : MonoBehaviour
     private void FindFloorObstacles()
     {
         allObstacles.Clear();
-        Debug.Log("CLEARING OBSTACLES");
         foreach (Obstacle obstacle in FindObjectsOfType<Obstacle>())
         {
             allObstacles.Add(obstacle);
-        }
-        foreach(Obstacle obstacle in allObstacles)
-        {
-            Debug.Log("hey in " + obstacle.gameObject.name + " at " + obstacle.pos.x + "." + obstacle.pos.y);
         }
     }
     private void FindFloorObjects()

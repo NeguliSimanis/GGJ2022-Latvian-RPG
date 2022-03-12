@@ -474,7 +474,7 @@ public class PlayerControls : MonoBehaviour
 
     private void LevelUp()
     {
-        stats.expRequired = (int)(1.1f * stats.expRequired);
+        stats.expRequired = (int)(2.1f * stats.expRequired);
         stats.level++;
         GameData.current.playerTurnEndTime += 15f;
         //gameManager.popupManager.UpdateGuideText(name + "reached level " + stats.level + "!");

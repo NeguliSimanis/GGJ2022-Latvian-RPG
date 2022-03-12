@@ -169,7 +169,7 @@ public class PopupManager : MonoBehaviour
 
     private void Start()
     {
-        if (GameData.current.isDebugMode)
+        if (!GameData.current.isDebugMode)
             debugText.gameObject.SetActive(false);
     }
 
