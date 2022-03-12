@@ -381,7 +381,7 @@ public class PlayerControls : MonoBehaviour
     private void ConsumeHealthPack()
     {
         Debug.Log("consuming hp");
-        float healAmount = stats.maxLife -= stats.currLife;
+        float healAmount = stats.maxLife - stats.currLife;
         TakeDamage(healAmount, damageSource: this);
     }
 
@@ -443,7 +443,7 @@ public class PlayerControls : MonoBehaviour
             damageSource.GainExp(ExpAction.Kill);
             Die(damageSource);
         }
-        else
+        else if (!Mathf.Approximately(damageDealt,0f))
         {
             // UPDATE HUD BARS
             StartCoroutine(ShowLifeBarForXSeconds(3f));
@@ -543,17 +543,58 @@ public class PlayerControls : MonoBehaviour
     private IEnumerator UpdateStatBarWithDelay(bool isLifeBar)
     {
         yield return new WaitForSeconds(0.2f);
+       
+        
         float targetFill = (stats.currLife * 1f) / stats.maxLife;
-        if (!isLifeBar)
-            targetFill = (stats.currMana * 1f) / stats.maxMana;
-        int safetyCounter = 80;
+        float maxStatAmount = stats.maxLife;
+        float currStatAmount = stats.currLife;
+        Image statBar = lifeBar;
+        int safetyCounter = 90;
         float fillSpeed = 0.01f;
-
-        if (targetFill > lifeBar.fillAmount && isLifeBar)
+        
+        if (!isLifeBar)
+        {
+            
+            targetFill = (stats.currMana * 1f) / stats.maxMana;
+            statBar = manaBar;
+            maxStatAmount = stats.maxMana;
+            currStatAmount = stats.currMana;
+            Debug.Log("mana target: " + targetFill + ". Curr fill: " + statBar.fillAmount);
+        }
+       
+        // regeneration
+        if (targetFill > statBar.fillAmount)
             fillSpeed *= -1;
-        if (targetFill > manaBar.fillAmount && !isLifeBar)
-            fillSpeed *= -1;
 
+
+        float diff = Mathf.Abs(Mathf.Abs(targetFill) - Mathf.Abs(statBar.fillAmount));
+        Debug.Log("diff " + diff);
+        fillSpeed *= maxStatAmount * 0.15f * diff;
+        while (!MathUtils.FastApproximately(statBar.fillAmount, targetFill, 0.001f))
+        {
+            // regenration
+            if (fillSpeed < 0)
+            {
+                if (statBar.fillAmount >= targetFill)
+                    break;
+            }
+            // taking damage
+            else if (fillSpeed > 0)
+            {
+                if (statBar.fillAmount <= targetFill)
+                    break;
+            }
+
+
+            statBar.fillAmount = statBar.fillAmount - (fillSpeed);
+            yield return new WaitForSeconds(0.01f);
+            safetyCounter--;
+            if (safetyCounter < 0)
+                break;
+        }
+        statBar.fillAmount = (currStatAmount * 1f) / maxStatAmount;
+
+        /*
         if (isLifeBar)
         {
             fillSpeed *= stats.maxLife * 0.1f * 0.6f;
@@ -579,7 +620,7 @@ public class PlayerControls : MonoBehaviour
                     break;
             }
             manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
-        }
+        }*/
     }
 
     public void SpendMana(float amount)

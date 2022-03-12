@@ -31,7 +31,7 @@ public class StartScreen : MonoBehaviour
     private void Start()
     {
 #if UNITY_EDITOR
-        if (GameData.current.isTestingMode)
+        if (GameData.current.isDebugMode)
             EndCutScenes();
         #endif
         cutScene1.SetActive(false);

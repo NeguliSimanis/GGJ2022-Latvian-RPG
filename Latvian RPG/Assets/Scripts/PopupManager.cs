@@ -34,6 +34,12 @@ public class PopupManager : MonoBehaviour
     PlayerControls charToShow;
     #endregion
 
+    #region DEBUG
+    [Header("DEBUG")]
+    [SerializeField]
+    Text debugText;
+    #endregion
+
     #region CHARACTER POPUP
     [Header("Character popup")]
     [SerializeField]
@@ -159,6 +165,28 @@ public class PopupManager : MonoBehaviour
         darkVictoryScreen.SetActive(false);
         lightVictoryScreen.SetActive(false);
 
+    }
+
+    private void Start()
+    {
+        if (GameData.current.isDebugMode)
+            debugText.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (!GameData.current.isDebugMode)
+            return;
+        debugText.gameObject.SetActive(true);
+        if (gameManager.selectedChar == null)
+        {
+            debugText.text = "no selected char";
+        }
+        else
+        {
+            PlayerControls selectedChar = gameManager.selectedChar;
+            debugText.text = selectedChar.name + " - " + selectedChar.stats.currLife + "/" + selectedChar.stats.maxLife + " laif";
+        }
     }
 
     private void AddButtListeners()
@@ -315,7 +343,7 @@ public class PopupManager : MonoBehaviour
          offenseText.text = "Offense: " + playerControls.stats.offense.ToString();
          armorText.text = "Defense: " + playerControls.stats.defense.ToString();
 
-         lifeText.text = playerControls.stats.currLife.ToString() + "/" + playerControls.stats.maxLife.ToString();
+         lifeText.text = ((int)playerControls.stats.currLife).ToString() + "/" + ((int)playerControls.stats.maxLife).ToString();
          manaText.text = "Mana: " + playerControls.stats.currMana.ToString() + "/" + playerControls.stats.maxMana.ToString();
 
         speedText.text = "Speed: " + playerControls.stats.speed;
@@ -399,4 +427,5 @@ public class PopupManager : MonoBehaviour
     {
         darkVictoryScreen.SetActive(true);
     }
+
 }

@@ -76,6 +76,7 @@ public class GameManager : MonoBehaviour
     private GameObject[] npcRoster;
     public List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
     public PlayerControls selectedChar;
+    private PlayerControls lastSelectedPlayerChar;
     public PlayerControls highlightedChar;
     private bool isAnyCharSelected = false;
     public List<Vector2Int> allowedWalkCoordsNPC = new List<Vector2Int>();
@@ -153,7 +154,7 @@ public class GameManager : MonoBehaviour
             {
                 highlightedChar = playerControls;
                 HighlightChar(playerControls);
-                SelectCharacter(playerControls);
+                SelectChar(playerControls);
                 return;
             }
         }
@@ -641,7 +642,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="characterToSelect"></param>
     /// <returns></returns>
-    public bool SelectCharacter(PlayerControls characterToSelect)
+    public bool SelectChar(PlayerControls characterToSelect)
     {
         bool characterSelected = false;
 
@@ -662,6 +663,7 @@ public class GameManager : MonoBehaviour
                 {
                     return characterSelected;
                 }
+                lastSelectedPlayerChar = selectedChar;
                 DisplayActionRange(ActionType.Walk, character.type);
                 ShowSkillButton();
                 return characterSelected;
@@ -782,17 +784,7 @@ public class GameManager : MonoBehaviour
         // SELECT FIRST RANDOM PLAYER CHARACTER
         if (GameData.current.turnType == TurnType.Player)
         {
-            foreach (PlayerControls character in allCharacters)
-            {
-                if (character.type == CharType.Player
-                    && !character.isDead)
-                {
-                    HighlightChar(character);
-                    SelectCharacter(character);
-                    MoveCameraToPlayer();
-                    break;
-                }
-            }
+            GoToLastSelectedPlayerChar();
 
             // SHOW CHAR UI IF PLAYER TURN
             ShowTurnTimerBar(true);
@@ -814,7 +806,7 @@ public class GameManager : MonoBehaviour
                 GameData.current.turnType == TurnType.Enemy))
             {
                 allCharacters[i].npcController.id = i;
-                SelectCharacter(allCharacters[i]);
+                SelectChar(allCharacters[i]);
                 allCharacters[i].npcController.Act();
                 return;
             }
@@ -822,6 +814,35 @@ public class GameManager : MonoBehaviour
         EndTurn();
     }
 
+    private void GoToLastSelectedPlayerChar()
+    {
+        foreach (PlayerControls character in allCharacters)
+        {
+            if (character.type == CharType.Player
+                && character == lastSelectedPlayerChar
+                && !character.isDead)
+            {
+                HighlightChar(character);
+                SelectChar(character);
+                MoveCameraToPlayer();
+                return;
+            }
+
+        }
+       
+        // LAST SELECTED CHAR IS DEAD
+        foreach (PlayerControls character in allCharacters)
+        {
+            if (character.type == CharType.Player
+                && !character.isDead)
+            {
+                HighlightChar(character);
+                SelectChar(character);
+                MoveCameraToPlayer();
+                break;
+            }
+        }
+    }
 
     /// <summary>
     /// Called by NPC when they finish their actions for the turn
@@ -839,7 +860,7 @@ public class GameManager : MonoBehaviour
                 GameData.current.turnType == TurnType.Enemy))
             {
                 allCharacters[i].npcController.id = i;
-                SelectCharacter(allCharacters[i]);
+                SelectChar(allCharacters[i]);
                 allCharacters[i].npcController.Act();
                 return;
             }

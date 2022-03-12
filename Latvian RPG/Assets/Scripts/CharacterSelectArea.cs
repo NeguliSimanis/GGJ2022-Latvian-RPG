@@ -47,7 +47,7 @@ public class CharacterSelectArea : MonoBehaviour
         gameManager.HighlightChar(characterController);
         if (characterController.type != CharType.Player)
             return;
-        gameManager.SelectCharacter(characterController);
+        gameManager.SelectChar(characterController);
             //characterFrame.SetActive(characterController.characterIsSelected);
         //characterSelectedCount++;
     }

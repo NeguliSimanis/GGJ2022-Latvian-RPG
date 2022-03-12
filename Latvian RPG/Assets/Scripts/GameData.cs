@@ -7,7 +7,7 @@ public class GameData
     public static GameData current;
 
     #region TESTING
-    public bool isTestingMode = false; // turned on for testing game
+    public bool isDebugMode = false; // turned on for testing game
     #endregion
 
     #region GENERAL
