@@ -3,13 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum TurnType
-{
-    Player,
-    Enemy,
-    Neutral
-}
-
 public class TurnManager : MonoBehaviour
 {
 
@@ -38,23 +31,24 @@ public class TurnManager : MonoBehaviour
 
         switch (GameData.current.turnType)
         {
-            case TurnType.Player:
-                GameData.current.turnType = TurnType.Enemy;
+            case CharType.Player:
+                GameData.current.turnType = CharType.Enemy;
                 Debug.Log("start enemy turn");
                 newTurnText = "Enemy Turn";
                 break;
-            case TurnType.Enemy:
-                GameData.current.turnType = TurnType.Neutral;
+            case CharType.Enemy:
+                GameData.current.turnType = CharType.Neutral;
                 Debug.Log("start neutral turn");
                 newTurnText = "Neutral Turn";
                 break;
-            case TurnType.Neutral:
-                GameData.current.turnType = TurnType.Player;
+            case CharType.Neutral:
+                GameData.current.turnType = CharType.Player;
                 Debug.Log("start player turn");
                 newTurnText = "Your Turn";
                 break;
         }
-        gameManager.popupManager.UpdateGuideText(newTurnText);
+
+        gameManager.popupManager.UpdateTurnText();
         //StartCoroutine(ShowTurnTextForSeconds(newTurnText));
     }
 

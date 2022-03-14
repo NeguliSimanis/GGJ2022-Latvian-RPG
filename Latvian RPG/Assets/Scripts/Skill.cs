@@ -12,13 +12,13 @@ public enum SkillType
 
 public class Skill : MonoBehaviour
 {
-
     public float skillDamage;
     public float manaCost;
     public string skillName;
     public int skillRange;
     public SkillType[] type;
     public string description;
+    public SkillEffect[] skillEffects;
 
     public string GetDescription()
     {
@@ -27,6 +27,12 @@ public class Skill : MonoBehaviour
         if (type[0] == SkillType.Recruit)
         {
             totalDescription = description 
+                 + "\n Mana cost: " + (int)manaCost
+                + "\n Range: " + skillRange;
+        }
+        else if (type[0] == SkillType.Buff)
+        {
+            totalDescription = description
                  + "\n Mana cost: " + (int)manaCost
                 + "\n Range: " + skillRange;
         }

@@ -49,3 +49,5 @@ MonoBehaviour:
   skillRange: 2
   type: 02000000
   description: Adds mana to target. Gain Lightness points
+  skillEffects:
+  - {fileID: -6489593602666348602, guid: 55d642d4ae8c214489e40555498f4dc8, type: 3}

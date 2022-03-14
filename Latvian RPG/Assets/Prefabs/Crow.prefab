@@ -318,6 +318,7 @@ MonoBehaviour:
   bigCharSprite: {fileID: 21300000, guid: 7e8ba39ec2b6192438c42d5f2e939df5, type: 3}
   spriteRenderer: {fileID: 5263861361188574545}
   hurtAnimator: {fileID: 1671162231256336809}
+  activeStatusEffects: []
 --- !u!114 &5701418463263706139
 MonoBehaviour:
   m_ObjectHideFlags: 0

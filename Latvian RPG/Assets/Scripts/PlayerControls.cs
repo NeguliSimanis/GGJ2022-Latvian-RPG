@@ -85,7 +85,11 @@ public class PlayerControls : MonoBehaviour
     Animator hurtAnimator;
     #endregion
 
-    private void Start()
+    #region STATUS EFFECTS
+    public List<SkillEffect> activeStatusEffects;
+    #endregion
+
+    private void Awake()
     {
         UpdateCoordAndSortOrder();
         stats = new CharacterStats(character);
@@ -459,7 +463,7 @@ public class PlayerControls : MonoBehaviour
         switch(expAction)
         {
             case ExpAction.Kill:
-                stats.currExp += 10;
+                stats.currExp += 10 + GameData.current.dungeonFloor;
                 stats.UpdateProgressToGameVictory(ExpAction.Kill);
                 break;
             case ExpAction.Hire:
@@ -529,6 +533,8 @@ public class PlayerControls : MonoBehaviour
     /// </summary>
     public void UpdateNewTurnStats()
     {
+        Debug.Log("resetting");
+        ActivateStatusEffects();
         tilesWalked = 0;
         hasUsedSkillThisTurn = false;
     }
@@ -560,7 +566,6 @@ public class PlayerControls : MonoBehaviour
             statBar = manaBar;
             maxStatAmount = stats.maxMana;
             currStatAmount = stats.currMana;
-            Debug.Log("mana target: " + targetFill + ". Curr fill: " + statBar.fillAmount);
         }
        
         // regeneration
@@ -569,7 +574,6 @@ public class PlayerControls : MonoBehaviour
 
 
         float diff = Mathf.Abs(Mathf.Abs(targetFill) - Mathf.Abs(statBar.fillAmount));
-        Debug.Log("diff " + diff);
         fillSpeed *= maxStatAmount * 0.15f * diff;
         while (!MathUtils.FastApproximately(statBar.fillAmount, targetFill, 0.001f))
         {
@@ -783,5 +787,49 @@ public class PlayerControls : MonoBehaviour
                 Debug.Log(name + " increased defense");
                 break;
         }
+    }
+
+    public void ActivateStatusEffects()
+    {
+    
+        int effectCount = activeStatusEffects.Count;
+        Debug.Log("hello " + effectCount);
+        for  (int i = 0; i < effectCount && i > -1; i++)
+        {
+            SkillEffect effect = activeStatusEffects[i];
+
+            // MANA FLAT
+            if (effect.manaIncrease != 0)
+                AddMana(effect.manaIncrease, true);
+
+            // ARMOR PERCENT
+            if (effect.armorPercentIncrease != 0)
+            {
+                if (!effect.armorIncreased)
+                {
+                    Debug.Log("increasing armor!");
+                    effect.armorIncreased = true;
+                    effect.originalArmor = stats.defense;
+                    stats.defense = (int)(stats.defense*(1f + effect.armorPercentIncrease));
+                }
+            }
+
+            effect.effectDuration--;
+            if (effect.effectDuration <= 0)
+            {
+                Debug.Log("effect run out");
+                activeStatusEffects.RemoveAt(i);
+
+                // REMOVE ACTIVE EFFECTS
+                if (effect.armorIncreased)
+                     stats.defense = effect.originalArmor;
+
+                Destroy(effect);
+                i--;
+                effectCount--;
+            }
+
+        }
+        
     }
 }

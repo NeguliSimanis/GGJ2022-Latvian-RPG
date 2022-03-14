@@ -22,7 +22,7 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
 
     private void Update()
     {
-        if (GameData.current.gameStarted && GameData.current.turnType == TurnType.Player)
+        if (GameData.current.gameStarted && GameData.current.turnType == CharType.Player)
         {
             IsMouseOverButton();
         }
@@ -58,7 +58,7 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
     /// <param name="eventData"></param>
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (GameData.current.gameStarted && GameData.current.turnType == TurnType.Player)
+        if (GameData.current.gameStarted && GameData.current.turnType == CharType.Player)
         {
             if (eventData.pointerCurrentRaycast.gameObject != null)
             {

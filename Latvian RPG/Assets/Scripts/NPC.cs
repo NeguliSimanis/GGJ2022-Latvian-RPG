@@ -198,7 +198,10 @@ public class NPC : MonoBehaviour
             yield break;
         }
         Debug.Log("BREAK 3 didnt WORK - target within damaging skill range");
-        StartCoroutine(UseDamageSkillOnTarget(target: closestPlayer, skill: selectedSkill));
+        if (!hasUsedSkillThisTurn)
+            StartCoroutine(UseDamageSkillOnTarget(target: closestPlayer, skill: selectedSkill));
+        else
+            EndTurn();
 
         yield break;
     }
@@ -212,11 +215,11 @@ public class NPC : MonoBehaviour
 
     private bool IsMyTurn()
     {
-        if (GameData.current.turnType == TurnType.Enemy && npcControls.type == CharType.Enemy)
+        if (GameData.current.turnType == CharType.Enemy && npcControls.type == CharType.Enemy)
         {
             return true;
         }
-        if (GameData.current.turnType == TurnType.Neutral && npcControls.type == CharType.Neutral)
+        if (GameData.current.turnType == CharType.Neutral && npcControls.type == CharType.Neutral)
         {
             return true;
         }
@@ -231,11 +234,14 @@ public class NPC : MonoBehaviour
         Debug.Log(npcControls.name + "MOVING CLOSER TO TARGET. Method called by " + callerName);
         while (npcControls.tilesWalked < npcControls.playerSpeed)// && IsMyTurn())
         {
+            bool canMoveCloser = false;
             yield return new WaitForSeconds(delayBeforeActionStart);
             // FURTHER ON X AXIS - move closer on X axis
-            if (Mathf.Abs(target.x - npcControls.xCoord) >
-                Mathf.Abs(target.y - npcControls.yCoord))
+            int diffX = Mathf.Abs(target.x - npcControls.xCoord);
+            if (diffX > Mathf.Abs(target.y - npcControls.yCoord)
+                && diffX > 1)
             {
+                canMoveCloser = true;
                 if (target.x > npcControls.xCoord)
                 {
                     npcControls.MoveCharacterOneTile(Direction.Right);
@@ -246,8 +252,9 @@ public class NPC : MonoBehaviour
                 }
             }
             // FURTHER ON Y AXIS - move closer on Y axis
-            else
+            else if (target.x != npcControls.xCoord && target.y != npcControls.yCoord)
             {
+                canMoveCloser = true;
                 if (target.y > npcControls.yCoord)
                 {
                     npcControls.MoveCharacterOneTile(Direction.Up);
@@ -257,6 +264,8 @@ public class NPC : MonoBehaviour
                     npcControls.MoveCharacterOneTile(Direction.Down);
                 }
             }
+            if (!canMoveCloser)
+                break;
             Debug.Log(npcControls.name + " MOVED TO " + npcControls.xCoord + "." + npcControls.yCoord + ". CURR TILES WALKED + " + npcControls.tilesWalked);
             npcControls.tilesWalked++;
         }
@@ -281,7 +290,6 @@ public class NPC : MonoBehaviour
             // CHECK IF IN SKILL RANGE NOW
             if (IsTargetInSkillRange(target: target, skill: selectedSkill) && !hasUsedSkillThisTurn)
             {
-                hasUsedSkillThisTurn = true;
                 StartCoroutine(UseDamageSkillOnTarget(target, selectedSkill));
                 yield break;
             }
@@ -463,8 +471,6 @@ public class NPC : MonoBehaviour
         int newDiffX = Mathf.Abs(npcControls.xCoord - thisPlayer.xCoord);
         int newDiffY = Mathf.Abs(npcControls.yCoord - thisPlayer.yCoord);
 
-        Debug.Log("NEW DIFFX" + newDiffX + ". NEW DIFFY " + newDiffY);
-        Debug.Log("old DIFFX" + diffX + ". old DIFFY " + diffY);
 
         if (newDiffX + newDiffY < diffX + diffY)
         {
@@ -485,6 +491,7 @@ public class NPC : MonoBehaviour
         yield return new WaitForSeconds(GameData.current.npcActionDuration * 3);
         target.TakeDamage(amount: -skill.skillDamage, damageSource: npcControls);
         npcControls.SpendMana(skill.manaCost);
+        hasUsedSkillThisTurn = true;
 
         // DECIDE ON WHAT TO DO AFTER ATTACKING
         

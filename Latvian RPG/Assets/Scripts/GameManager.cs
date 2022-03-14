@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour
 
     #region CHAR MANAGEMENT
     [SerializeField]
-    private GameObject[] npcRoster;
+    private GameObject[] charRoster;
     public List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
     public PlayerControls selectedChar;
     private PlayerControls lastSelectedPlayerChar;
@@ -123,8 +123,8 @@ public class GameManager : MonoBehaviour
     {
         // UNHIGHLIGHT THE PREVIOUSLY HIGHLIGHTED CHARACTER
         highlightedChar.charMarker.AnimateMarker(false);
-        if (!GameData.current.gameStarted)
-            return;
+        //if (!GameData.current.gameStarted)
+        //    return;
         if (!highlight)
         {
             highlightedChar = selectedChar;
@@ -145,20 +145,55 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        SpawnNewFloor();
+        //SpawnRandomStartingChar();
+        SpawnStartingChar(Character.Crow);
+        //foreach (PlayerControls playerControls in allCharacters)
+        //{
+        //    if (playerControls.type == CharType.Player)
+        //    {
+        //        Debug.Log("STARTING FOUND");
+        //        highlightedChar = playerControls;
+        //        HighlightChar(playerControls);
+        //        SelectChar(playerControls);
+        //        return;
+        //    }
+        //}
         GameData.current.gameStarted = true;
         GameData.current.playerTurnStartTime = Time.time;
         GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer + 4f;
-        foreach (PlayerControls playerControls in allCharacters)
+    }
+
+    public void SpawnRandomStartingChar()
+    {
+        int rosterLength = charRoster.Length;
+        Character randomCharacter;
+        int randomRoll = Random.Range(0, rosterLength);
+        randomCharacter = charRoster[randomRoll].GetComponent<PlayerControls>().character;
+        SpawnStartingChar(randomCharacter);
+    }
+
+    public void SpawnStartingChar(Character newCharacter)
+    {
+        GameObject newPlayer = charRoster[0];
+        foreach (GameObject currChar in charRoster)
         {
-            if (playerControls.type == CharType.Player)
+            if (currChar.GetComponent<PlayerControls>().character == newCharacter)
             {
-                highlightedChar = playerControls;
-                HighlightChar(playerControls);
-                SelectChar(playerControls);
-                return;
+                newPlayer = currChar;
             }
         }
-        SpawnNewFloor();
+        GameObject newPlayerInstance = Instantiate(newPlayer);
+        PlayerControls newControls = newPlayerInstance.GetComponent<PlayerControls>();
+        newControls.type = CharType.Player;
+        cameraController.startTarget = newPlayerInstance.transform;
+        allCharacters.Add(newControls);
+
+        highlightedChar = newControls;
+        HighlightChar(newControls, highlight:true);
+        SelectChar(newControls);
+        cameraController.IntializeCamera(newPlayerInstance.transform);
+        newControls.charMarker.UpdateMarkerColor(CharType.Player);
     }
 
     private void ShowTurnTimerBar(bool show = true)
@@ -330,7 +365,6 @@ public class GameManager : MonoBehaviour
 
     private void SelectSkill(int skillID = 0)
     {
-        UnityEngine.Debug.Log(skillID);
 
         HideActionRange();
 
@@ -426,7 +460,7 @@ public class GameManager : MonoBehaviour
             reuseOldTargetHighlights = true;
         }
         
-        if (GameData.current.turnType != TurnType.Player)
+        if (GameData.current.turnType != CharType.Player)
         {
             allowedWalkCoordsNPC.Clear();
         }
@@ -437,7 +471,10 @@ public class GameManager : MonoBehaviour
         {
             Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x,
             selectedChar.transform.position.y, selectedChar.transform.position.z);
+            if (actionType != ActionType.UseUtilitySkill)
             SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType, allowInteraction: false);
+            else
+                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType, allowInteraction: true);
         }
 
         for (int i = 1; i < actionRange + 1; i++)
@@ -597,7 +634,7 @@ public class GameManager : MonoBehaviour
     {
         if (!GameData.current.gameStarted)
             return;
-        if (GameData.current.turnType != TurnType.Player)
+        if (GameData.current.turnType != CharType.Player)
             return;
         UpdateTurnTimeBar();
         if (Time.time > GameData.current.playerTurnEndTime)
@@ -625,7 +662,7 @@ public class GameManager : MonoBehaviour
 
     public void UpdateRemainingMovesText(int remainingMoves)
     {
-        if (GameData.current.turnType != TurnType.Player)
+        if (GameData.current.turnType != CharType.Player)
             return;
         popupManager.UpdateGuideText("Remaining moves: " + (remainingMoves).ToString());
     }
@@ -641,7 +678,7 @@ public class GameManager : MonoBehaviour
     {
         bool characterSelected = false;
 
-        if (characterToSelect.type == CharType.Player && GameData.current.turnType != TurnType.Player)
+        if (characterToSelect.type == CharType.Player && GameData.current.turnType != CharType.Player)
             return characterSelected;
 
         foreach (PlayerControls character in allCharacters)
@@ -679,6 +716,7 @@ public class GameManager : MonoBehaviour
 
         if (show)
         {
+            Debug.Log(selectedChar);
             skillButtonText.text = selectedChar.stats.skills[0].name;
             skillButtonText2.text = selectedChar.stats.skills[1].name;
             skillButtonControls.skill = selectedChar.stats.skills[0];
@@ -701,12 +739,14 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    private void MoveCameraToPlayer()
+    private void MoveCameraToPlayer(bool instant = false)
     {
+       
+        Debug.Log(selectedChar.transform.position);
         cameraController.SetPosition(new Vector3(
             selectedChar.transform.position.x,
             selectedChar.transform.position.y + 1,
-            cameraController.transform.position.z));
+            cameraController.transform.position.z), instant);
     }
 
     public bool CheckForAlivePlayers()
@@ -739,7 +779,7 @@ public class GameManager : MonoBehaviour
 
 
         // SHOW CONFIRMATION POPUP
-        if (GameData.current.turnType == TurnType.Player)
+        if (GameData.current.turnType == CharType.Player)
         {
             //if (!popupManager.isWarningPopupActive && CanPlayerPartyAct())
             //{
@@ -759,7 +799,7 @@ public class GameManager : MonoBehaviour
         // HIDE IRRELEVANT UI
         HideActionRange();
         ShowSkillButton(false);
-        if (GameData.current.turnType != TurnType.Player)
+        if (GameData.current.turnType != CharType.Player)
         {
             popupManager.charButton.gameObject.SetActive(false);
             ShowEndTurnButton(false);
@@ -773,11 +813,12 @@ public class GameManager : MonoBehaviour
         // RESET CHARACTER STATS
         foreach (PlayerControls character in allCharacters)
         {
-            character.UpdateNewTurnStats();
+            if (character.type == GameData.current.turnType)
+                character.UpdateNewTurnStats();
         }
 
         // SELECT FIRST RANDOM PLAYER CHARACTER
-        if (GameData.current.turnType == TurnType.Player)
+        if (GameData.current.turnType == CharType.Player)
         {
             GoToLastSelectedPlayerChar();
 
@@ -789,16 +830,16 @@ public class GameManager : MonoBehaviour
         }
 
         // MAKE NEUTRAL/ENEMY CHARS ACT
-        if (GameData.current.turnType == TurnType.Player)
+        if (GameData.current.turnType == CharType.Player)
             return;
         ShowTurnTimerBar(false);
         for (int i = 0; i < allCharacters.Count; i++)
         {
             if ((allCharacters[i].type == CharType.Neutral &&
-                GameData.current.turnType == TurnType.Neutral)
+                GameData.current.turnType == CharType.Neutral)
                 ||
                 (allCharacters[i].type == CharType.Enemy &&
-                GameData.current.turnType == TurnType.Enemy))
+                GameData.current.turnType == CharType.Enemy))
             {
                 allCharacters[i].npcController.id = i;
                 SelectChar(allCharacters[i]);
@@ -849,10 +890,10 @@ public class GameManager : MonoBehaviour
         for (int i = currCharID + 1; i < allCharacters.Count; i++)
         {
             if ((allCharacters[i].type == CharType.Neutral &&
-                GameData.current.turnType == TurnType.Neutral)
+                GameData.current.turnType == CharType.Neutral)
                 ||
                 (allCharacters[i].type == CharType.Enemy &&
-                GameData.current.turnType == TurnType.Enemy))
+                GameData.current.turnType == CharType.Enemy))
             {
                 allCharacters[i].npcController.id = i;
                 SelectChar(allCharacters[i]);
@@ -880,7 +921,7 @@ public class GameManager : MonoBehaviour
     /// <param name="yCoordinate"></param>
     public void ProcessInteractionRequest(int xCoordinate, int yCoordinate, ActionType actionType)
     {
-        if (GameData.current.turnType != TurnType.Player)
+        if (GameData.current.turnType != CharType.Player)
             return;
         if (!GameData.current.gameStarted)
             return;
@@ -956,11 +997,21 @@ public class GameManager : MonoBehaviour
         else if (selectedSkill.type[0] == SkillType.Recruit)
         {
             if (target.Convert(CharType.Player))
+            {
                 selectedChar.GainExp(ExpAction.Hire);
-        }
+                selectedChar.hasUsedSkillThisTurn = true;
+            }
+            }
         else if (selectedSkill.type[0] == SkillType.Buff)
         {
-            target.AddMana(selectedSkill.skillDamage, true);
+            foreach (SkillEffect skillEffect in selectedSkill.skillEffects)
+            {
+                GameObject newEffectObject = Instantiate(skillEffect.gameObject);
+                SkillEffect newSkill = newEffectObject.GetComponent<SkillEffect>();
+                target.activeStatusEffects.Add(newSkill);
+                Debug.Log("Added " + skillEffect.name + " skill effect to " + target.name);
+                target.ActivateStatusEffects();
+            }
             selectedChar.hasUsedSkillThisTurn = true;
         }
         
@@ -1010,15 +1061,15 @@ public class GameManager : MonoBehaviour
         {
             switch (GameData.current.turnType)
             {
-                case TurnType.Neutral:
+                case CharType.Neutral:
                     if (character.type == CharType.Neutral)
                         character.RegenMana();
                     break;
-                case TurnType.Enemy:
+                case CharType.Enemy:
                     if (character.type == CharType.Enemy)
                         character.RegenMana();
                     break;
-                case TurnType.Player:
+                case CharType.Player:
                     if (character.type == CharType.Player)
                         character.RegenMana();
                     break;

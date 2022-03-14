@@ -5,7 +5,6 @@ public class PopupManager : MonoBehaviour
 {
     GameManager gameManager;
 
-
     [HideInInspector]
     public bool isWarningPopupActive = false;
 
@@ -151,6 +150,10 @@ public class PopupManager : MonoBehaviour
     Sprite offenseIcon;
     #endregion
 
+    [Header("TURN UI")]
+    [SerializeField]
+    Text turnText;
+
     private void Awake()
     {
         gameManager = gameObject.GetComponent<GameManager>();
@@ -284,7 +287,25 @@ public class PopupManager : MonoBehaviour
 
     public void UpdateGuideText(string newText)
     {
-        guideText.text = newText;
+        guideText.text =  newText;
+    }
+
+    public void UpdateTurnText()
+    {
+        string prefix = "";
+        switch (GameData.current.turnType)
+        {
+            case CharType.Enemy:
+                prefix = "enemy turn";
+                break;
+            case CharType.Player:
+                prefix = "player turn";
+                break;
+            case CharType.Neutral:
+                prefix = "neutral turn";
+                break;
+        }
+        turnText.text = prefix;
     }
 
     private void SetMooningLevelHUD()

@@ -7,13 +7,13 @@ public class GameData
     public static GameData current;
 
     #region TESTING
-    public bool isDebugMode = true; // turned on for testing game
+    public bool isDebugMode = false; // turned on for testing game
     #endregion
 
     #region GENERAL
     public bool gameStarted = false;
     public int currentTurn = 1;
-    public TurnType turnType = TurnType.Player;
+    public CharType turnType = CharType.Player;
     public float tileSize = 1f;
     public int charactersSortingOrder = 3;
     #endregion
