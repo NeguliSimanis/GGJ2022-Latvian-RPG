@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectDuration: 4
-  armorPercentIncrease: 0.2
+  armorPercentIncrease: 0.3
   originalArmor: 0
   increasedArmor: 0
   armorIncreased: 0

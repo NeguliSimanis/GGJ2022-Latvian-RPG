@@ -48,6 +48,6 @@ MonoBehaviour:
   skillName: Guard
   skillRange: 1
   type: 02000000
-  description: Increases defense of target by 20% for 3 turns
+  description: Increases defense of target by 30% for 3 turns
   skillEffects:
   - {fileID: -6489593602666348602, guid: 795be75fb153b1b4ca144e3767de1585, type: 3}

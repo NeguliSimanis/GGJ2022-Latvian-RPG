@@ -33,7 +33,7 @@ public class Skill : MonoBehaviour
         else if (type[0] == SkillType.Buff)
         {
             totalDescription = description
-                 + "\n Mana cost: " + (int)manaCost
+                 + "\n\n Mana cost: " + (int)manaCost
                 + "\n Range: " + skillRange;
         }
         else

@@ -146,8 +146,8 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         SpawnNewFloor();
-        //SpawnRandomStartingChar();
-        SpawnStartingChar(Character.Crow);
+        SpawnRandomStartingChar();
+        //SpawnStartingChar(Character.Goat);
         //foreach (PlayerControls playerControls in allCharacters)
         //{
         //    if (playerControls.type == CharType.Player)
