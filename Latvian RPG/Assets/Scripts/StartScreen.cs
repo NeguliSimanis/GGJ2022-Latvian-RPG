@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StartScreen : MonoBehaviour
 {
@@ -10,10 +11,10 @@ public class StartScreen : MonoBehaviour
     [SerializeField]
     GameObject[] startSreenObjects;
 
+    #region CUTSCENES
+    [Header("CUTSCENES")]
     [SerializeField]
     GameObject cutScene1;
-    [SerializeField]
-    Animator scene1Animator;
 
     [SerializeField]
     GameObject cutScene2;
@@ -28,16 +29,33 @@ public class StartScreen : MonoBehaviour
     bool scene1Active = false;
     bool scene2Active = false;
     bool scene3Active = false;
+    bool cutscenesOver = false;
+    #endregion
+
+    #region CHAR SELECTION SCREEN
+    [Header("char SELECTION")]
+    [SerializeField]
+    GameObject charSelectionScreen;
+
+    [SerializeField]
+    Transform charSelectionPanel;
+
+    [SerializeField]
+    GameObject charSelectButtonPrefab;
+
+    List<PlayerControls> characterList = new List<PlayerControls>();
+    #endregion
 
     private void Start()
     {
 #if UNITY_EDITOR
         if (GameData.current.isDebugMode)
             EndCutScenes();
-        #endif
+#endif
         cutScene1.SetActive(false);
         cutScene2.SetActive(false);
         cutScene3.SetActive(false);
+        charSelectionScreen.SetActive(false);
     }
 
 
@@ -82,6 +100,81 @@ public class StartScreen : MonoBehaviour
 
     private void EndCutScenes()
     {
+        if (cutscenesOver)
+            return;
+        cutscenesOver = true;
+        ShowCharSelection();
+    }
+
+    private void ShowCharSelection()
+    {
+        charSelectionScreen.SetActive(true);
+        GetCharRosterData();
+
+        // SPAWN AVAILABLE CHARACTERS
+        foreach (PlayerControls newChar in characterList)
+        {
+            if (newChar.availableInRoster)
+            {
+                GameObject newButtonObj = Instantiate(charSelectButtonPrefab, charSelectionPanel);
+                Button newButton = newButtonObj.GetComponent<Button>();
+                newButton.onClick.AddListener((delegate { SelectCharacter(newChar.character); }));
+                newButton.onClick.AddListener(gameManager.audioManager.PlayButtonSFX);
+                DisplayCharData(newChar, newButtonObj);
+            }
+        }
+
+        // SPAWN A RANDOM CHAR
+        int charCount = characterList.Count;
+        int randomRoll = Random.Range(0, charCount);
+        PlayerControls randomChar = characterList[randomRoll];
+
+        GameObject randomCharButtonObj = Instantiate(charSelectButtonPrefab, charSelectionPanel);
+        Button randomCharButton = randomCharButtonObj.GetComponent<Button>();
+        randomCharButton.onClick.AddListener((delegate { SelectCharacter(randomChar.character); }));
+        randomCharButton.onClick.AddListener(gameManager.audioManager.PlayButtonSFX);
+        DisplayCharData(randomChar, randomCharButtonObj, secretChar: true);
+    }
+
+    private void DisplayCharData(PlayerControls charToDisplay, GameObject displayPlace, bool secretChar = false)
+    {
+        SelectCharButton selectCharButton = displayPlace.GetComponent<SelectCharButton>();
+        if (secretChar)
+        {
+            selectCharButton.charPortrait.color = Color.black;
+            selectCharButton.charName.text = "Random";
+            selectCharButton.charSkills.text = "Starting skills: " +
+                "????????" + ", " +
+                "????????";
+            return;
+        }
+        selectCharButton.charPortrait.sprite = charToDisplay.charPortrait;
+        selectCharButton.charName.text = charToDisplay.name;
+        selectCharButton.charSkills.text = "Starting skills: " +
+            charToDisplay.startingSkills[0].name + ", " +
+            charToDisplay.startingSkills[1].name;
+    }
+
+    /// <summary>
+    /// Populates char list and returns list length
+    /// </summary>
+    /// <returns></returns>
+    private void GetCharRosterData()
+    {
+        int rosterCharCount = 0;
+        foreach (GameObject charObject in gameManager.charRoster)
+        {
+            PlayerControls newChar = charObject.GetComponent<PlayerControls>();
+            characterList.Add(newChar);
+            newChar.GetCharData();
+            if (newChar.availableInRoster)
+                rosterCharCount++;
+        }
+    }
+
+    public void SelectCharacter(Character selectedChar)
+    {
+        gameManager.SpawnStartingChar(selectedChar);
         gameManager.StartGame();
         gameObject.SetActive(false);
     }

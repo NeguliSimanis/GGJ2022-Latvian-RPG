@@ -72,8 +72,7 @@ public class GameManager : MonoBehaviour
     List<HighlightTileObject> skillHighlights = new List<HighlightTileObject>();
 
     #region CHAR MANAGEMENT
-    [SerializeField]
-    private GameObject[] charRoster;
+    public GameObject[] charRoster;
     public List<PlayerControls> allCharacters = new List<PlayerControls>(); // all characters currently in game, including NPCS
     public PlayerControls selectedChar;
     private PlayerControls lastSelectedPlayerChar;
@@ -146,7 +145,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         SpawnNewFloor();
-        SpawnRandomStartingChar();
+        // SpawnRandomStartingChar();
         //SpawnStartingChar(Character.Goat);
         //foreach (PlayerControls playerControls in allCharacters)
         //{
@@ -185,7 +184,7 @@ public class GameManager : MonoBehaviour
         }
         GameObject newPlayerInstance = Instantiate(newPlayer);
         PlayerControls newControls = newPlayerInstance.GetComponent<PlayerControls>();
-        newControls.type = CharType.Player;
+        newControls.charType = CharType.Player;
         cameraController.startTarget = newPlayerInstance.transform;
         allCharacters.Add(newControls);
 
@@ -283,7 +282,7 @@ public class GameManager : MonoBehaviour
         int listLength = allCharacters.Count;
         for (int i = 0; i < listLength; i++)
         {
-            if (allCharacters[i].type != CharType.Player)
+            if (allCharacters[i].charType != CharType.Player)
             {
                 PlayerControls removeThis = allCharacters[i];
                 allCharacters.Remove(removeThis);
@@ -308,7 +307,7 @@ public class GameManager : MonoBehaviour
         int playerID = 0;
         foreach (PlayerControls curPlayer in allCharacters)
         {
-            if (curPlayer.type == CharType.Player)
+            if (curPlayer.charType == CharType.Player)
             {
                 Debug.Log("TELEPORTING " + curPlayer.name);
                 curPlayer.TeleportPlayerCharacter(startingPoint.x, startingPoint.y, instantTeleport: true);
@@ -335,7 +334,7 @@ public class GameManager : MonoBehaviour
     {
         if (!skillSelected && !isAnyCharSelected)
         {
-            switch (character.type)
+            switch (character.charType)
             {
                 case CharType.Enemy:
                     popupManager.UpdateGuideText(character.name + " (Enemy)");
@@ -678,7 +677,7 @@ public class GameManager : MonoBehaviour
     {
         bool characterSelected = false;
 
-        if (characterToSelect.type == CharType.Player && GameData.current.turnType != CharType.Player)
+        if (characterToSelect.charType == CharType.Player && GameData.current.turnType != CharType.Player)
             return characterSelected;
 
         foreach (PlayerControls character in allCharacters)
@@ -691,12 +690,12 @@ public class GameManager : MonoBehaviour
                 characterSelected = true;
                 selectedChar = characterToSelect;
                 HideActionRange();
-                if (character.type != CharType.Player)
+                if (character.charType != CharType.Player)
                 {
                     return characterSelected;
                 }
                 lastSelectedPlayerChar = selectedChar;
-                DisplayActionRange(ActionType.Walk, character.type);
+                DisplayActionRange(ActionType.Walk, character.charType);
                 ShowSkillButton();
                 return characterSelected;
             }
@@ -732,7 +731,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (PlayerControls character in allCharacters)
         {
-            if (character.type == CharType.Player &&
+            if (character.charType == CharType.Player &&
                 character.CanCharacterAct())
                 return true;
         }
@@ -753,7 +752,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (PlayerControls character in allCharacters)
         {
-            if (character.type == CharType.Player && !character.isDead)
+            if (character.charType == CharType.Player && !character.isDead)
             {
                 return true;
             }
@@ -813,7 +812,7 @@ public class GameManager : MonoBehaviour
         // RESET CHARACTER STATS
         foreach (PlayerControls character in allCharacters)
         {
-            if (character.type == GameData.current.turnType)
+            if (character.charType == GameData.current.turnType)
                 character.UpdateNewTurnStats();
         }
 
@@ -835,10 +834,10 @@ public class GameManager : MonoBehaviour
         ShowTurnTimerBar(false);
         for (int i = 0; i < allCharacters.Count; i++)
         {
-            if ((allCharacters[i].type == CharType.Neutral &&
+            if ((allCharacters[i].charType == CharType.Neutral &&
                 GameData.current.turnType == CharType.Neutral)
                 ||
-                (allCharacters[i].type == CharType.Enemy &&
+                (allCharacters[i].charType == CharType.Enemy &&
                 GameData.current.turnType == CharType.Enemy))
             {
                 allCharacters[i].npcController.id = i;
@@ -854,7 +853,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (PlayerControls character in allCharacters)
         {
-            if (character.type == CharType.Player
+            if (character.charType == CharType.Player
                 && character == lastSelectedPlayerChar
                 && !character.isDead)
             {
@@ -869,7 +868,7 @@ public class GameManager : MonoBehaviour
         // LAST SELECTED CHAR IS DEAD
         foreach (PlayerControls character in allCharacters)
         {
-            if (character.type == CharType.Player
+            if (character.charType == CharType.Player
                 && !character.isDead)
             {
                 HighlightChar(character);
@@ -889,10 +888,10 @@ public class GameManager : MonoBehaviour
     {
         for (int i = currCharID + 1; i < allCharacters.Count; i++)
         {
-            if ((allCharacters[i].type == CharType.Neutral &&
+            if ((allCharacters[i].charType == CharType.Neutral &&
                 GameData.current.turnType == CharType.Neutral)
                 ||
-                (allCharacters[i].type == CharType.Enemy &&
+                (allCharacters[i].charType == CharType.Enemy &&
                 GameData.current.turnType == CharType.Enemy))
             {
                 allCharacters[i].npcController.id = i;
@@ -1062,15 +1061,15 @@ public class GameManager : MonoBehaviour
             switch (GameData.current.turnType)
             {
                 case CharType.Neutral:
-                    if (character.type == CharType.Neutral)
+                    if (character.charType == CharType.Neutral)
                         character.RegenMana();
                     break;
                 case CharType.Enemy:
-                    if (character.type == CharType.Enemy)
+                    if (character.charType == CharType.Enemy)
                         character.RegenMana();
                     break;
                 case CharType.Player:
-                    if (character.type == CharType.Player)
+                    if (character.charType == CharType.Player)
                         character.RegenMana();
                     break;
             }

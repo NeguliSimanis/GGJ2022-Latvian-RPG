@@ -33,8 +33,9 @@ public enum ExpAction
 
 public class PlayerControls : MonoBehaviour
 {
+    public bool availableInRoster = false;
     public bool hasActedThisTurn = false;
-    public CharType type;
+    public CharType charType;
     [HideInInspector]
     public bool isDead = false;
     [HideInInspector]
@@ -92,8 +93,17 @@ public class PlayerControls : MonoBehaviour
     private void Awake()
     {
         UpdateCoordAndSortOrder();
+        GetCharData();
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+        charMarker.UpdateMarkerColor(charType);
+
+        InitializePlayerStatUI();
+    }
+
+    public void GetCharData()
+    {
         stats = new CharacterStats(character);
-        if (type != CharType.Player)
+        if (charType != CharType.Player)
             UpdateStatsToCurrDungeonFloor();
         foreach (Skill newSkill in startingSkills)
         {
@@ -103,10 +113,6 @@ public class PlayerControls : MonoBehaviour
         playerSpeed = stats.speed;
         characterIsSelected = false;
         defaultSortingOrder = spriteRenderer.sortingOrder;
-        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
-        charMarker.UpdateMarkerColor(type);
-
-        InitializePlayerStatUI();
     }
 
     private void InitializePlayerStatUI()
@@ -150,7 +156,7 @@ public class PlayerControls : MonoBehaviour
 
     public bool Convert(CharType targetType)
     {
-        if (type == CharType.Player)
+        if (charType == CharType.Player)
         {
             gameManager.popupManager.UpdateGuideText(this.name + " already is in your party!");
             return false;
@@ -173,7 +179,7 @@ public class PlayerControls : MonoBehaviour
         int playerCharCount = 0;
         foreach(PlayerControls character in gameManager.allCharacters)
         {
-            if (character.type == CharType.Player)
+            if (character.charType == CharType.Player)
                 playerCharCount++;
         }
         if (playerCharCount > 2)
@@ -182,13 +188,13 @@ public class PlayerControls : MonoBehaviour
             return false;
         }
 
-        type = CharType.Player;
+        charType = CharType.Player;
         transform.parent = null;
         gameManager.popupManager.UpdateGuideText(this.name + " joins you!");
         gameManager.audioManager.PlayUtilitySFX();
         
         GameData.current.currMoonPoints += GameData.current.recruitPointsReward;
-        charMarker.UpdateMarkerColor(type);
+        charMarker.UpdateMarkerColor(charType);
         return true;
     }
 
@@ -347,7 +353,7 @@ public class PlayerControls : MonoBehaviour
         }
         gameManager.audioManager.PlayStepSound();
         UpdateCoordAndSortOrder();
-        if (type == CharType.Player)
+        if (charType == CharType.Player)
         {
             switch (gameManager.CheckInteractableObject(new Vector2Int(xCoord, yCoord)))
             {
@@ -431,7 +437,7 @@ public class PlayerControls : MonoBehaviour
 
 
         // COMBAT LOG - taking damage
-        if (type == CharType.Player || type == CharType.Enemy)
+        if (charType == CharType.Player || charType == CharType.Enemy)
         gameManager.popupManager.UpdateGuideText(
             damageSource.name + " dealt " + -damageDealt + " damage to " + name + "!");
 
@@ -439,8 +445,8 @@ public class PlayerControls : MonoBehaviour
         {
             gameManager.popupManager.UpdateGuideText(
             name + " becomes an enemy!");
-            type = CharType.Enemy;
-            charMarker.UpdateMarkerColor(type);
+            charType = CharType.Enemy;
+            charMarker.UpdateMarkerColor(charType);
         }
         // DEATH
         if (stats.currLife <= 0)
@@ -523,7 +529,7 @@ public class PlayerControls : MonoBehaviour
         gameManager.popupManager.UpdateGuideText(
             murderer.name + " killed " + name + "!");
         isDead = true;
-        type = CharType.Neutral;
+        charType = CharType.Neutral;
         Debug.Log(this.name + " IS DEAD");
         gameObject.SetActive(false);
     }

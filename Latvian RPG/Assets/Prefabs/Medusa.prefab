@@ -517,8 +517,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f890c518830274e48ab50334ec9bdfdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  availableInRoster: 0
   hasActedThisTurn: 0
-  type: 1
+  charType: 0
   isDead: 0
   hasUsedSkillThisTurn: 0
   xCoord: 0
@@ -541,6 +542,7 @@ MonoBehaviour:
   bigCharSprite: {fileID: 21300000, guid: f5422923507d2094e9f934d9c5eabd8d, type: 3}
   spriteRenderer: {fileID: 5263861361188574545}
   hurtAnimator: {fileID: 7913881009425419282}
+  activeStatusEffects: []
 --- !u!114 &-6362190921303917739
 MonoBehaviour:
   m_ObjectHideFlags: 0

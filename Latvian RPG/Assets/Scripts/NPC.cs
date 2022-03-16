@@ -121,7 +121,7 @@ public class NPC : MonoBehaviour
     private void SetBehaviour(Behaviour newBehaviour = Behaviour.Idle)
     {
 
-        if (npcControls.type == CharType.Neutral || newBehaviour == Behaviour.Patrol)
+        if (npcControls.charType == CharType.Neutral || newBehaviour == Behaviour.Patrol)
         {
             behaviour = Behaviour.Patrol;
         }
@@ -130,7 +130,7 @@ public class NPC : MonoBehaviour
             Debug.Log(npcControls.name + " SHOULD FLEE");
             behaviour = Behaviour.Flee;
         }
-        else if (npcControls.type == CharType.Enemy || newBehaviour == Behaviour.HuntPlayer)
+        else if (npcControls.charType == CharType.Enemy || newBehaviour == Behaviour.HuntPlayer)
         {
             Debug.Log(npcControls.name + " SHOULD HUNT");
             behaviour = Behaviour.HuntPlayer;
@@ -210,16 +210,16 @@ public class NPC : MonoBehaviour
     {
         Debug.Log("DisplayNPCWalkRange called by " + callerName);
         npcSpriteRenderer.sortingOrder = defaultSortingOrder + 7;
-        gameManager.DisplayActionRange(ActionType.Walk, npcControls.type);
+        gameManager.DisplayActionRange(ActionType.Walk, npcControls.charType);
     }
 
     private bool IsMyTurn()
     {
-        if (GameData.current.turnType == CharType.Enemy && npcControls.type == CharType.Enemy)
+        if (GameData.current.turnType == CharType.Enemy && npcControls.charType == CharType.Enemy)
         {
             return true;
         }
-        if (GameData.current.turnType == CharType.Neutral && npcControls.type == CharType.Neutral)
+        if (GameData.current.turnType == CharType.Neutral && npcControls.charType == CharType.Neutral)
         {
             return true;
         }
@@ -320,7 +320,7 @@ public class NPC : MonoBehaviour
         // 1. Go through all players chars
         foreach (PlayerControls player in gameManager.allCharacters)
         {
-            if (player.type == CharType.Player)
+            if (player.charType == CharType.Player)
             {
                 // 2. Current safe space not safe after all - find a new one
                 if (!IsCoordinateSafeFromPlayer(player, safestCoord)
@@ -412,7 +412,7 @@ public class NPC : MonoBehaviour
         bool anyPlayerFound = false;
         foreach (PlayerControls player in gameManager.allCharacters)
         {
-            if (player.type == CharType.Player && !player.isDead)
+            if (player.charType == CharType.Player && !player.isDead)
             {
                 if (!anyPlayerFound)
                 {
@@ -556,6 +556,6 @@ public class NPC : MonoBehaviour
         Debug.Log("end turn called by " + callerName);
         npcSpriteRenderer.sortingOrder = defaultSortingOrder;
         gameManager.HighlightChar(npcControls, highlight: false);
-        gameManager.ProcessEndCharMove(npcControls.type, id);
+        gameManager.ProcessEndCharMove(npcControls.charType, id);
     }
 }

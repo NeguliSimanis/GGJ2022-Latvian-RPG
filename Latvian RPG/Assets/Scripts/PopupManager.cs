@@ -369,7 +369,7 @@ public class PopupManager : MonoBehaviour
 
         speedText.text = "Speed: " + playerControls.stats.speed;
 
-        switch (playerControls.type)
+        switch (playerControls.charType)
         {
             case CharType.Enemy:
                 levelText.text = "Level " + playerControls.stats.level + " Enemy";
@@ -386,7 +386,7 @@ public class PopupManager : MonoBehaviour
 
     public void ShowLevelUpPopup(PlayerControls player, bool show = true)
     {
-        if (player.type != CharType.Player)
+        if (player.charType != CharType.Player)
             return;
         if (!show)
         {

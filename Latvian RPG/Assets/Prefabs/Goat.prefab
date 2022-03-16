@@ -517,8 +517,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f890c518830274e48ab50334ec9bdfdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  availableInRoster: 1
   hasActedThisTurn: 0
-  type: 2
+  charType: 0
   isDead: 0
   hasUsedSkillThisTurn: 0
   xCoord: 0
