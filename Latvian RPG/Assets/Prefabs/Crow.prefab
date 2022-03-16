@@ -296,7 +296,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   availableInRoster: 1
   hasActedThisTurn: 0
-  charType: 0
+  charType: 2
   isDead: 0
   hasUsedSkillThisTurn: 0
   xCoord: 0

@@ -216,10 +216,10 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         // INITIALIZE CHARACTERS
-        foreach (PlayerControls character in FindObjectsOfType<PlayerControls>())
-        {
-            AddNewCharacter(character);
-        }
+        //foreach (PlayerControls character in FindObjectsOfType<PlayerControls>())
+        //{
+        //    AddNewCharacter(character);
+        //}
         FindFloorObstacles();
         FindFloorObjects();
         // INITIALIZE BUTTONS
