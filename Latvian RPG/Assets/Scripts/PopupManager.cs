@@ -139,15 +139,12 @@ public class PopupManager : MonoBehaviour
     #region STAT ICONS
     [Header("STAT ICONS")]
     [SerializeField]
-    Sprite speedIcon;
-    [SerializeField]
-    Sprite lifeIcon;
-    [SerializeField]
-    Sprite manaIcon;
-    [SerializeField]
-    Sprite defenseIcon;
-    [SerializeField]
-    Sprite offenseIcon;
+    public Sprite speedIcon;
+    public Sprite lifeIcon;
+    public Sprite manaIcon;
+    public Sprite defenseIcon;
+    public Sprite offenseIcon;
+    public Sprite xpIcon;
     #endregion
 
     [Header("TURN UI")]

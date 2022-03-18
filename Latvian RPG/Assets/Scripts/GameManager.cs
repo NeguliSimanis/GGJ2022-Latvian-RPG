@@ -38,7 +38,7 @@ public class HighlightTileObject
 
 public class GameManager : MonoBehaviour
 {
-
+    public static GameManager instance;
     TurnManager turnManager;
     public PopupManager popupManager;
     [SerializeField]
@@ -113,8 +113,18 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        //if (instance == null)
+        //    instance = this;
+
+        //else if (instance != this)
+        //    Destroy(gameObject);
+
+        //DontDestroyOnLoad(this.gameObject);
+
         if (GameData.current == null)
             GameData.current = new GameData();
+        Debug.Log("CURR FLOOR " + GameData.current.dungeonFloor);
+        Debug.Log("FLOOOORS CLEARED " + GameData.totalFloorsCleared);
         GetComponents();
     }
 
@@ -172,7 +182,7 @@ public class GameManager : MonoBehaviour
         SpawnStartingChar(randomCharacter);
     }
 
-    public void SpawnStartingChar(Character newCharacter)
+    public void SpawnStartingChar(Character newCharacter, bool applyRebirthBonus = false)
     {
         GameObject newPlayer = charRoster[0];
         foreach (GameObject currChar in charRoster)
@@ -185,6 +195,8 @@ public class GameManager : MonoBehaviour
         GameObject newPlayerInstance = Instantiate(newPlayer);
         PlayerControls newControls = newPlayerInstance.GetComponent<PlayerControls>();
         newControls.charType = CharType.Player;
+        if (GameData.totalFloorsCleared > 0 && applyRebirthBonus)
+            newControls.ApplyRebirthBonus();
         cameraController.startTarget = newPlayerInstance.transform;
         allCharacters.Add(newControls);
 
@@ -320,8 +332,6 @@ public class GameManager : MonoBehaviour
         }
         // move camera
         MoveCameraToPlayer();
-        
-        
     }
 
 
@@ -1121,5 +1131,34 @@ public class GameManager : MonoBehaviour
 
         // FIND OBSTACLES
         FindFloorObstacles();
+    }
+
+    public void CalculateRebirthBonus()
+    {
+        // 1,2 = XP BONUS
+        if (GameData.totalFloorsCleared < 3)
+        {
+
+        }
+        // 3,4 = XP BONUS OR MANA
+        else if (GameData.totalFloorsCleared < 5)
+        {
+
+        }
+        // 5,6 = OFFENSE OR MANA
+        else if (GameData.totalFloorsCleared < 7)
+        {
+
+        }
+        // 7, 9 = offfense/defense/mana
+        else if (GameData.totalFloorsCleared < 10)
+        {
+
+        }
+        // 10+ = offense/defense/mana/life
+        else if (GameData.totalFloorsCleared > 9)
+        {
+
+        }
     }
 }

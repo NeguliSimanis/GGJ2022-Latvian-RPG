@@ -20,6 +20,7 @@ public class GameData
 
     #region DUNGEON
     public int dungeonFloor = -1;
+    public static int totalFloorsCleared = 0;
     #endregion
 
     #region TURNDURATION
@@ -55,6 +56,11 @@ public class GameData
      * Heal - 5 light points
      * Victory - 100 light/dark points
      */
-            
     #endregion
+
+    public void EnterNextFloor()
+    {
+        dungeonFloor++;
+        totalFloorsCleared++;
+    }
 }

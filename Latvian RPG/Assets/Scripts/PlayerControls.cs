@@ -371,7 +371,7 @@ public class PlayerControls : MonoBehaviour
 
     private void EnterNextLevel()
     {
-        GameData.current.dungeonFloor++;
+        GameData.current.EnterNextFloor();
 
         // FADE TRANSITION?
 
@@ -836,6 +836,14 @@ public class PlayerControls : MonoBehaviour
             }
 
         }
+        
+    }
+
+
+    public void ApplyRebirthBonus(CharStat selectedStat = CharStat.speed, int amount = 0)
+    {
+        Debug.Log("PREVIOUS ");
+
         
     }
 }

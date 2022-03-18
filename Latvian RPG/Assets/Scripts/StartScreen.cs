@@ -174,7 +174,7 @@ public class StartScreen : MonoBehaviour
 
     public void SelectCharacter(Character selectedChar)
     {
-        gameManager.SpawnStartingChar(selectedChar);
+        gameManager.SpawnStartingChar(selectedChar, applyRebirthBonus: true);
         gameManager.StartGame();
         gameObject.SetActive(false);
     }

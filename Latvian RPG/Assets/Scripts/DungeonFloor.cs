@@ -93,6 +93,7 @@ public class DungeonFloor : MonoBehaviour
         GameObject newNPC = Instantiate(npcRooster[npcRoll], spawnTransform);
         PlayerControls newNPCControls = newNPC.GetComponent<PlayerControls>();
 
+
         gameManager.AddNewCharacter(newNPCControls);
     }
 }
