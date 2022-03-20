@@ -604,34 +604,6 @@ public class PlayerControls : MonoBehaviour
                 break;
         }
         statBar.fillAmount = (currStatAmount * 1f) / maxStatAmount;
-
-        /*
-        if (isLifeBar)
-        {
-            fillSpeed *= stats.maxLife * 0.1f * 0.6f;
-            while (!MathUtils.FastApproximately(lifeBar.fillAmount, targetFill, 0.001f))
-            {
-                lifeBar.fillAmount = lifeBar.fillAmount - (fillSpeed);
-                yield return new WaitForSeconds(0.01f);
-                safetyCounter--;
-                if (safetyCounter < 0)
-                    break;
-            }
-            lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
-        }
-        else
-        {
-            fillSpeed *= stats.maxMana * 0.1f * 0.6f;
-            while (!MathUtils.FastApproximately(manaBar.fillAmount, targetFill, 0.001f))
-            {
-                manaBar.fillAmount = manaBar.fillAmount - (fillSpeed);
-                yield return new WaitForSeconds(0.01f);
-                safetyCounter--;
-                if (safetyCounter < 0)
-                    break;
-            }
-            manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
-        }*/
     }
 
     public void SpendMana(float amount)
@@ -842,7 +814,7 @@ public class PlayerControls : MonoBehaviour
 
     public void ApplyRebirthBonus(CharStat selectedStat = CharStat.speed, int amount = 0)
     {
-        Debug.Log("PREVIOUS ");
+        Debug.Log("APPLYING REBIRTH BONUS ");
 
         
     }

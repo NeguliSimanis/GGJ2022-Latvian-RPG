@@ -25,7 +25,8 @@ public enum CharStat
     defense,
     speed,
     life,
-    mana
+    mana,
+    xp
 }
 
 public class CharacterStats

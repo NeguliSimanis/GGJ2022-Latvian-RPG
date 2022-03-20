@@ -772,6 +772,7 @@ public class GameManager : MonoBehaviour
 
     private void LoseGame()
     {
+        RollRebirthBonus();
         audioManager.PlayDefeatSFX();
         popupManager.DisplayGameLostPopup();
     }
@@ -1133,32 +1134,53 @@ public class GameManager : MonoBehaviour
         FindFloorObstacles();
     }
 
-    public void CalculateRebirthBonus()
+
+     /// <summary>
+     /// 
+     /// Rolls what rebirth bonuses will be available.
+     /// The bonuses depend on how many floors have been cleared:
+     /// 1,2 = XP BONUS
+     /// 3,4 = XP BONUS OR MANA
+     /// 5,6 = OFFENSE OR MANA
+     /// 7, 9 = offfense/defense/mana
+     /// 10+ = offense/defense/mana/life
+     /// 
+     /// </summary>
+     /// <returns>
+     /// -1 => only xp bonus is available
+     /// 0 => xp & mana bonuses are available
+     /// 1 
+     /// </returns>
+    public int RollRebirthBonus()
     {
+        int isOnlyXp = -1;
         // 1,2 = XP BONUS
         if (GameData.totalFloorsCleared < 3)
         {
+            isOnlyXp = 1;
 
+            return isOnlyXp;
         }
         // 3,4 = XP BONUS OR MANA
         else if (GameData.totalFloorsCleared < 5)
         {
+            isOnlyXp = 0;
 
+            return isOnlyXp;
         }
-        // 5,6 = OFFENSE OR MANA
-        else if (GameData.totalFloorsCleared < 7)
-        {
 
+        // 5,6 = OFFENSE OR MANA
+        if (GameData.totalFloorsCleared < 7)
+        {
         }
         // 7, 9 = offfense/defense/mana
         else if (GameData.totalFloorsCleared < 10)
         {
-
         }
         // 10+ = offense/defense/mana/life
         else if (GameData.totalFloorsCleared > 9)
         {
-
         }
+        return isOnlyXp;
     }
 }
