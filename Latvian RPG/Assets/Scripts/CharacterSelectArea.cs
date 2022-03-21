@@ -18,7 +18,6 @@ public class CharacterSelectArea : MonoBehaviour
     [SerializeField]
     public CharacterMarker charMarker; // displayed when character selected
 
-    int characterSelectedCount = 0; // how many times char has been selected
 
     private void Start()
     {

@@ -40,12 +40,22 @@ public class TileHighlight : MonoBehaviour
     public int xCoord;
     public int yCoord;
 
+    private List<SpriteRenderer> markerSprites = new List<SpriteRenderer>();
+
     private void Start()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         marker.SetActive(false);
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         defaultSortingOrder = spriteRenderer.sortingOrder;
+
+        foreach (Transform child in marker.transform)
+        {
+            SpriteRenderer newMarker = child.gameObject.GetComponent<SpriteRenderer>();
+            markerSprites.Add(newMarker);
+        }
+        
+
         UpdateCoord();
     }
     private void OnMouseOver()
@@ -79,7 +89,6 @@ public class TileHighlight : MonoBehaviour
         }
     }
 
-
     private void OnMouseDown()
     {
         if (active && allowInteraction)
@@ -99,29 +108,53 @@ public class TileHighlight : MonoBehaviour
     /// <param name="mark"></param>
     private void MarkTile(bool mark)
     {
-        marker.SetActive(mark);
+        
         if (!allowInteraction)
             return;
+        if (GameData.current.turnType != CharType.Player)
+            return;
+
+        marker.SetActive(mark);
+        Color newMarkerColor = Color.white;
         switch (tileActionType)
         {
             case ActionType.UseCombatSkill:
                 if (mark)
+                {
                     spriteRenderer.color = attackHighlightColor;
+                    newMarkerColor = attackHighlightColor;
+                }
                 else
                     spriteRenderer.color = attackDefaultColor;
                 break;
             case ActionType.Walk:
                 if (mark)
+                {
                     spriteRenderer.color = moveHighlightColor;
+                    newMarkerColor = moveHighlightColor;
+                }
                 else
                     spriteRenderer.color = moveDefaultColor;
                 break;
             default:
                 if (mark)
+                {
                     spriteRenderer.color = interactHighlightColor;
+                    newMarkerColor = interactHighlightColor;
+                }
                 else
                     spriteRenderer.color = interactDefaultColor;
                 break;
+        }
+        SwitchMarkerColor(newMarkerColor);
+    }
+
+    private void SwitchMarkerColor(Color newColor)
+    {
+        Debug.Log("changing colors!");
+        foreach (SpriteRenderer markerSprite in markerSprites)
+        {
+            markerSprite.color = newColor;
         }
     }
 

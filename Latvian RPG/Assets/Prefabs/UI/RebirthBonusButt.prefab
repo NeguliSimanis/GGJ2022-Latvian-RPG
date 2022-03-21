@@ -167,6 +167,7 @@ GameObject:
   - component: {fileID: 2321967472996526452}
   - component: {fileID: 2048555003905492537}
   - component: {fileID: 8410777220796916027}
+  - component: {fileID: 6311694681158666851}
   m_Layer: 5
   m_Name: RebirthBonusButt
   m_TagString: Untagged
@@ -217,7 +218,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.6431373}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -277,7 +278,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_MethodName: PlayButtonSFX
+        m_MethodName: RestartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -287,6 +288,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
+--- !u!114 &6311694681158666851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342644140172096060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b26455d82562dd84fa708d35b3e3e95a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statImage: {fileID: 747036004767863554}
+  statAmount: {fileID: 7923209969310354685}
+  statName: {fileID: 7830047436062969207}
 --- !u!1 &7972166460689973040
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,13 +371,13 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: 4a36c1f63ffb12c44b1f11530630f38e, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 25
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 3
+  m_Text: +3

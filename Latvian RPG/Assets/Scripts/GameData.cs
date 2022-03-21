@@ -21,6 +21,7 @@ public class GameData
     #region DUNGEON
     public int dungeonFloor = -1;
     public static int totalFloorsCleared = 0;
+    public static int maxFloorReached = 0;
     #endregion
 
     #region TURNDURATION
@@ -62,5 +63,12 @@ public class GameData
     {
         dungeonFloor++;
         totalFloorsCleared++;
+        //maxFloorReached = dungeonFloor + 2;
+        //dungeonFloor += 4;
+        //totalFloorsCleared += 4;
+    }
+    public void UpdateMaxFloorReached()
+    {
+        maxFloorReached = dungeonFloor + 2;
     }
 }

@@ -744,7 +744,6 @@ public class PlayerControls : MonoBehaviour
 
     private void UpdateStatsToCurrDungeonFloor()
     {
-        Debug.Log("BIG SUCCESS");
         int statIncrease = GameData.current.dungeonFloor;
 
         int increaseRoll = Random.Range(0, (int)3);
@@ -811,11 +810,4 @@ public class PlayerControls : MonoBehaviour
         
     }
 
-
-    public void ApplyRebirthBonus(CharStat selectedStat = CharStat.speed, int amount = 0)
-    {
-        Debug.Log("APPLYING REBIRTH BONUS ");
-
-        
-    }
 }

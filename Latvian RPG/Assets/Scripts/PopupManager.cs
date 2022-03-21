@@ -18,11 +18,6 @@ public class PopupManager : MonoBehaviour
     [SerializeField]
     Button cancelEndTurnButton;
 
-    [SerializeField]
-    GameObject gameLostPanel;
-    [SerializeField]
-    Button restartGameButton;
-
     [SerializeField] Text guideText;
 
     #region CHAR butt
@@ -146,10 +141,29 @@ public class PopupManager : MonoBehaviour
     public Sprite offenseIcon;
     public Sprite xpIcon;
     #endregion
-
+    
     [Header("TURN UI")]
     [SerializeField]
     Text turnText;
+
+    #region REBIRTH
+    [Header("REBIRTH")]
+    [SerializeField]
+    GameObject rebirthScreen;
+    [SerializeField]
+    Transform rebirthButtPanel;
+    [SerializeField]
+    GameObject rebirthButtonObj;
+    [SerializeField]
+    GameObject rebirthOrText;
+    [SerializeField]
+    Text rebirthFlairText;
+
+    [SerializeField]
+    GameObject showRebirthBonusPanel;
+    [SerializeField]
+    GameObject hideRebirthBonusPanel;
+    #endregion
 
     private void Awake()
     {
@@ -158,7 +172,7 @@ public class PopupManager : MonoBehaviour
         AddButtListeners();
         ShowLevelUpPopup(new PlayerControls(), false);
         ShowWarningPopup(false);
-        DisplayGameLostPopup(false);
+        DisplayRebirthPopup(false);
         ShowCharPopup(new PlayerControls(), false);
 
         startScreen.SetActive(true);
@@ -272,14 +286,59 @@ public class PopupManager : MonoBehaviour
         gameManager.RestartGame();
     }
 
-    public void DisplayGameLostPopup(bool show = true)
+    public void DisplayRebirthPopup(bool show = true)
     {
         if (!show)
         {
-            gameLostPanel.SetActive(false);
+            rebirthScreen.SetActive(false);
             return;
         }
-        gameLostPanel.SetActive(true);
+
+
+        rebirthScreen.SetActive(true);
+
+        int realFloorReached = GameData.current.dungeonFloor + 2;
+        int maxFloor = realFloorReached;
+        if (GameData.maxFloorReached > maxFloor)
+            maxFloor = GameData.maxFloorReached;
+
+        if (realFloorReached < maxFloor)
+        {
+            showRebirthBonusPanel.SetActive(false);
+            hideRebirthBonusPanel.SetActive(true);
+            return;
+        }
+        showRebirthBonusPanel.SetActive(true);
+        hideRebirthBonusPanel.SetActive(false);
+
+        int buttCount = CountRebirthButts();
+        Debug.Log("REBIRTH BUTT COUNT " + buttCount);
+        if (buttCount < 2)
+            rebirthOrText.gameObject.SetActive(false);
+        for (int i = 0; i < buttCount; i++)
+        {
+            GameObject newRebirthButtObj = Instantiate(rebirthButtonObj, rebirthButtPanel);
+            RebirthStatButton newRebirthButt = newRebirthButtObj.GetComponent<RebirthStatButton>();
+            RebirthBonus newRebirthBonus = RebirthManager.instance.GetRebirthBonusInfo();
+            newRebirthButt.DisplayStats(newRebirthBonus, this);
+        }
+        
+        rebirthFlairText.text = "Reached Floor " + realFloorReached + "\n" + "Current best: " + maxFloor;
+    }
+
+    private int CountRebirthButts()
+    {
+        int rebirthButtCount = 0;
+        foreach (RebirthBonus rebirthBonus in RebirthManager.instance.rebirthBonuses)
+        {
+            if (rebirthBonus.amount > 0)
+            {
+                rebirthButtCount++;
+            }
+        }
+        if (rebirthButtCount > 2)
+            rebirthButtCount = 2;
+        return rebirthButtCount;
     }
 
     public void UpdateGuideText(string newText)

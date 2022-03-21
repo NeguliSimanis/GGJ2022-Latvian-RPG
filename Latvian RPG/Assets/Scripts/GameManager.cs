@@ -38,14 +38,20 @@ public class HighlightTileObject
 
 public class GameManager : MonoBehaviour
 {
+    #region CONTROLLERS
     public static GameManager instance;
-    TurnManager turnManager;
-    public PopupManager popupManager;
-    [SerializeField]
-    CameraController cameraController;
     public AudioManager audioManager;
+    public PopupManager popupManager;
+
+    [SerializeField]
+    private CameraController cameraController;
+    [SerializeField]
+    private GameObject rebirthManagerObj;
+    private TurnManager turnManager;
+    #endregion
 
 
+    #region UI
     [Header("UI")]
     [SerializeField]
     GameObject turnTimerObject;
@@ -67,6 +73,7 @@ public class GameManager : MonoBehaviour
     Image skillButtonImage2;
 
     int lastSelectedSkillButton = 0; // 0 - none , 1 - first , 2 - second
+    #endregion 
 
     [SerializeField] GameObject targetHighlight;
     List<HighlightTileObject> skillHighlights = new List<HighlightTileObject>();
@@ -113,18 +120,23 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        //if (instance == null)
-        //    instance = this;
+        // REBIRTH
+        if (GameObject.FindObjectOfType<RebirthManager>() == null)
+        {
+            GameObject newObj = Instantiate(rebirthManagerObj);
+            RebirthManager.instance = newObj.GetComponent<RebirthManager>();
+        }
+        else
+            RebirthManager.instance = GameObject.FindObjectOfType<RebirthManager>();
 
-        //else if (instance != this)
-        //    Destroy(gameObject);
-
-        //DontDestroyOnLoad(this.gameObject);
 
         if (GameData.current == null)
             GameData.current = new GameData();
+
+
         Debug.Log("CURR FLOOR " + GameData.current.dungeonFloor);
         Debug.Log("FLOOOORS CLEARED " + GameData.totalFloorsCleared);
+
         GetComponents();
     }
 
@@ -157,17 +169,7 @@ public class GameManager : MonoBehaviour
         SpawnNewFloor();
         // SpawnRandomStartingChar();
         //SpawnStartingChar(Character.Goat);
-        //foreach (PlayerControls playerControls in allCharacters)
-        //{
-        //    if (playerControls.type == CharType.Player)
-        //    {
-        //        Debug.Log("STARTING FOUND");
-        //        highlightedChar = playerControls;
-        //        HighlightChar(playerControls);
-        //        SelectChar(playerControls);
-        //        return;
-        //    }
-        //}
+
         GameData.current.gameStarted = true;
         GameData.current.playerTurnStartTime = Time.time;
         GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer + 4f;
@@ -195,14 +197,14 @@ public class GameManager : MonoBehaviour
         GameObject newPlayerInstance = Instantiate(newPlayer);
         PlayerControls newControls = newPlayerInstance.GetComponent<PlayerControls>();
         newControls.charType = CharType.Player;
-        if (GameData.totalFloorsCleared > 0 && applyRebirthBonus)
-            newControls.ApplyRebirthBonus();
         cameraController.startTarget = newPlayerInstance.transform;
         allCharacters.Add(newControls);
 
         highlightedChar = newControls;
         HighlightChar(newControls, highlight:true);
         SelectChar(newControls);
+        if (GameData.totalFloorsCleared > 0 && applyRebirthBonus)
+            RebirthManager.instance.ApplyRebirthBonus(newControls);
         cameraController.IntializeCamera(newPlayerInstance.transform);
         newControls.charMarker.UpdateMarkerColor(CharType.Player);
     }
@@ -271,13 +273,13 @@ public class GameManager : MonoBehaviour
         {
             if (coord.x == iObject.xCoord && coord.y == iObject.yCoord)
             {
-                if (iObject.objType == ObjectType.HealingPotion)
+                if (iObject.objType == ObjectType.HealingPotion && !iObject.consumed)
                 {
                     iObject.consumed = true;
                     iObject.gameObject.SetActive(false);
                     return ObjectType.HealingPotion;
                 }
-                else
+                else if (iObject.objType == ObjectType.LevelExit)
                 {
                     return ObjectType.LevelExit;
                 }
@@ -750,8 +752,6 @@ public class GameManager : MonoBehaviour
 
     private void MoveCameraToPlayer(bool instant = false)
     {
-       
-        Debug.Log(selectedChar.transform.position);
         cameraController.SetPosition(new Vector3(
             selectedChar.transform.position.x,
             selectedChar.transform.position.y + 1,
@@ -772,9 +772,9 @@ public class GameManager : MonoBehaviour
 
     private void LoseGame()
     {
-        RollRebirthBonus();
+        RebirthManager.instance.RollRebirthBonus();
         audioManager.PlayDefeatSFX();
-        popupManager.DisplayGameLostPopup();
+        popupManager.DisplayRebirthPopup();
     }
 
     public void EndTurn()
@@ -974,10 +974,12 @@ public class GameManager : MonoBehaviour
         {
             if (xCoordinate == character.xCoord && yCoordinate == character.yCoord)
             {
-                UnityEngine.Debug.Log("TARGET ACQUIRED AT " + xCoordinate + ":" + yCoordinate);
-                target = character;
-                targetViable = true;
-
+                if (!character.isDead)
+                {
+                    UnityEngine.Debug.Log("TARGET ACQUIRED AT " + xCoordinate + ":" + yCoordinate);
+                    target = character;
+                    targetViable = true;
+                }
             }
         }
         if (!targetViable)
@@ -1111,10 +1113,8 @@ public class GameManager : MonoBehaviour
 
     public void SpawnNewFloor()
     {
-        Debug.Log("dungeon length " + dungeonFloors.Length);
         if (GameData.current.dungeonFloor == -1)
         {
-            Debug.Log("yay");
             return;
         }
         DestroyImmediate(currFloor);
@@ -1132,55 +1132,5 @@ public class GameManager : MonoBehaviour
 
         // FIND OBSTACLES
         FindFloorObstacles();
-    }
-
-
-     /// <summary>
-     /// 
-     /// Rolls what rebirth bonuses will be available.
-     /// The bonuses depend on how many floors have been cleared:
-     /// 1,2 = XP BONUS
-     /// 3,4 = XP BONUS OR MANA
-     /// 5,6 = OFFENSE OR MANA
-     /// 7, 9 = offfense/defense/mana
-     /// 10+ = offense/defense/mana/life
-     /// 
-     /// </summary>
-     /// <returns>
-     /// -1 => only xp bonus is available
-     /// 0 => xp & mana bonuses are available
-     /// 1 
-     /// </returns>
-    public int RollRebirthBonus()
-    {
-        int isOnlyXp = -1;
-        // 1,2 = XP BONUS
-        if (GameData.totalFloorsCleared < 3)
-        {
-            isOnlyXp = 1;
-
-            return isOnlyXp;
-        }
-        // 3,4 = XP BONUS OR MANA
-        else if (GameData.totalFloorsCleared < 5)
-        {
-            isOnlyXp = 0;
-
-            return isOnlyXp;
-        }
-
-        // 5,6 = OFFENSE OR MANA
-        if (GameData.totalFloorsCleared < 7)
-        {
-        }
-        // 7, 9 = offfense/defense/mana
-        else if (GameData.totalFloorsCleared < 10)
-        {
-        }
-        // 10+ = offense/defense/mana/life
-        else if (GameData.totalFloorsCleared > 9)
-        {
-        }
-        return isOnlyXp;
     }
 }
