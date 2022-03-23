@@ -151,7 +151,6 @@ public class TileHighlight : MonoBehaviour
 
     private void SwitchMarkerColor(Color newColor)
     {
-        Debug.Log("changing colors!");
         foreach (SpriteRenderer markerSprite in markerSprites)
         {
             markerSprite.color = newColor;

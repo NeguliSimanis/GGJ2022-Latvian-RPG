@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4943662844980051666}
   - component: {fileID: 2785303261803931187}
   - component: {fileID: 2157206496298226645}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: TileHighlight
   m_TagString: AttackArea
   m_Icon: {fileID: 0}
@@ -70,9 +70,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingLayerID: -218157303
+  m_SortingLayer: -1
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 76271273fd72cb64c9bf6542b46fa8ef, type: 3}
   m_Color: {r: 1, g: 0.29803923, b: 0.29803923, a: 0.4666667}
   m_FlipX: 0
@@ -102,7 +102,7 @@ MonoBehaviour:
   attackHighlightColor: {r: 0.9811321, g: 0.254539, b: 0.254539, a: 0.9372549}
   attackDefaultColor: {r: 1, g: 0.29803923, b: 0.29803923, a: 0.5372549}
   moveHighlightColor: {r: 1, g: 1, b: 1, a: 0.70980394}
-  moveDefaultColor: {r: 1, g: 1, b: 1, a: 0.54509807}
+  moveDefaultColor: {r: 1, g: 1, b: 1, a: 0.3137255}
   interactHighlightColor: {r: 1, g: 0.82689804, b: 0, a: 0.74509805}
   interactDefaultColor: {r: 1, g: 0.827451, b: 0, a: 0.44705883}
   marker: {fileID: 170659840012717515}
@@ -141,10 +141,25 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4943662844980051667}
     m_Modifications:
+    - target: {fileID: 4775608146307001100, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4775608146449293161, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 4775608146871529739, guid: a0a4937c8ceb6d745a439d99acdc90c1,
         type: 3}
       propertyPath: m_Name
       value: SelectAnimation
+      objectReference: {fileID: 0}
+    - target: {fileID: 4775608146871529739, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4775608146871529844, guid: a0a4937c8ceb6d745a439d99acdc90c1,
         type: 3}
@@ -200,6 +215,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4775608147557865710, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4775608148096070598, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0a4937c8ceb6d745a439d99acdc90c1, type: 3}

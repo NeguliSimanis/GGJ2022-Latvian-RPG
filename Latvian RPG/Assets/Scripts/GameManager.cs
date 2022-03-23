@@ -11,6 +11,7 @@ public enum ActionType
     UseCombatSkill,
     Walk,
     UseUtilitySkill,
+    Unknown,
 }
 
 public class HighlightTileObject
@@ -925,7 +926,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Attempt to use selected skill on X;Y coordinates
+    /// Attempt to use selected skill on X;Y coordinates. Can be called by clicking on neutral/enemy if skill selected and in range
     /// </summary>
     /// <param name="xCoordinate"></param>
     /// <param name="yCoordinate"></param>
@@ -935,6 +936,40 @@ public class GameManager : MonoBehaviour
             return;
         if (!GameData.current.gameStarted)
             return;
+
+        #region Unknown Action type
+        // Determine action type and call method again if valid request
+        if ((selectedChar.hasUsedSkillThisTurn || !skillSelected) && actionType == ActionType.Unknown)
+        {
+            return;
+        }
+        if (actionType == ActionType.Unknown)
+        {
+            if (!MathUtils.IsWithinDamageRange(
+                target: new Vector2Int(xCoordinate, yCoordinate),
+                damageSource: new Vector2Int(selectedChar.xCoord, selectedChar.yCoord),
+                moveSpeed: 0,
+                damageSkill: selectedSkill))
+            {
+                return;
+            }
+            switch (selectedSkill.type[0])
+            {
+                case SkillType.Buff:
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill);
+                    return;
+                case SkillType.Damage:
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseCombatSkill);
+                    return;
+                case SkillType.Recruit:
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill);
+                    return;
+                default:
+                    Debug.LogError("YO WTF DUDE");
+                    return;
+            }
+        }
+        #endregion
 
         // WALK INTERACTION
         if (actionType == ActionType.Walk)
