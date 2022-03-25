@@ -274,7 +274,6 @@ public class GameManager : MonoBehaviour
         {
             if (coord.x == iObject.xCoord && coord.y == iObject.yCoord)
             {
-                Debug.LogError("YOOMAN1");
                 if (iObject.objType == ObjectType.HealingPotion && !iObject.consumed)
                 {
                     iObject.consumed = true;
@@ -285,9 +284,10 @@ public class GameManager : MonoBehaviour
                 {
                     return ObjectType.LevelExit;
                 }
-                else if (iObject.objType == ObjectType.LearnSkill)
+                else if (iObject.objType == ObjectType.LearnSkill && !iObject.consumed)
                 {
-                    Debug.LogError("YOOMAN2");
+                    iObject.consumed = true;
+                    iObject.gameObject.SetActive(false);
                     return ObjectType.LearnSkill;
                 }
             }

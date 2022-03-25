@@ -1,18 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Scholar : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    Skill []allowedSkills;
 
-    // Update is called once per frame
-    void Update()
+    public Skill SelectSkillToTeach(PlayerControls apprentice)
     {
-        
+        int skillCount = allowedSkills.Length;
+        int skillRoll = Random.Range(0, skillCount);
+        Skill skillToTeach = allowedSkills[skillRoll];
+        return skillToTeach;
     }
 }
