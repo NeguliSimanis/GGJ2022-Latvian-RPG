@@ -6,6 +6,8 @@ public enum ObjectType
 {
     HealingPotion,
     LevelExit,
+    LearnSkill,
+    ForgetSkill,
     Undefined
 }
 

@@ -284,7 +284,12 @@ public class GameManager : MonoBehaviour
                 {
                     return ObjectType.LevelExit;
                 }
+                else if (iObject.objType == ObjectType.LearnSkill)
+                {
+                    return ObjectType.LearnSkill;
+                }
             }
+
         }
         return ObjectType.Undefined;
     }
