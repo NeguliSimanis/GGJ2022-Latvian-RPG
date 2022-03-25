@@ -141,7 +141,7 @@ public class PopupManager : MonoBehaviour
     public Sprite offenseIcon;
     public Sprite xpIcon;
     #endregion
-    
+
     [Header("TURN UI")]
     [SerializeField]
     Text turnText;
@@ -165,6 +165,12 @@ public class PopupManager : MonoBehaviour
     GameObject hideRebirthBonusPanel;
     #endregion
 
+    #region SCHOLAR
+    [Header("SCHOLAR")]
+    [SerializeField]
+    GameObject scholarPopup;
+    #endregion
+
     private void Awake()
     {
         gameManager = gameObject.GetComponent<GameManager>();
@@ -173,6 +179,7 @@ public class PopupManager : MonoBehaviour
         ShowLevelUpPopup(new PlayerControls(), false);
         ShowWarningPopup(false);
         DisplayRebirthPopup(false);
+        DisplayScholarPopup(false);
         ShowCharPopup(new PlayerControls(), false);
 
         startScreen.SetActive(true);
@@ -249,7 +256,7 @@ public class PopupManager : MonoBehaviour
     private void DarkLevelUp()
     {
         ShowLevelUpPopup(new PlayerControls(), false);
-        if(playerToLevel.stats.UpdateProgressToGameVictory(ExpAction.LevelUpDark))
+        if (playerToLevel.stats.UpdateProgressToGameVictory(ExpAction.LevelUpDark))
         {
             gameManager.Victory();
         }
@@ -322,7 +329,7 @@ public class PopupManager : MonoBehaviour
             RebirthBonus newRebirthBonus = RebirthManager.instance.GetRebirthBonusInfo();
             newRebirthButt.DisplayStats(newRebirthBonus, this);
         }
-        
+
         rebirthFlairText.text = "Reached Floor " + realFloorReached + "\n" + "Current best: " + maxFloor;
     }
 
@@ -343,7 +350,7 @@ public class PopupManager : MonoBehaviour
 
     public void UpdateGuideText(string newText)
     {
-        guideText.text =  newText;
+        guideText.text = newText;
     }
 
     public void UpdateTurnText()
@@ -368,7 +375,7 @@ public class PopupManager : MonoBehaviour
     {
         int moonPoints = GameData.current.currMoonPoints;
         mooningText.text = Mathf.Abs(moonPoints).ToString() + "/" + GameData.current.pointsRequiredPhase3;
-        
+
         // darkest
         if (moonPoints < -GameData.current.pointsRequiredPhase2)
         {
@@ -410,18 +417,18 @@ public class PopupManager : MonoBehaviour
 
         /// REPLACE THIS STUFF WITH TEXTMESHJ
         charName.text = playerControls.stats.name;
-         charBioText.text = playerControls.stats.bio;
-         
+        charBioText.text = playerControls.stats.bio;
+
         charPopupImage.sprite = playerControls.bigCharSprite;
 
         // stats
-         expText.text =  playerControls.stats.currExp.ToString() + "/"+ playerControls.stats.expRequired.ToString() + "xp";
+        expText.text = playerControls.stats.currExp.ToString() + "/" + playerControls.stats.expRequired.ToString() + "xp";
 
-         offenseText.text = "Offense: " + playerControls.stats.offense.ToString();
-         armorText.text = "Defense: " + playerControls.stats.defense.ToString();
+        offenseText.text = "Offense: " + playerControls.stats.offense.ToString();
+        armorText.text = "Defense: " + playerControls.stats.defense.ToString();
 
-         lifeText.text = ((int)playerControls.stats.currLife).ToString() + "/" + ((int)playerControls.stats.maxLife).ToString();
-         manaText.text = "Mana: " + playerControls.stats.currMana.ToString() + "/" + playerControls.stats.maxMana.ToString();
+        lifeText.text = ((int)playerControls.stats.currLife).ToString() + "/" + ((int)playerControls.stats.maxLife).ToString();
+        manaText.text = "Mana: " + playerControls.stats.currMana.ToString() + "/" + playerControls.stats.maxMana.ToString();
 
         speedText.text = "Speed: " + playerControls.stats.speed;
 
@@ -437,7 +444,7 @@ public class PopupManager : MonoBehaviour
                 levelText.text = "Level " + playerControls.stats.level + " Neutral";
                 break;
         }
-        
+
     }
 
     public void ShowLevelUpPopup(PlayerControls player, bool show = true)
@@ -503,6 +510,17 @@ public class PopupManager : MonoBehaviour
     public void ShowDarkVictory()
     {
         darkVictoryScreen.SetActive(true);
+    }
+
+    public void DisplayScholarPopup(bool display = true)
+    {
+        if (!display)
+        {
+            scholarPopup.SetActive(false);
+            return;
+        }
+        scholarPopup.SetActive(true);
+
     }
 
 }
