@@ -364,7 +364,7 @@ public class PlayerControls : MonoBehaviour
                     EnterNextLevel();
                     break;
                 case ObjectType.LearnSkill:
-                    gameManager.popupManager.DisplayScholarPopup();
+                    // code called in gamemanager
                     break;
                 case ObjectType.Undefined:
                     break;

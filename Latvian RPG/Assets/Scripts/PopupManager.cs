@@ -168,7 +168,8 @@ public class PopupManager : MonoBehaviour
     #region SCHOLAR
     [Header("SCHOLAR")]
     [SerializeField]
-    GameObject scholarPopup;
+    GameObject scholarPopupObject;
+    ScholarPopup scholarPopup;
     #endregion
 
     private void Awake()
@@ -179,13 +180,19 @@ public class PopupManager : MonoBehaviour
         ShowLevelUpPopup(new PlayerControls(), false);
         ShowWarningPopup(false);
         DisplayRebirthPopup(false);
-        DisplayScholarPopup(false);
+        InitializeScholarInfo();
         ShowCharPopup(new PlayerControls(), false);
 
         startScreen.SetActive(true);
         darkVictoryScreen.SetActive(false);
         lightVictoryScreen.SetActive(false);
 
+    }
+
+    private void InitializeScholarInfo()
+    {
+        scholarPopup = scholarPopupObject.GetComponent<ScholarPopup>();
+        DisplayScholarPopup(display: false);
     }
 
     private void Start()
@@ -512,14 +519,20 @@ public class PopupManager : MonoBehaviour
         darkVictoryScreen.SetActive(true);
     }
 
-    public void DisplayScholarPopup(bool display = true)
+    public void DisplayScholarPopup(Skill skillToDisplay = null, bool display = true)
     {
         if (!display)
         {
-            scholarPopup.SetActive(false);
+            scholarPopupObject.SetActive(false);
             return;
         }
-        scholarPopup.SetActive(true);
+        scholarPopupObject.SetActive(true);
+
+        scholarPopup.scholarText.text =
+            "An old man offers to teach you a new skill. Learn " +
+            skillToDisplay.skillName + "?";
+
+        scholarPopup.skillText.text = skillToDisplay.GetDescription();
 
     }
 

@@ -288,6 +288,9 @@ public class GameManager : MonoBehaviour
                 {
                     iObject.consumed = true;
                     iObject.gameObject.SetActive(false);
+                    Skill skillToDisplay = iObject.GetComponent<Scholar>().SelectSkillToTeach(selectedChar);
+                    popupManager.DisplayScholarPopup(skillToDisplay);
+                   
                     return ObjectType.LearnSkill;
                 }
             }
