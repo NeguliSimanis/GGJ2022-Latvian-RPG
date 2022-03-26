@@ -1035,7 +1035,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23c3ddb3444a9ee46bec9d7d26023a3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allowedSkills: []
+  allowedSkills:
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
 --- !u!1 &124959671
 GameObject:
   m_ObjectHideFlags: 0
@@ -9338,7 +9343,7 @@ MonoBehaviour:
   rebirthFlairText: {fileID: 1130992957}
   showRebirthBonusPanel: {fileID: 1807409825}
   hideRebirthBonusPanel: {fileID: 1947325802}
-  scholarPopup: {fileID: 1576118170}
+  scholarPopupObject: {fileID: 1576118170}
 --- !u!114 &1408546956
 MonoBehaviour:
   m_ObjectHideFlags: 0
