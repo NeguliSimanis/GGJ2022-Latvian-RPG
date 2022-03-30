@@ -19,6 +19,8 @@ public class Skill : MonoBehaviour
     public SkillType[] type;
     public string description;
     public SkillEffect[] skillEffects;
+    public GameObject skillAnimation;
+    public Vector2 animationOffset;
 
     public string GetDescription()
     {

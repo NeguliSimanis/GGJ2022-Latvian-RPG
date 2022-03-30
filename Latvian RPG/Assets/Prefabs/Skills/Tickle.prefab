@@ -49,3 +49,7 @@ MonoBehaviour:
   skillRange: 1
   type: 00000000
   description: Weak close range attack
+  skillEffects: []
+  skillAnimation: {fileID: 153183041852810696, guid: 18bd9f7e6b28c834f9358fefcdaa9ed0,
+    type: 3}
+  animationOffset: {x: 0, y: 0}

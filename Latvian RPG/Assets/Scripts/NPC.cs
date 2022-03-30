@@ -590,6 +590,7 @@ public class NPC : MonoBehaviour
         gameManager.DisplayActionRange(ActionType.UseCombatSkill, CharType.Enemy);
         yield return new WaitForSeconds(GameData.current.npcActionDuration * 3);
         target.TakeDamage(amount: -skill.skillDamage, damageSource: npcControls);
+        Instantiate(skill.skillAnimation, target.transform);
         npcControls.SpendMana(skill.manaCost);
         hasUsedSkillThisTurn = true;
 

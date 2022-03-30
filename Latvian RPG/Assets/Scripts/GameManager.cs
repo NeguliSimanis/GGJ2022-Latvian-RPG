@@ -1087,11 +1087,14 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Added " + skillEffect.name + " skill effect to " + target.name);
                 target.ActivateStatusEffects();
             }
+            audioManager.PlayUtilitySFX();
             selectedChar.hasUsedSkillThisTurn = true;
         }
-        
+
 
         // 4 - remove spent mana
+        // 5 - play animation
+        Instantiate(selectedSkill.skillAnimation, target.transform);
         selectedChar.SpendMana(selectedSkill.manaCost);
 
     }

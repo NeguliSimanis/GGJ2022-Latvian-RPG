@@ -51,3 +51,6 @@ MonoBehaviour:
   description: Increases defense of target by 30% for 3 turns
   skillEffects:
   - {fileID: -6489593602666348602, guid: 795be75fb153b1b4ca144e3767de1585, type: 3}
+  skillAnimation: {fileID: 153183041852810696, guid: e0cf930235026ea4b802d55f06c58275,
+    type: 3}
+  animationOffset: {x: 0, y: 0}

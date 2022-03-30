@@ -664,10 +664,7 @@ public class PlayerControls : MonoBehaviour
 
     public void RegenMana()
     {
-       
         AddMana(stats.manaRegen, false);
-       
-
     }
 
     private IEnumerator MovePlayerCloserToTarget(Vector2 target, int distance)
