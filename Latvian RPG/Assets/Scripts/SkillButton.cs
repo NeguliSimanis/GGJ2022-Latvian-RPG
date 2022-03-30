@@ -15,6 +15,10 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
     [SerializeField]
     Text helpText;
 
+    public Text skillButtonText;
+    public Image skillButtonImage;
+    public Button thisButton;
+
     private void Start()
     {
         ShowSkillInfo(false);

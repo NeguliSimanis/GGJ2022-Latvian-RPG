@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5497702999956385537}
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 2, y: 1, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5497703000954599422}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5497702999956385539
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -70,7 +70,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0c674b8be0f36a94587e8592480f8d93, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6cd52e2ace9c04d4fb213ba4caa6ae8c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -91,8 +91,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5497703000954599422}
   - component: {fileID: 5497703000954599420}
+  - component: {fileID: 123272113}
   m_Layer: 0
-  m_Name: Door
+  m_Name: Scholar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -105,7 +106,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5497703000954599421}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 6, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -128,5 +129,23 @@ MonoBehaviour:
   xCoord: 0
   yCoord: 0
   consumed: 0
-  objType: 1
+  objType: 2
   spriteRenderer: {fileID: 5497702999956385539}
+--- !u!114 &123272113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5497703000954599421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23c3ddb3444a9ee46bec9d7d26023a3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allowedSkills:
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}

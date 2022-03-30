@@ -13,8 +13,8 @@ public enum ObjectType
 
 public class InteractableObject : MonoBehaviour
 {
-    public int xCoord;
-    public int yCoord;
+    public float xCoord;
+    public float yCoord;
     public bool consumed = false;
     public ObjectType objType = ObjectType.HealingPotion;
     [SerializeField]
@@ -22,8 +22,8 @@ public class InteractableObject : MonoBehaviour
 
     void Start()
     {
-        xCoord = (int)transform.position.x;
-        yCoord = (int)transform.position.y;
-        spriteRenderer.sortingOrder = -yCoord;
+        xCoord = transform.position.x;
+        yCoord = transform.position.y;
+        spriteRenderer.sortingOrder = -(int)yCoord;
     }
 }

@@ -9,7 +9,7 @@ public class Obstacle : MonoBehaviour
     [SerializeField]
     Transform obstacleTransform;
 
-    public Vector2Int pos = new Vector2Int();
+    public Vector2 pos = new Vector2();
 
 
     private void Start()
@@ -22,6 +22,6 @@ public class Obstacle : MonoBehaviour
 
     public void GetPos()
     {
-        pos = new Vector2Int((int)obstacleTransform.position.x, (int)obstacleTransform.position.y);
+        pos = new Vector2(obstacleTransform.position.x, obstacleTransform.position.y);
     }
 }

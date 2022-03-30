@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PopupManager : MonoBehaviour
 {
@@ -7,6 +8,9 @@ public class PopupManager : MonoBehaviour
 
     [HideInInspector]
     public bool isWarningPopupActive = false;
+
+    [SerializeField]
+    Text currFloorText;
 
     [SerializeField]
     GameObject startScreen;
@@ -142,9 +146,25 @@ public class PopupManager : MonoBehaviour
     public Sprite xpIcon;
     #endregion
 
+    #region TURN TEXT
     [Header("TURN UI")]
     [SerializeField]
     Text turnText;
+    #endregion
+
+    #region SKILL BUTTS
+    [Header("SKILL BUTTS")]
+    [SerializeField]
+    Transform skillButtPanel;
+
+    [SerializeField]
+    GameObject skillButtObj;
+
+    [HideInInspector]
+    public List<SkillButton> skillButts = new List<SkillButton>();
+    [HideInInspector]
+    public int skillButtCount = 0;
+    #endregion
 
     #region REBIRTH
     [Header("REBIRTH")]
@@ -193,12 +213,16 @@ public class PopupManager : MonoBehaviour
     {
         scholarPopup = scholarPopupObject.GetComponent<ScholarPopup>();
         DisplayScholarPopup(display: false);
+
+        scholarPopup.lightOptionButton.onClick.AddListener(delegate { ScholarButtPress(isLight: true); });
+        scholarPopup.darkOptionButton.onClick.AddListener(delegate { ScholarButtPress(isLight: false); });
     }
 
     private void Start()
     {
         if (!GameData.current.isDebugMode)
             debugText.gameObject.SetActive(false);
+        UpdateFloorText();
     }
 
     private void Update()
@@ -224,7 +248,6 @@ public class PopupManager : MonoBehaviour
         confirmEndTurnButton.onClick.AddListener(ConfirmEndTurn);
         cancelEndTurnButton.onClick.AddListener(CancelEndTurn);
         charButton.onClick.AddListener(CharButtonPressed);
-        //restartGameButton.onClick.AddListener(RestartGame);
     }
 
     void CharButtonPressed()
@@ -526,14 +549,91 @@ public class PopupManager : MonoBehaviour
             scholarPopupObject.SetActive(false);
             return;
         }
+        scholarPopup.skillToTeach = skillToDisplay;
         scholarPopupObject.SetActive(true);
 
         scholarPopup.scholarText.text =
             "An old man offers to teach you a new skill. Learn " +
             skillToDisplay.skillName + "?";
 
+        scholarPopup.skillName.text = skillToDisplay.skillName;
+
         scholarPopup.skillText.text = skillToDisplay.GetDescription();
+
+        scholarPopup.darkSmallText.text = "\n\n+" + GameData.current.levelUpPointsReward + " darkness";
+        scholarPopup.lightSmallText.text = "\n\n+" + GameData.current.levelUpPointsReward + " lightness";
 
     }
 
+    public void ScholarButtPress(bool isLight = true)
+    {
+        scholarPopupObject.SetActive(false);
+
+        if (isLight)
+        {
+            gameManager.selectedChar.LearnSkill(scholarPopup.skillToTeach);
+            gameManager.VictoryCheck(ExpAction.LevelUpLight);
+        }
+        else
+        {
+            gameManager.VictoryCheck(ExpAction.LevelUpDark);
+        }
+    }
+
+    public void DisplayCharSkillButts(PlayerControls charToDisplay, bool display = true)
+    {
+        int skillCount = charToDisplay.stats.skills.Count;
+        int lastSkillCount = skillButtCount;
+
+        while (skillButtCount < skillCount)
+        {
+            GameObject newSkillButtObj = Instantiate(skillButtObj, skillButtPanel);
+            skillButts.Add(newSkillButtObj.GetComponent<SkillButton>());
+            skillButtCount++;
+        }
+
+        if (lastSkillCount < skillButtCount)
+            InitializeSkillButts(lastSkillCount);
+
+        int currSkillID = 0;
+        foreach(SkillButton skillButt in skillButts)
+        {
+            skillButt.gameObject.SetActive(display);
+
+            if (display)
+            {
+                if (currSkillID < charToDisplay.stats.skills.Count)
+                {
+                    skillButt.skillButtonText.text = charToDisplay.stats.skills[currSkillID].skillName;
+                    skillButt.skill = charToDisplay.stats.skills[currSkillID];
+                }
+                else
+                    skillButt.gameObject.SetActive(false);
+            }
+            currSkillID++;
+        }
+    }
+
+    private void InitializeSkillButts(int startingID)
+    {
+        for (int i = startingID; i < skillButtCount; i++)
+        {
+            int id = i; // dunno why doesnt work if I dont save it as a separate variable
+            skillButts[id].thisButton.onClick.AddListener((delegate { gameManager.SelectSkill(id); }));
+        }
+    }
+
+    public void ColorSkillButts(Color newColor)
+    {
+        foreach(SkillButton skillButton in skillButts)
+        {
+            skillButton.skillButtonImage.color = newColor;
+        }
+    }
+
+    public void UpdateFloorText()
+    {
+        int realFloor = GameData.current.RealFloor();
+        currFloorText.text = "FLOOR " + realFloor.ToString();
+    }
 }

@@ -190,7 +190,7 @@ public class NPC : MonoBehaviour
             DisplayNPCWalkRange();
             if (npcControls.tilesWalked < npcControls.stats.speed)
                 StartCoroutine(MoveCloserToTarget(
-                    target: new Vector2Int(closestPlayer.xCoord, closestPlayer.yCoord),
+                    target: new Vector2(closestPlayer.xCoord, closestPlayer.yCoord),
                     endTurnAfter: false,
                     attemptAttackAfter: true));
             else
@@ -229,41 +229,138 @@ public class NPC : MonoBehaviour
         }
     }
 
-    private IEnumerator MoveCloserToTarget(Vector2Int target, bool endTurnAfter = false, bool attemptAttackAfter = false, [CallerMemberName] string callerName = "")
+    private IEnumerator MoveCloserToTarget(Vector2 target, bool endTurnAfter = false, bool attemptAttackAfter = false, [CallerMemberName] string callerName = "",
+        bool avoidLeft = false,
+        bool avoidRight = false,
+        bool avoidTop = false,
+        bool avoidBottom = false)
     {
         Debug.Log(npcControls.name + "MOVING CLOSER TO TARGET. Method called by " + callerName);
         while (npcControls.tilesWalked < npcControls.playerSpeed)// && IsMyTurn())
         {
             bool canMoveCloser = false;
-            yield return new WaitForSeconds(delayBeforeActionStart);
-            // FURTHER ON X AXIS - move closer on X axis
-            int diffX = Mathf.Abs(target.x - npcControls.xCoord);
-            if (diffX > Mathf.Abs(target.y - npcControls.yCoord)
-                && diffX > 1)
+
+            float diffX = Mathf.Abs(target.x - npcControls.xCoord);
+            float diffY = Mathf.Abs(target.y - npcControls.yCoord);
+
+            // MOVE ON X AXIS
+            // if further on x axis 
+            // OR top/down are blocked
+            if ((diffX > diffY || (avoidBottom && avoidTop)) &&
+                diffX > 1)
             {
                 canMoveCloser = true;
                 if (target.x > npcControls.xCoord)
                 {
-                    npcControls.MoveCharacterOneTile(Direction.Right);
+                    if (avoidRight)
+                    {
+
+                    }
+                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord + 1, npcControls.yCoord)))
+                    {
+                        // CANT MOVE RIGHT BECAUSE OCCUPPIED BY OBSTACLE
+                        StartCoroutine(MoveCloserToTarget(target: target,
+                            endTurnAfter: endTurnAfter,
+                            attemptAttackAfter: attemptAttackAfter,
+                            avoidLeft: avoidLeft,
+                            avoidRight: true,
+                            avoidTop: avoidTop,
+                            avoidBottom: avoidBottom));
+                        yield break;
+                    }
+                    else
+                    {
+                        yield return new WaitForSeconds(delayBeforeActionStart);
+                        npcControls.MoveCharacterOneTile(Direction.Right);
+                    }
                 }
                 else if (target.x < npcControls.xCoord)
                 {
-                    npcControls.MoveCharacterOneTile(Direction.Left);
+                    if (avoidLeft)
+                    {
+
+                    }
+                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord - 1, npcControls.yCoord)))
+                    {
+                        // CANT MOVE LEFT BECAUSE OCCUPPIED BY OBSTACLE
+                        StartCoroutine(MoveCloserToTarget(target: target,
+                            endTurnAfter: endTurnAfter,
+                            attemptAttackAfter: attemptAttackAfter,
+                            avoidLeft: true,
+                            avoidRight: avoidRight,
+                            avoidTop: avoidTop,
+                            avoidBottom: avoidBottom));
+                        yield break;
+                    }
+                    else
+                    {
+                        yield return new WaitForSeconds(delayBeforeActionStart);
+                        npcControls.MoveCharacterOneTile(Direction.Left);
+                    }
                 }
             }
-            // FURTHER ON Y AXIS - move closer on Y axis
-            else if (target.x != npcControls.xCoord && target.y != npcControls.yCoord)
+
+            // MOVE ON Y AXIS
+            // if further on y axis 
+            // OR right/left are blocked
+            else if (
+                (((!MathUtils.FastApproximately(target.x, npcControls.xCoord, 0.1f)) &&
+                (!MathUtils.FastApproximately(target.y, npcControls.yCoord, 0.1f)))
+                || (avoidRight && avoidLeft)) &&
+                diffY > 1)
             {
                 canMoveCloser = true;
                 if (target.y > npcControls.yCoord)
                 {
-                    npcControls.MoveCharacterOneTile(Direction.Up);
+                    if (avoidTop)
+                    {
+
+                    }
+                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord, npcControls.yCoord + 1)))
+                    {
+                        // CANT MOVE up BECAUSE OCCUPPIED BY OBSTACLE
+                        StartCoroutine(MoveCloserToTarget(target: target,
+                            endTurnAfter: endTurnAfter,
+                            attemptAttackAfter: attemptAttackAfter,
+                            avoidLeft: avoidLeft,
+                            avoidRight: avoidRight,
+                            avoidTop: true,
+                            avoidBottom: avoidBottom));
+                        yield break;
+                    }
+                    else
+                    {
+                        yield return new WaitForSeconds(delayBeforeActionStart);
+                        npcControls.MoveCharacterOneTile(Direction.Up);
+                    }
                 }
                 else if (target.y < npcControls.yCoord)
                 {
-                    npcControls.MoveCharacterOneTile(Direction.Down);
+                    if (avoidBottom)
+                    {
+
+                    }
+                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord, npcControls.yCoord - 1)))
+                    {
+                        // CANT MOVE down BECAUSE OCCUPPIED BY OBSTACLE
+                        StartCoroutine(MoveCloserToTarget(target: target,
+                            endTurnAfter: endTurnAfter,
+                            attemptAttackAfter: attemptAttackAfter,
+                            avoidLeft: avoidLeft,
+                            avoidRight: avoidRight,
+                            avoidTop: avoidTop,
+                            avoidBottom: true));
+                        yield break;
+                    }
+                    else
+                    {
+                        yield return new WaitForSeconds(delayBeforeActionStart);
+                        npcControls.MoveCharacterOneTile(Direction.Down);
+                    }
                 }
             }
+            if (avoidLeft && avoidRight && avoidTop && avoidBottom)
+                break;
             if (!canMoveCloser)
                 break;
             Debug.Log(npcControls.name + " MOVED TO " + npcControls.xCoord + "." + npcControls.yCoord + ". CURR TILES WALKED + " + npcControls.tilesWalked);
@@ -279,6 +376,9 @@ public class NPC : MonoBehaviour
             EndTurn();
         }
     }
+
+
+
 
     /// <summary>
     /// WARNING: WON'T WORK CORRECTLY IF HASN'T MOVED NEXT TO TARGET YET
@@ -305,15 +405,15 @@ public class NPC : MonoBehaviour
         Debug.Log("FLEEING ENEMY COORD = " + npcControls.xCoord + "." + npcControls.yCoord);
         DisplayNPCWalkRange();
 
-        int xMin = npcControls.xCoord - npcControls.playerSpeed;
-        int xMax = npcControls.xCoord + npcControls.playerSpeed;
-        int yMin = npcControls.yCoord - npcControls.playerSpeed;
-        int yMax = npcControls.yCoord + npcControls.playerSpeed;
+        float xMin = npcControls.xCoord - npcControls.playerSpeed;
+        float xMax = npcControls.xCoord + npcControls.playerSpeed;
+        float yMin = npcControls.yCoord - npcControls.playerSpeed;
+        float yMax = npcControls.yCoord + npcControls.playerSpeed;
 
-        Vector2Int npcCoord = new Vector2Int(npcControls.xCoord, npcControls.yCoord);
+        Vector2 npcCoord = new Vector2(npcControls.xCoord, npcControls.yCoord);
         Vector2Int defaultSafestCoord = new Vector2Int(99999, 99999);
-        Vector2Int safestCoord = new Vector2Int(xMin, yMin);
-        Vector2Int coordToCheck = safestCoord;
+        Vector2 safestCoord = new Vector2(xMin, yMin);
+        Vector2 coordToCheck = safestCoord;
 
         bool safeSpaceFound = true;
 
@@ -329,13 +429,13 @@ public class NPC : MonoBehaviour
                     safeSpaceFound = false;
 
                     // 2.1. go through all remaining coords
-                    for (int xCoord = safestCoord.x; xCoord < xMax; xCoord++)
+                    for (float xCoord = safestCoord.x; xCoord < xMax; xCoord++)
                     {
                         if (safeSpaceFound)
                             break;
-                        for (int yCoord = safestCoord.y; yCoord < yMax; yCoord++)
+                        for (float yCoord = safestCoord.y; yCoord < yMax; yCoord++)
                         {
-                            coordToCheck = new Vector2Int(xCoord, yCoord);
+                            coordToCheck = new Vector2(xCoord, yCoord);
                             // 2.2 SAFE SPACE FOUND!
                             if (IsCoordinateSafeFromPlayer(player, coordToCheck)
                                 && gameManager.IsTileAllowedForNPC(coordToCheck))
@@ -364,7 +464,7 @@ public class NPC : MonoBehaviour
         }
     }
 
-    private bool IsCoordinateSafeFromPlayer(PlayerControls player, Vector2Int coord)
+    private bool IsCoordinateSafeFromPlayer(PlayerControls player, Vector2 coord)
     {
 
         if (gameManager.IsTileOccupiedByObstacle(coord))
@@ -376,7 +476,7 @@ public class NPC : MonoBehaviour
         bool isInDanger = false;
         isInDanger = MathUtils.IsWithinDamageRange(
             target: coord,                                                  // npc
-            damageSource: new Vector2Int(player.xCoord, player.yCoord),    // player
+            damageSource: new Vector2(player.xCoord, player.yCoord),    // player
             damageSkill: player.GetLongestRangeDamageSkill(),               // 
             moveSpeed: player.playerSpeed);
 
@@ -455,8 +555,8 @@ public class NPC : MonoBehaviour
          *      yup seems correct
          */
         #endregion
-        int xDiff = Mathf.Abs(target.xCoord - npcControls.xCoord);
-        int yDiff = Mathf.Abs(target.yCoord - npcControls.yCoord);
+        int xDiff = (int)Mathf.Abs(target.xCoord - npcControls.xCoord);
+        int yDiff = (int)Mathf.Abs(target.yCoord - npcControls.yCoord);
         if (xDiff + yDiff <= skill.skillRange)
             return true;
         return false;
@@ -465,11 +565,11 @@ public class NPC : MonoBehaviour
     private bool IsThisPlayerCloser(PlayerControls thisPlayer)
     {
         Debug.Log("checking " + thisPlayer.name);
-        int diffX = Mathf.Abs(npcControls.xCoord - closestPlayer.xCoord);
-        int diffY = Mathf.Abs(npcControls.yCoord - closestPlayer.yCoord);
+        float diffX = Mathf.Abs(npcControls.xCoord - closestPlayer.xCoord);
+        float diffY = Mathf.Abs(npcControls.yCoord - closestPlayer.yCoord);
 
-        int newDiffX = Mathf.Abs(npcControls.xCoord - thisPlayer.xCoord);
-        int newDiffY = Mathf.Abs(npcControls.yCoord - thisPlayer.yCoord);
+        float newDiffX = Mathf.Abs(npcControls.xCoord - thisPlayer.xCoord);
+        float newDiffY = Mathf.Abs(npcControls.yCoord - thisPlayer.yCoord);
 
 
         if (newDiffX + newDiffY < diffX + diffY)

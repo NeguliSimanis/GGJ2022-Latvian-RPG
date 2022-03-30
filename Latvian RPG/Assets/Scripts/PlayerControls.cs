@@ -41,8 +41,8 @@ public class PlayerControls : MonoBehaviour
     [HideInInspector]
     public bool hasUsedSkillThisTurn = false;
 
-    public int xCoord;
-    public int yCoord;
+    public float xCoord;
+    public float yCoord;
 
     public NPC npcController;
     public Character character;
@@ -256,16 +256,17 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    public void TeleportPlayerCharacter (int targetX, int targetY, bool instantTeleport = false)
+    public void TeleportPlayerCharacter (float targetX, float targetY, bool instantTeleport = false)
     {
-        int currX = (int)transform.position.x;
-        int currY = (int)transform.position.y;
+        
+        float currX = transform.position.x;
+        float currY = transform.position.y;
 
         // CALCULATE WALKED TILES
-        int xDiff = targetX - currX;
-        int yDiff = targetY - currY;
+        float xDiff = targetX - currX;
+        float yDiff = targetY - currY;
 
-        int walkedTiles = Mathf.Abs(xDiff) + Mathf.Abs(yDiff);
+        int walkedTiles = (int) (Mathf.Abs(xDiff) + Mathf.Abs(yDiff));
 
         if (instantTeleport)
         {
@@ -278,18 +279,19 @@ public class PlayerControls : MonoBehaviour
         }
 
         // MOVE CHARACTER
-        StartCoroutine(MovePlayerCloserToTarget(new Vector2Int(targetX, targetY),walkedTiles));
+        StartCoroutine(MovePlayerCloserToTarget(new Vector2(targetX, targetY),walkedTiles));
         
         //transform.position = new Vector3((float)(targetX), (float)targetY, transform.position.z);
     }
 
-    private bool IsTileFree(int x, int y)
+    private bool IsTileFree(float x, float y)
     {
-        if (!gameManager.IsTileAllowedForNPC(new Vector2Int(x, y)))
+        if (!gameManager.IsTileAllowedForNPC(new Vector2(x, y)))
             return false;
         foreach (PlayerControls character in gameManager.allCharacters)
         {
-            if (character.xCoord == x && character.yCoord == y)
+            if (character.xCoord == x 
+                && character.yCoord == y)
                 return false;
         }
         return true;
@@ -300,7 +302,7 @@ public class PlayerControls : MonoBehaviour
         bool targetPositionFound = false;
         int directionCount = Direction.GetNames(typeof(Direction)).Length - 1;
         Direction direction = (Direction)Random.Range(0, directionCount);
-        Vector3Int targetPosition = new Vector3Int(xCoord, yCoord - 1, 0); ;
+        Vector3 targetPosition = new Vector3(xCoord, yCoord - 1, 0); ;
         int whileCounter = 5;
 
         /// WHAT IF SURROUNDED?
@@ -309,16 +311,16 @@ public class PlayerControls : MonoBehaviour
             switch(direction)
             {
                 case Direction.Down:
-                    targetPosition = new Vector3Int(xCoord, yCoord-1, 0);
+                    targetPosition = new Vector3(xCoord, yCoord-1, 0);
                     break;
                 case Direction.Left:
-                    targetPosition = new Vector3Int(xCoord-1, yCoord, 0);
+                    targetPosition = new Vector3(xCoord-1, yCoord, 0);
                     break;
                 case Direction.Right:
-                    targetPosition = new Vector3Int(xCoord+1, yCoord, 0);
+                    targetPosition = new Vector3(xCoord+1, yCoord, 0);
                     break;
                 case Direction.Up:
-                    targetPosition = new Vector3Int(xCoord, yCoord+1, 0);
+                    targetPosition = new Vector3(xCoord, yCoord+1, 0);
                     break;
             }
             targetPositionFound = IsTileFree(targetPosition.x, targetPosition.y);
@@ -332,6 +334,8 @@ public class PlayerControls : MonoBehaviour
         gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
         return true;
     }
+
+
 
     public void MoveCharacterOneTile(Direction moveDirection)
     {
@@ -355,7 +359,7 @@ public class PlayerControls : MonoBehaviour
         UpdateCoordAndSortOrder();
         if (charType == CharType.Player)
         {
-            switch (gameManager.CheckInteractableObject(new Vector2Int(xCoord, yCoord)))
+            switch (gameManager.CheckInteractableObject(new Vector2(xCoord, yCoord)))
             {
                 case ObjectType.HealingPotion:
                     ConsumeHealthPack();
@@ -406,10 +410,10 @@ public class PlayerControls : MonoBehaviour
 
     public void UpdateCoordAndSortOrder()
     {
-        xCoord = (int)transform.position.x;
-        yCoord = (int)transform.position.y;
+        xCoord = transform.position.x; 
+        yCoord = transform.position.y;
 
-        defaultSortingOrder = startingSortingOrder - yCoord;
+        defaultSortingOrder = (int)(startingSortingOrder - yCoord);
     }
 
     /// <summary>
@@ -625,9 +629,9 @@ public class PlayerControls : MonoBehaviour
 
     public Skill GetLongestRangeDamageSkill()
     {
-        Skill longestSkill = startingSkills[0];
+        Skill longestSkill = stats.skills[0];
         
-        foreach (Skill skilly in startingSkills)
+        foreach (Skill skilly in stats.skills)
         {
             foreach (SkillType skillType in skilly.type)
             {
@@ -666,20 +670,20 @@ public class PlayerControls : MonoBehaviour
 
     }
 
-    private IEnumerator MovePlayerCloserToTarget(Vector2Int target, int distance)
+    private IEnumerator MovePlayerCloserToTarget(Vector2 target, int distance)
     {
         while (distance > 0)
         {
             yield return new WaitForSeconds(GameData.current.playerMoveDuration);
             // FURTHER ON X AXIS - move closer on X axis
-            if (Mathf.Abs(target.x - xCoord) >
-                Mathf.Abs(target.y - yCoord))
+            if (Mathf.Abs(target.x - transform.position.x) >
+                Mathf.Abs(target.y - transform.position.y))
             {
-                if (target.x > xCoord)
+                if (target.x > transform.position.x)
                 {
                     MoveCharacterOneTile(Direction.Right);
                 }
-                else if (target.x < xCoord)
+                else if (target.x < transform.position.x)
                 {
                     MoveCharacterOneTile(Direction.Left);
                 }
@@ -687,11 +691,11 @@ public class PlayerControls : MonoBehaviour
             // FURTHER ON Y AXIS - move closer on Y axis
             else
             {
-                if (target.y > yCoord)
+                if (target.y > transform.position.y)
                 {
                     MoveCharacterOneTile(Direction.Up);
                 }
-                else if (target.y < yCoord)
+                else if (target.y < transform.position.y)
                 {
                     MoveCharacterOneTile(Direction.Down);
                 }
@@ -811,6 +815,27 @@ public class PlayerControls : MonoBehaviour
 
         }
         
+    }
+
+    public void LearnSkill(Skill skillToLearn)
+    {
+        int newSkillCount = startingSkills.Length + 1;
+
+        stats.skills.Add(skillToLearn);
+        //Skill[] newSkills = new Skill[newSkillCount];
+
+        //for (int i = 0; i < newSkillCount; i++)
+        //{
+        //    if (i < newSkillCount - 1)
+        //        newSkills[i] = startingSkills[i];
+        //    else
+        //        newSkills[i] = skillToLearn;
+        //}
+
+        //startingSkills = newSkills;
+
+        gameManager.popupManager.DisplayCharSkillButts(this);
+
     }
 
 }

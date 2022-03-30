@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour
     Text skillButtonText2;
     Image skillButtonImage2;
 
-    int lastSelectedSkillButton = 0; // 0 - none , 1 - first , 2 - second
+    int lastSelectedSkillButton = -1; // -1 - none , 0 - first , 1 - second
     #endregion 
 
     [SerializeField] GameObject targetHighlight;
@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
     private PlayerControls lastSelectedPlayerChar;
     public PlayerControls highlightedChar;
     private bool isAnyCharSelected = false;
-    public List<Vector2Int> allowedWalkCoordsNPC = new List<Vector2Int>();
+    public List<Vector2> allowedWalkCoordsNPC = new List<Vector2>();
     #endregion
 
     #region SKILLS
@@ -208,6 +208,7 @@ public class GameManager : MonoBehaviour
             RebirthManager.instance.ApplyRebirthBonus(newControls);
         cameraController.IntializeCamera(newPlayerInstance.transform);
         newControls.charMarker.UpdateMarkerColor(CharType.Player);
+        MovePlayerToFloorStartingPoint();
     }
 
     private void ShowTurnTimerBar(bool show = true)
@@ -224,22 +225,17 @@ public class GameManager : MonoBehaviour
     {
         turnTimerFill1.fillAmount = Mathf.InverseLerp(GameData.current.playerTurnEndTime, GameData.current.playerTurnStartTime, Time.time);
         turnTimerFill2.fillAmount = Mathf.InverseLerp(GameData.current.playerTurnEndTime, GameData.current.playerTurnStartTime, Time.time);
-        //(GameData.current.playerTurnTimer / (Time.time - GameData.current.playerTurnStartTime));
-        //(stats.currLife * 1f) / stats.maxLife;
     }
 
     private void Start()
     {
-        // INITIALIZE CHARACTERS
-        //foreach (PlayerControls character in FindObjectsOfType<PlayerControls>())
-        //{
-        //    AddNewCharacter(character);
-        //}
+
         FindFloorObstacles();
         FindFloorObjects();
+
         // INITIALIZE BUTTONS
         endTurnButton.onClick.AddListener(EndTurn);
-        InitializeSkillButton();
+        //InitializeSkillButton();
     }
 
     public void AddNewCharacter(PlayerControls character)
@@ -268,11 +264,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public ObjectType CheckInteractableObject(Vector2Int coord)
+    public ObjectType CheckInteractableObject(Vector2 coord)
     {
         foreach (InteractableObject iObject in levelObjects)
         {
-            if (coord.x == iObject.xCoord && coord.y == iObject.yCoord)
+            if (MathUtils.FastApproximately(coord.x, iObject.xCoord, 0.1f) &&
+                MathUtils.FastApproximately(coord.y,iObject.yCoord, 0.1f))
             {
                 if (iObject.objType == ObjectType.HealingPotion && !iObject.consumed)
                 {
@@ -322,11 +319,11 @@ public class GameManager : MonoBehaviour
     public void MovePlayerToFloorStartingPoint()
     {
         Transform levelStartPoint = currFloor.GetComponent<DungeonFloor>().levelStartPoint;
-        Vector2Int startingPoint = new Vector2Int(
-            (int)levelStartPoint.position.x,
-            (int)levelStartPoint.position.y);
-        Vector2Int startingPoint2 = new Vector2Int(startingPoint.x-1, startingPoint.y + 1);
-        Vector2Int startingPoint3 = new Vector2Int(startingPoint.x-1, startingPoint.y - 1);
+        Vector2 startingPoint = new Vector2(
+            (levelStartPoint.position.x),
+            (levelStartPoint.position.y));
+        Vector2 startingPoint2 = new Vector2((startingPoint.x-1), startingPoint.y + 1);
+        Vector2 startingPoint3 = new Vector2(startingPoint.x-1, startingPoint.y - 1);
 
         Debug.Log("start poi " + startingPoint);
         int playerID = 0;
@@ -372,22 +369,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void InitializeSkillButton()
+    public void SelectSkill(int skillID)
     {
-        skillButton.onClick.AddListener((delegate { SelectSkill(1); }));
-        skillButtonText = skillButton.transform.GetChild(0).GetComponent<Text>();
-        skillButtonImage = skillButton.gameObject.GetComponent<Image>();
-        skillButton.gameObject.SetActive(false);
-
-        skillButton2.onClick.AddListener((delegate { SelectSkill(2); }));
-        skillButtonText2 = skillButton2.transform.GetChild(0).GetComponent<Text>();
-        skillButtonImage2 = skillButton2.gameObject.GetComponent<Image>();
-        skillButton2.gameObject.SetActive(false);
-    }
-
-    private void SelectSkill(int skillID = 0)
-    {
-
         HideActionRange();
 
         // DETERMINE IF A BUTTON WAS SELECTED BEFORE
@@ -400,57 +383,38 @@ public class GameManager : MonoBehaviour
             skillSelected = true;
         lastSelectedSkillButton = skillID;
 
+        popupManager.ColorSkillButts(skillButtonDefaultColor);
 
         // SKILL DESELECTED
         if (!skillSelected)
         {
-            skillButtonImage.color = skillButtonDefaultColor;
-            skillButtonImage2.color = skillButtonDefaultColor;
             DisplayActionRange(ActionType.Walk);
-            UnityEngine.Debug.Log("display walk");
             return;
         }
 
-
+        // ATTEMPT TO USE MULTIPLE SKILLS PER TURN
         if (selectedChar.hasUsedSkillThisTurn)
         {
             popupManager.UpdateGuideText(selectedChar.name + " can use skill only once per turn!");
+            DisplayActionRange(ActionType.Walk);
             return;
         }
 
-        // FIRST BUTTON
-        if (skillID == 1)
-        {
-            selectedSkill = selectedChar.stats.skills[0];
-            skillButtonImage.color = skillButtonSelectedColor;
-            skillButtonImage2.color = skillButtonDefaultColor;
-            if (selectedSkill.type[0] == SkillType.Damage)
-                DisplayActionRange();
-            else
-            {
-                DisplayActionRange(ActionType.UseUtilitySkill);
-            }
-            
-        }
-        if (skillID != 2)
-            return;
-
-        // SECOND BUTTON
-        selectedSkill = selectedChar.stats.skills[1];
-        skillButtonImage2.color = skillButtonSelectedColor;
-        skillButtonImage.color = skillButtonDefaultColor;
+        // SUCCESSFUL SKILL SELECT
+        selectedSkill = selectedChar.stats.skills[skillID];
+        popupManager.skillButts[skillID].skillButtonImage.color = skillButtonSelectedColor;
         if (selectedSkill.type[0] == SkillType.Damage)
+        {
             DisplayActionRange();
+        }
         else
         {
             DisplayActionRange(ActionType.UseUtilitySkill);
         }
-        
     }
 
     public void DisplayActionRange(ActionType actionType = ActionType.UseCombatSkill, CharType charType = CharType.Player)
     {
-        
         // show the char sprite above the tile sprites
         selectedChar.SetToDefaultSortOrder(defaultOrder: false);
 
@@ -582,11 +546,17 @@ public class GameManager : MonoBehaviour
             return;
 
         // DONT SPAWN IF ON TOP OF OBStacle        
-        foreach (Obstacle obstacle in allObstacles)
-        {
-            if (obstacle.pos.x == (int)highlightLocation.x && obstacle.pos.y == (int)highlightLocation.y)
-                return;
-        }
+        if (IsTileOccupiedByObstacle(highlightLocation))
+            return;
+        //foreach (Obstacle obstacle in allObstacles)
+        //{
+        //    if (MathUtils.FastApproximately(obstacle.pos.x, highlightLocation.x, 0.2f)
+        //         && MathUtils.FastApproximately(obstacle.pos.y, highlightLocation.y, 0.2f))
+        //    {
+                
+        //        return;
+        //    }
+        //}
 
 
         // DONT SPAWN ON TOP OF CHAR IF THAT'S MOVE ACTION
@@ -594,11 +564,13 @@ public class GameManager : MonoBehaviour
         {
             if (actionType != ActionType.Walk)
                 break;
-            if (!character.isDead && character.xCoord == (int)highlightLocation.x && character.yCoord == (int)highlightLocation.y)
+            if (!character.isDead && 
+                MathUtils.FastApproximately(character.xCoord, highlightLocation.x, 0.2f) &&
+                MathUtils.FastApproximately(character.yCoord, highlightLocation.y, 0.2f))
                 return;
         }
 
-        allowedWalkCoordsNPC.Add(new Vector2Int((int)highlightLocation.x, (int)highlightLocation.y));
+        allowedWalkCoordsNPC.Add(new Vector2(highlightLocation.x, highlightLocation.y));
         SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType);
     }
 
@@ -609,8 +581,7 @@ public class GameManager : MonoBehaviour
         //    UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.tilesWalked);
         if (skillSelected)
         {
-            skillButtonImage.color = skillButtonDefaultColor;
-            skillButtonImage2.color = skillButtonDefaultColor;
+            popupManager.ColorSkillButts(skillButtonDefaultColor);
         }
 
         foreach (HighlightTileObject skillHighlight in skillHighlights)
@@ -676,9 +647,57 @@ public class GameManager : MonoBehaviour
         {
             popupManager.ShowWarningPopup(false);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1) && isAnyCharSelected)
+        ListenForShortcuts();
+
+    }
+
+    private void ListenForShortcuts()
+    {
+        if (!isAnyCharSelected)
+            return;
+        // WALK SHORTCUTS
+        if (!skillSelected)
         {
-            SelectSkill();
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                ProcessInteractionRequest(selectedChar.xCoord, selectedChar.yCoord + 1, ActionType.Walk);
+            } 
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                ProcessInteractionRequest(selectedChar.xCoord - 1, selectedChar.yCoord, ActionType.Walk);
+            }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                ProcessInteractionRequest(selectedChar.xCoord, selectedChar.yCoord - 1, ActionType.Walk);
+            }
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                ProcessInteractionRequest(selectedChar.xCoord + 1, selectedChar.yCoord, ActionType.Walk);
+            }
+        }
+        
+
+
+        // SKILL SHORTCUTS
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            SelectSkill(0);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            SelectSkill(1);
+        }
+        if (selectedChar.stats.skills.Count < 3)
+            return;
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            SelectSkill(2);
+        }
+        if (selectedChar.stats.skills.Count < 4)
+            return;
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            SelectSkill(3);
         }
     }
 
@@ -733,17 +752,8 @@ public class GameManager : MonoBehaviour
 
     private void ShowSkillButton(bool show = true)
     {
-        skillButton.gameObject.SetActive(show);
-        skillButton2.gameObject.SetActive(show);
+        popupManager.DisplayCharSkillButts(selectedChar, display: show);
 
-        if (show)
-        {
-            Debug.Log(selectedChar);
-            skillButtonText.text = selectedChar.stats.skills[0].name;
-            skillButtonText2.text = selectedChar.stats.skills[1].name;
-            skillButtonControls.skill = selectedChar.stats.skills[0];
-            skillButtonControls2.skill = selectedChar.stats.skills[1];
-        }
     }
 
     /// <summary>
@@ -856,8 +866,13 @@ public class GameManager : MonoBehaviour
         ShowTurnTimerBar(false);
         for (int i = 0; i < allCharacters.Count; i++)
         {
-            if ((allCharacters[i].charType == CharType.Neutral &&
-                GameData.current.turnType == CharType.Neutral)
+            if (allCharacters[i].isDead)
+            {
+                // do nothin
+            }
+            else if ((allCharacters[i].charType == CharType.Neutral &&
+                GameData.current.turnType == CharType.Neutral
+                )
                 ||
                 (allCharacters[i].charType == CharType.Enemy &&
                 GameData.current.turnType == CharType.Enemy))
@@ -940,7 +955,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="xCoordinate"></param>
     /// <param name="yCoordinate"></param>
-    public void ProcessInteractionRequest(int xCoordinate, int yCoordinate, ActionType actionType)
+    public void ProcessInteractionRequest(float xCoordinate, float yCoordinate, ActionType actionType)
     {
         if (GameData.current.turnType != CharType.Player)
             return;
@@ -956,8 +971,8 @@ public class GameManager : MonoBehaviour
         if (actionType == ActionType.Unknown)
         {
             if (!MathUtils.IsWithinDamageRange(
-                target: new Vector2Int(xCoordinate, yCoordinate),
-                damageSource: new Vector2Int(selectedChar.xCoord, selectedChar.yCoord),
+                target: new Vector2(xCoordinate, yCoordinate),
+                damageSource: new Vector2(selectedChar.xCoord, selectedChar.yCoord),
                 moveSpeed: 0,
                 damageSkill: selectedSkill))
             {
@@ -988,7 +1003,9 @@ public class GameManager : MonoBehaviour
             // 1 - check if tile not occupied
             foreach (PlayerControls character in allCharacters)
             {
-                if (xCoordinate == character.xCoord && yCoordinate == character.yCoord && !character.isDead)
+                if (MathUtils.FastApproximately(xCoordinate, character.xCoord, 0.01F) &&
+                    MathUtils.FastApproximately(yCoordinate, character.yCoord, 0.01F) &&
+                    !character.isDead)
                 {
                     UnityEngine.Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
                     popupManager.UpdateGuideText("Cannot move there!");
@@ -997,9 +1014,10 @@ public class GameManager : MonoBehaviour
             }
             foreach (Obstacle obstacle in allObstacles)
             {
-                if (xCoordinate == obstacle.pos.x && yCoordinate == obstacle.pos.y)
+                if (MathUtils.FastApproximately(xCoordinate, obstacle.pos.x, 0.1F) &&
+                    MathUtils.FastApproximately(yCoordinate, obstacle.pos.y, 0.1F))
                 {
-                    UnityEngine.Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
+                    UnityEngine.Debug.LogError("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
                     popupManager.UpdateGuideText("Cannot move there!");
                     return;
                 }
@@ -1041,7 +1059,7 @@ public class GameManager : MonoBehaviour
         }
 
         // 2.5 - hide current skill highlights
-        SelectSkill();
+       // SelectSkill(0);
         HideActionRange();
 
 
@@ -1086,11 +1104,12 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public bool IsTileAllowedForNPC(Vector2Int coord)
+    public bool IsTileAllowedForNPC(Vector2 coord)
     {
-        foreach (Vector2Int currCoord in allowedWalkCoordsNPC)
+        foreach (Vector2 currCoord in allowedWalkCoordsNPC)
         {
-            if (currCoord == coord)
+            if (MathUtils.FastApproximately(currCoord.x, coord.x, 0.1f)
+            && MathUtils.FastApproximately(currCoord.y, coord.y, 0.1f))
             {
                 return true;
             }
@@ -1098,11 +1117,12 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public bool IsTileOccupiedByObstacle(Vector2Int coord)
+    public bool IsTileOccupiedByObstacle(Vector2 coord)
     {
         foreach (Obstacle obstacle in allObstacles)
         {
-            if (obstacle.pos.x == coord.x && obstacle.pos.y == coord.y)
+            if (MathUtils.FastApproximately(obstacle.pos.x, coord.x, 0.1F)&&
+                MathUtils.FastApproximately(obstacle.pos.y, coord.y, 0.1f))
             {
                 UnityEngine.Debug.Log(coord + " occuppied by obstacle");
                 return true;
@@ -1164,18 +1184,29 @@ public class GameManager : MonoBehaviour
         }
         DestroyImmediate(currFloor);
         int newFloorID = GameData.current.dungeonFloor;
+        //newFloorID = dungeonFloors.Length - 4;
         if (newFloorID >= dungeonFloors.Length)
         {
-            newFloorID = dungeonFloors.Length - 1;
+            newFloorID = dungeonFloors.Length - 2;
         }
         GameObject newFloor = Instantiate(dungeonFloors[newFloorID]);
         currFloor = newFloor;
 
         levelObjects.Clear();
+        popupManager.UpdateFloorText();
         FindFloorObjects();
 
 
         // FIND OBSTACLES
         FindFloorObstacles();
+    }
+
+    public void VictoryCheck(ExpAction expAction)
+    {
+        if (selectedChar.stats.UpdateProgressToGameVictory(expAction))
+        {
+            Debug.LogError("adding stuff");
+            Victory();
+        }
     }
 }

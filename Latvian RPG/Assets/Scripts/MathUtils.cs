@@ -34,7 +34,7 @@ public static class MathUtils
     /// <param name="moveSpeed"></param>
     /// <param name="damageSkill"></param>
     /// <returns></returns>
-    public static bool IsWithinDamageRange(Vector2Int target, Vector2Int damageSource, int moveSpeed, Skill damageSkill)
+    public static bool IsWithinDamageRange(Vector2 target, Vector2 damageSource, int moveSpeed, Skill damageSkill)
     {
         
         int totalRange = moveSpeed + damageSkill.skillRange;
@@ -50,8 +50,8 @@ public static class MathUtils
          *
          */
 
-        int xDiff = Mathf.Abs(target.x - damageSource.x);
-        int yDiff = Mathf.Abs(target.y - damageSource.y);
+        int xDiff = (int)Mathf.Abs(target.x - damageSource.x);
+        int yDiff = (int)Mathf.Abs(target.y - damageSource.y);
 
 
         if (xDiff + yDiff <= totalRange)

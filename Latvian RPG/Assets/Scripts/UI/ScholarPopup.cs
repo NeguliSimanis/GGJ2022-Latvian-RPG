@@ -8,6 +8,7 @@ public class ScholarPopup : MonoBehaviour
 
     public Text skillText;
     public Text scholarText;
+    public Text skillName;
 
     [Header("Light option")]
     public Button lightOptionButton;
@@ -18,4 +19,7 @@ public class ScholarPopup : MonoBehaviour
     public Button darkOptionButton;
     public Text darkBigText;
     public Text darkSmallText;
+
+    [HideInInspector]
+    public Skill skillToTeach;
 }

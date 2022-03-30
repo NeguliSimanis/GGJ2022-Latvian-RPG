@@ -22,6 +22,7 @@ public class GameData
     public int dungeonFloor = -1;
     public static int totalFloorsCleared = 0;
     public static int maxFloorReached = 0;
+    public bool secondSkillFloorSpawned = false;
     #endregion
 
     #region TURNDURATION
@@ -50,6 +51,8 @@ public class GameData
     public int levelUpPointsReward = 30;
     public int healPointsReward = 5;
     public int recruitPointsReward = 10;
+
+
     /*
      * Kill - 10 dark points
      * Level up choice - 20 dark/light points
@@ -69,6 +72,11 @@ public class GameData
     }
     public void UpdateMaxFloorReached()
     {
-        maxFloorReached = dungeonFloor + 2;
+        maxFloorReached = RealFloor();
+    }
+
+    public int RealFloor()
+    {
+        return dungeonFloor + 2;
     }
 }

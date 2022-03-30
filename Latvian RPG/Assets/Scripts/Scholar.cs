@@ -17,12 +17,11 @@ public class Scholar : MonoBehaviour
         foreach (Skill skill in allowedSkills)
         {
             bool available = true;
-            foreach (Skill apprenticeSkills in apprentice.startingSkills)
+            foreach (Skill apprenticeSkills in apprentice.stats.skills)
             {
                 if (skill.name == apprenticeSkills.name)
                 {
                     available = false;
-                    Debug.LogError(skill.name + " not available because I said so");
                     break;
                 }
             }

@@ -37,8 +37,8 @@ public class TileHighlight : MonoBehaviour
     private GameObject marker;
     private GameManager gameManager;
 
-    public int xCoord;
-    public int yCoord;
+    public float xCoord;
+    public float yCoord;
 
     private List<SpriteRenderer> markerSprites = new List<SpriteRenderer>();
 
@@ -69,8 +69,8 @@ public class TileHighlight : MonoBehaviour
 
     private void UpdateCoord()
     {
-        xCoord = (int)transform.position.x;
-        yCoord = (int)transform.position.y;
+        xCoord = transform.position.x;
+        yCoord = transform.position.y;
     }
 
     public void SetDefaultSortingOrder(bool defaultOrder)
