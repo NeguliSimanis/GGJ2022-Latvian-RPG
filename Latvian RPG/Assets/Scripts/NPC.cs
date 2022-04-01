@@ -143,6 +143,7 @@ public class NPC : MonoBehaviour
     /// </summary>
     private IEnumerator Patrol()
     {
+
         DisplayNPCWalkRange();
         yield return new WaitForSeconds(delayBeforeActionStart);
         int whileCounter = 10;
@@ -236,6 +237,7 @@ public class NPC : MonoBehaviour
         bool avoidBottom = false)
     {
         Debug.Log(npcControls.name + "MOVING CLOSER TO TARGET. Method called by " + callerName);
+        bool movedThisLoop = false;
         while (npcControls.tilesWalked < npcControls.playerSpeed)// && IsMyTurn())
         {
             bool canMoveCloser = false;
@@ -246,7 +248,8 @@ public class NPC : MonoBehaviour
             // MOVE ON X AXIS
             // if further on x axis 
             // OR top/down are blocked
-            if ((diffX > diffY || (avoidBottom && avoidTop)) &&
+            if ((diffX > diffY || 
+                ((avoidBottom || avoidTop) && !movedThisLoop)) &&
                 diffX > 1)
             {
                 canMoveCloser = true;
@@ -272,6 +275,7 @@ public class NPC : MonoBehaviour
                     {
                         yield return new WaitForSeconds(delayBeforeActionStart);
                         npcControls.MoveCharacterOneTile(Direction.Right);
+                        movedThisLoop = true;
                     }
                 }
                 else if (target.x < npcControls.xCoord)
@@ -296,6 +300,7 @@ public class NPC : MonoBehaviour
                     {
                         yield return new WaitForSeconds(delayBeforeActionStart);
                         npcControls.MoveCharacterOneTile(Direction.Left);
+                        movedThisLoop = true;
                     }
                 }
             }
@@ -306,8 +311,9 @@ public class NPC : MonoBehaviour
             else if (
                 (((!MathUtils.FastApproximately(target.x, npcControls.xCoord, 0.1f)) &&
                 (!MathUtils.FastApproximately(target.y, npcControls.yCoord, 0.1f)))
-                || (avoidRight && avoidLeft)) &&
-                diffY > 1)
+                || (avoidRight || avoidLeft)) &&
+                diffY > 1   &&
+                !movedThisLoop)
             {
                 canMoveCloser = true;
                 if (target.y > npcControls.yCoord)
@@ -332,6 +338,7 @@ public class NPC : MonoBehaviour
                     {
                         yield return new WaitForSeconds(delayBeforeActionStart);
                         npcControls.MoveCharacterOneTile(Direction.Up);
+                        movedThisLoop = true;
                     }
                 }
                 else if (target.y < npcControls.yCoord)
@@ -356,6 +363,7 @@ public class NPC : MonoBehaviour
                     {
                         yield return new WaitForSeconds(delayBeforeActionStart);
                         npcControls.MoveCharacterOneTile(Direction.Down);
+                        movedThisLoop = true;
                     }
                 }
             }
@@ -363,8 +371,24 @@ public class NPC : MonoBehaviour
                 break;
             if (!canMoveCloser)
                 break;
-            Debug.Log(npcControls.name + " MOVED TO " + npcControls.xCoord + "." + npcControls.yCoord + ". CURR TILES WALKED + " + npcControls.tilesWalked);
-            npcControls.tilesWalked++;
+            bool hasRandomMoved = false;
+            if (!movedThisLoop)
+            {
+                int firstCounter = 10;
+                while (!hasRandomMoved && firstCounter > 0)
+                {
+                    if (npcControls.RandomMoveNPC())
+                    {
+                        hasRandomMoved = true;
+                        movedThisLoop = true;
+                    }
+                    firstCounter--;
+                }
+            }
+            
+            if (!hasRandomMoved)
+                npcControls.tilesWalked++;
+            movedThisLoop = false;
         }
         if (attemptAttackAfter)
         {

@@ -9203,8 +9203,8 @@ MonoBehaviour:
   - {fileID: 4568654058478110076, guid: 8543b50d0dac7324b9ebd3290158a989, type: 3}
   - {fileID: 4568654058478110076, guid: 58655154b76410744894db32bf0ed11c, type: 3}
   - {fileID: 4568654058478110076, guid: c2337ff5e2d1a414b8362f9813ef8f21, type: 3}
-  - {fileID: 4568654058478110076, guid: 7fec73aed259f334dafdee7809917777, type: 3}
-  - {fileID: 4568654058478110076, guid: 5fbcbbc065282644fbcffd4b0183402b, type: 3}
+  - {fileID: 4568654058478110076, guid: c451f5f936a57ea4aa38ca357940ce92, type: 3}
+  - {fileID: 4568654058478110076, guid: d89c7f240b240f643a8a07a37192f809, type: 3}
   - {fileID: 4568654058478110076, guid: 0811f74ea6b05e240ac5800ea9c243e8, type: 3}
   currFloor: {fileID: 1104640800}
   levelTopBorder: {fileID: 0}

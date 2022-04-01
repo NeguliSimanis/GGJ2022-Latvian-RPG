@@ -258,6 +258,7 @@ public class PopupManager : MonoBehaviour
     private void LightLevelUp()
     {
         ShowLevelUpPopup(new PlayerControls(), false);
+        GameData.current.PauseGame(true);
         if (playerToLevel.stats.UpdateProgressToGameVictory(ExpAction.LevelUpLight))
         {
             gameManager.Victory();
@@ -286,6 +287,7 @@ public class PopupManager : MonoBehaviour
     private void DarkLevelUp()
     {
         ShowLevelUpPopup(new PlayerControls(), false);
+        GameData.current.PauseGame(true);
         if (playerToLevel.stats.UpdateProgressToGameVictory(ExpAction.LevelUpDark))
         {
             gameManager.Victory();
@@ -327,12 +329,14 @@ public class PopupManager : MonoBehaviour
     {
         if (!show)
         {
+            GameData.current.PauseGame(false);
             rebirthScreen.SetActive(false);
             return;
         }
 
 
         rebirthScreen.SetActive(true);
+        GameData.current.PauseGame(true);
 
         int realFloorReached = GameData.current.dungeonFloor + 2;
         int maxFloor = realFloorReached;
@@ -437,10 +441,12 @@ public class PopupManager : MonoBehaviour
     {
         if (!show)
         {
+            GameData.current.PauseGame(false);
             charPopup.SetActive(false);
             return;
         }
-        GameData.current.playerTurnEndTime += 20f;
+        GameData.current.PauseGame(true);
+        GameData.current.playerTurnEndTime += 5f;
         charPopup.SetActive(true);
 
         SetMooningLevelHUD();
@@ -484,10 +490,12 @@ public class PopupManager : MonoBehaviour
         if (!show)
         {
             levelUpPopup.SetActive(false);
+            GameData.current.PauseGame(false);
             return;
         }
         playerToLevel = player;
         levelUpPopup.SetActive(true);
+        GameData.current.PauseGame(true);
 
         levelUpPicture.sprite = player.bigCharSprite;
 
@@ -547,8 +555,10 @@ public class PopupManager : MonoBehaviour
         if (!display)
         {
             scholarPopupObject.SetActive(false);
+            GameData.current.PauseGame(false);
             return;
         }
+        GameData.current.PauseGame(true);
         scholarPopup.skillToTeach = skillToDisplay;
         scholarPopupObject.SetActive(true);
 
@@ -568,6 +578,7 @@ public class PopupManager : MonoBehaviour
     public void ScholarButtPress(bool isLight = true)
     {
         scholarPopupObject.SetActive(false);
+        GameData.current.PauseGame(false);
 
         if (isLight)
         {

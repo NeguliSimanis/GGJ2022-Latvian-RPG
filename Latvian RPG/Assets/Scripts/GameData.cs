@@ -11,6 +11,7 @@ public class GameData
     #endregion
 
     #region GENERAL
+    private bool gamePaused = false;
     public bool gameStarted = false;
     public int currentTurn = 1;
     public CharType turnType = CharType.Player;
@@ -78,5 +79,25 @@ public class GameData
     public int RealFloor()
     {
         return dungeonFloor + 2;
+    }
+
+    public bool isGamePaused
+    {
+        get
+        {
+            return gamePaused;
+        }
+    }
+
+    public void PauseGame(bool pause)
+    {
+        if (pause)
+        {
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
     }
 }
