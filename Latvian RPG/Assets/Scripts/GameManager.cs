@@ -1212,4 +1212,16 @@ public class GameManager : MonoBehaviour
             Victory();
         }
     }
+
+    public void PauseGame(bool pause)
+    {
+        GameData.current.PauseGame(pause);
+    }
+
+    public IEnumerator PauseGameAfterSeconds(bool pause, float seconds = 0f)
+    {
+        yield return new WaitForSeconds(seconds);
+        PauseGame(pause);
+    }
+   
 }
