@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using System;
 
 public enum Direction
 {
@@ -30,7 +30,7 @@ public enum ExpAction
     LevelUpDark,
     LevelUpLight
 }
-
+[Serializable]
 public class PlayerControls : MonoBehaviour
 {
     public bool availableInRoster = false;
@@ -301,7 +301,7 @@ public class PlayerControls : MonoBehaviour
     {
         bool targetPositionFound = false;
         int directionCount = Direction.GetNames(typeof(Direction)).Length - 1;
-        Direction direction = (Direction)Random.Range(0, directionCount);
+        Direction direction = (Direction)UnityEngine.Random.Range(0, directionCount);
         Vector3 targetPosition = new Vector3(xCoord, yCoord - 1, 0); ;
         int whileCounter = 5;
 
@@ -506,7 +506,7 @@ public class PlayerControls : MonoBehaviour
         // choose dark stats
         //  life 0.3
         //  offense 0.7
-        if (Random.Range(0, 1f) > 0.7f)
+        if (UnityEngine.Random.Range(0, 1f) > 0.7f)
             stats.darkLevelUpStat = CharStat.life;
         else
             stats.darkLevelUpStat = CharStat.offense;
@@ -516,7 +516,7 @@ public class PlayerControls : MonoBehaviour
         //  mana
         //  defense,
         //  speed
-        float lightRNG = Random.Range(0, 1f);
+        float lightRNG = UnityEngine.Random.Range(0, 1f);
         if (lightRNG < 0.6f)
             stats.lightLevelUpStat = CharStat.defense;
         else if (lightRNG >= 0.6f && lightRNG < 0.99f)
@@ -750,7 +750,7 @@ public class PlayerControls : MonoBehaviour
     {
         int statIncrease = GameData.current.dungeonFloor;
 
-        int increaseRoll = Random.Range(0, (int)3);
+        int increaseRoll = UnityEngine.Random.Range(0, (int)3);
 
         switch (increaseRoll)
         {

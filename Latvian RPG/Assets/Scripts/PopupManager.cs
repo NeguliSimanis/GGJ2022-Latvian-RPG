@@ -12,8 +12,12 @@ public class PopupManager : MonoBehaviour
     [SerializeField]
     Text currFloorText;
 
+    #region START SCREEN
+    [Header("START SCREEN")]
+    public GameObject startScreen;
     [SerializeField]
-    GameObject startScreen;
+    Button loadGameButt;
+    #endregion
 
     [SerializeField]
     GameObject popupObject;
@@ -192,16 +196,32 @@ public class PopupManager : MonoBehaviour
     ScholarPopup scholarPopup;
     #endregion
 
+    #region PAUSE MENU
+    [Header("PAUSE MENU")]
+    [SerializeField]
+    GameObject pausePanel;
+
+    [SerializeField]
+    Button endPausePanelButt;
+
+    [SerializeField]
+    Button saveAndExitButt;
+    #endregion
+
     private void Awake()
     {
         gameManager = gameObject.GetComponent<GameManager>();
 
         AddButtListeners();
+
+            
+
         ShowLevelUpPopup(new PlayerControls(), false);
         ShowWarningPopup(false);
         DisplayRebirthPopup(false);
         InitializeScholarInfo();
         ShowCharPopup(new PlayerControls(), false);
+        ShowPausePanel(false);
 
         startScreen.SetActive(true);
         darkVictoryScreen.SetActive(false);
@@ -223,6 +243,8 @@ public class PopupManager : MonoBehaviour
         if (!GameData.current.isDebugMode)
             debugText.gameObject.SetActive(false);
         UpdateFloorText();
+        if (!gameManager.saveManager.SaveAvailable())
+            loadGameButt.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -248,6 +270,9 @@ public class PopupManager : MonoBehaviour
         confirmEndTurnButton.onClick.AddListener(ConfirmEndTurn);
         cancelEndTurnButton.onClick.AddListener(CancelEndTurn);
         charButton.onClick.AddListener(CharButtonPressed);
+        endPausePanelButt.onClick.AddListener((delegate {ShowPausePanel(false);}));
+        saveAndExitButt.onClick.AddListener((delegate {gameManager.SaveAndExitToMenu();}));
+        loadGameButt.onClick.AddListener((delegate {gameManager.LoadGame();}));
     }
 
     void CharButtonPressed()
@@ -653,5 +678,12 @@ public class PopupManager : MonoBehaviour
     {
         int realFloor = GameData.current.RealFloor();
         currFloorText.text = "FLOOR " + realFloor.ToString();
+    }
+
+    public void ShowPausePanel(bool show)
+    {
+        GameData.current.PauseGame(show);
+        gameManager.audioManager.PlayButtonSFX();
+        pausePanel.SetActive(show);
     }
 }

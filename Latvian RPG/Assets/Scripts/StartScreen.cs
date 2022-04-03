@@ -179,7 +179,7 @@ public class StartScreen : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void SkipScene(bool skipToEnd = false)
+    public void SkipScene(bool skipToEnd = false)
     {
         if (scene3Active || skipToEnd)
         {

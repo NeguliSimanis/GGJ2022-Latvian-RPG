@@ -93,10 +93,12 @@ public class GameData
     {
         if (pause)
         {
+            gamePaused = true;
             Time.timeScale = 0f;
         }
         else
         {
+            gamePaused = false;
             Time.timeScale = 1f;
         }
     }

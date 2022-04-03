@@ -43,7 +43,8 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public AudioManager audioManager;
     public PopupManager popupManager;
-
+    public SaveLoad saveManager;
+    
     [SerializeField]
     private CameraController cameraController;
     [SerializeField]
@@ -635,18 +636,7 @@ public class GameManager : MonoBehaviour
             EndTurn();
             return;
         }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            ToggleCharInfoPanel();
-        }
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            EndTurn();
-        }
-        if (Input.GetKeyDown(KeyCode.Escape) && popupManager.isWarningPopupActive)
-        {
-            popupManager.ShowWarningPopup(false);
-        }
+
         ListenForShortcuts();
 
     }
@@ -655,27 +645,56 @@ public class GameManager : MonoBehaviour
     {
         if (!isAnyCharSelected)
             return;
-        // WALK SHORTCUTS
-        if (!skillSelected)
+        // TURN MANAGEMENT
+        if (Input.GetKeyDown(KeyCode.Return))
         {
-            if (Input.GetKeyDown(KeyCode.W))
+            EndTurn();
+        }
+
+        // POPUPS
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            ToggleCharInfoPanel();
+        }
+        if (Input.GetKeyDown(KeyCode.Escape) && popupManager.isWarningPopupActive)
+        {
+            popupManager.ShowWarningPopup(false);
+        }
+
+        // PAUSE
+        if (Input.GetKeyDown(KeyCode.P) || Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (GameData.current.isGamePaused)
             {
-                ProcessInteractionRequest(selectedChar.xCoord, selectedChar.yCoord + 1, ActionType.Walk);
-            } 
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                ProcessInteractionRequest(selectedChar.xCoord - 1, selectedChar.yCoord, ActionType.Walk);
+                popupManager.ShowPausePanel(false);
             }
-            if (Input.GetKeyDown(KeyCode.S))
+            else
             {
-                ProcessInteractionRequest(selectedChar.xCoord, selectedChar.yCoord - 1, ActionType.Walk);
-            }
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                ProcessInteractionRequest(selectedChar.xCoord + 1, selectedChar.yCoord, ActionType.Walk);
+                popupManager.ShowPausePanel(true);
             }
         }
-        
+
+        // WALK SHORTCUTS
+        //if (!skillSelected)
+        //{
+        //    if (Input.GetKeyDown(KeyCode.W))
+        //    {
+        //        ProcessInteractionRequest(selectedChar.xCoord, selectedChar.yCoord + 1, ActionType.Walk);
+        //    } 
+        //    if (Input.GetKeyDown(KeyCode.A))
+        //    {
+        //        ProcessInteractionRequest(selectedChar.xCoord - 1, selectedChar.yCoord, ActionType.Walk);
+        //    }
+        //    if (Input.GetKeyDown(KeyCode.S))
+        //    {
+        //        ProcessInteractionRequest(selectedChar.xCoord, selectedChar.yCoord - 1, ActionType.Walk);
+        //    }
+        //    if (Input.GetKeyDown(KeyCode.D))
+        //    {
+        //        ProcessInteractionRequest(selectedChar.xCoord + 1, selectedChar.yCoord, ActionType.Walk);
+        //    }
+        //}
+
 
 
         // SKILL SHORTCUTS
@@ -1208,7 +1227,6 @@ public class GameManager : MonoBehaviour
     {
         if (selectedChar.stats.UpdateProgressToGameVictory(expAction))
         {
-            Debug.LogError("adding stuff");
             Victory();
         }
     }
@@ -1222,6 +1240,29 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(seconds);
         PauseGame(pause);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void SaveAndExitToMenu()
+    {
+        saveManager.SaveGame(this);
+        RestartGame();
+    }
+
+    public void LoadGame()
+    {
+        Debug.LogError("fuck");
+        popupManager.startScreen.SetActive(false);
+        saveManager.LoadGame(this);
+        SpawnRandomStartingChar();
+        
+        StartGame();
+
+        MovePlayerToFloorStartingPoint();
     }
    
 }

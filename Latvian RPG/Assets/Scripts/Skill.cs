@@ -12,6 +12,7 @@ public enum SkillType
 
 public class Skill : MonoBehaviour
 {
+    public int skillID = 0;
     public float skillDamage;
     public float manaCost;
     public string skillName;

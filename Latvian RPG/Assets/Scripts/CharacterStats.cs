@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public enum Alignment
 {
@@ -29,6 +30,7 @@ public enum CharStat
     xp
 }
 
+[Serializable]
 public class CharacterStats
 {
     // game progress
