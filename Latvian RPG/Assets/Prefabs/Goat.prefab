@@ -526,11 +526,66 @@ MonoBehaviour:
   yCoord: 0
   npcController: {fileID: -6362190921303917739}
   character: 4
+  stats:
+    savedCharType: 0
+    lastSavedPosX: 0
+    lastSavedPosY: 0
+    savedCharacter: 0
+    lightPoints: 0
+    darkPoints: 0
+    level: 1
+    currExp: 0
+    expRequired: 10
+    darkLevelUpStat: 0
+    lightLevelUpStat: 0
+    maxLife: 10
+    currLife: 10
+    maxMana: 10
+    currMana: 10
+    manaRegen: 1
+    offense: 10
+    defense: 9
+    speed: 2
+    skills:
+    - Punch
+    - Guard
+    alignment: 2
+    bio: Oh, you found one of my favorites!Many are those, who reach me through their
+      might or cunning, great people of war and politics.This one raised entire forests
+      and gave shelter to men and beast alike, after a calamity struck their land.
+    name: Zurabi
   playerSpeed: 2
   tilesWalked: 0
   characterIsSelected: 0
   characterSelector: {fileID: 5263861361188574544}
   startingSkills:
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  currentSkills:
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
   - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
   - {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac, type: 3}
   manaBar: {fileID: 2127507951562188337}

@@ -647,8 +647,8 @@ public class PopupManager : MonoBehaviour
             {
                 if (currSkillID < charToDisplay.stats.skills.Count)
                 {
-                    skillButt.skillButtonText.text = charToDisplay.stats.skills[currSkillID].skillName;
-                    skillButt.skill = charToDisplay.stats.skills[currSkillID];
+                    skillButt.skillButtonText.text = charToDisplay.currentSkills[currSkillID].skillName;
+                    skillButt.skill = charToDisplay.currentSkills[currSkillID];
                 }
                 else
                     skillButt.gameObject.SetActive(false);

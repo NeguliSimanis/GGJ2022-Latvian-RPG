@@ -39,11 +39,12 @@ public class HighlightTileObject
 
 public class GameManager : MonoBehaviour
 {
-    #region CONTROLLERS
+    #region MANAGERS
     public static GameManager instance;
     public AudioManager audioManager;
     public PopupManager popupManager;
     public SaveLoad saveManager;
+    public SkillManager skillManager;
     
     [SerializeField]
     private CameraController cameraController;
@@ -166,15 +167,54 @@ public class GameManager : MonoBehaviour
         popupManager = gameObject.GetComponent<PopupManager>();
     }
 
-    public void StartGame()
+    public void StartGame(bool isLoadedGame = false)
     {
-        SpawnNewFloor();
+        SpawnNewFloor(isLoadedProgress: isLoadedGame);
         // SpawnRandomStartingChar();
         //SpawnStartingChar(Character.Goat);
 
         GameData.current.gameStarted = true;
         GameData.current.playerTurnStartTime = Time.time;
         GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer + 4f;
+    }
+
+    #region SPAWNING CHARACTERS
+    private void SpawnLoadedCharacters()
+    {
+        foreach (CharacterStats loadedCharStats in saveManager.loadedCharStats)
+        {
+            GameObject newCharacterObject = charRoster[0];
+
+            // FIND THE SAVED CHARACTER IN THE ROSTER
+            foreach (GameObject currChar in charRoster)
+            {
+                if (currChar.GetComponent<PlayerControls>().character == loadedCharStats.savedCharacter)
+                {
+                    newCharacterObject = currChar;
+                }
+            }
+
+            GameObject newPlayerInstance = Instantiate(newCharacterObject);
+            PlayerControls newControls = newPlayerInstance.GetComponent<PlayerControls>();
+
+            // LOAD CHAR ALIGNMENT
+            newControls.charType = loadedCharStats.savedCharType;
+            newControls.stats = loadedCharStats;
+            allCharacters.Add(newControls);
+            if (newControls.charType == CharType.Player)
+            {
+                cameraController.startTarget = newPlayerInstance.transform;
+                highlightedChar = newControls;
+                HighlightChar(newControls, highlight: true);
+                SelectChar(newControls);
+                cameraController.IntializeCamera(newPlayerInstance.transform);
+            }
+           
+            newControls.charMarker.UpdateMarkerColor(loadedCharStats.savedCharType);
+            newControls.TeleportPlayerCharacter(loadedCharStats.lastSavedPosX, loadedCharStats.lastSavedPosY,
+                instantTeleport: true);
+            newControls.InstantUpdateStatBars();
+        }
     }
 
     public void SpawnRandomStartingChar()
@@ -211,6 +251,7 @@ public class GameManager : MonoBehaviour
         newControls.charMarker.UpdateMarkerColor(CharType.Player);
         MovePlayerToFloorStartingPoint();
     }
+    #endregion
 
     private void ShowTurnTimerBar(bool show = true)
     {
@@ -402,7 +443,7 @@ public class GameManager : MonoBehaviour
         }
 
         // SUCCESSFUL SKILL SELECT
-        selectedSkill = selectedChar.stats.skills[skillID];
+        selectedSkill = selectedChar.currentSkills[skillID];
         popupManager.skillButts[skillID].skillButtonImage.color = skillButtonSelectedColor;
         if (selectedSkill.type[0] == SkillType.Damage)
         {
@@ -1198,12 +1239,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SpawnNewFloor()
+    public void SpawnNewFloor(bool isLoadedProgress = false)
     {
         if (GameData.current.dungeonFloor == -1)
         {
             return;
         }
+        Debug.LogError("spawning floor. is saved previously?: " + isLoadedProgress);
         DestroyImmediate(currFloor);
         int newFloorID = GameData.current.dungeonFloor;
         //newFloorID = dungeonFloors.Length - 4;
@@ -1211,8 +1253,12 @@ public class GameManager : MonoBehaviour
         {
             newFloorID = dungeonFloors.Length - 2;
         }
-        GameObject newFloor = Instantiate(dungeonFloors[newFloorID]);
-        currFloor = newFloor;
+
+
+        GameObject newFloorObj = Instantiate(dungeonFloors[newFloorID]);
+        currFloor = newFloorObj;
+        DungeonFloor newFloor = newFloorObj.GetComponent<DungeonFloor>();
+        newFloor.InitializeFloor(spawnEnemies: !isLoadedProgress);
 
         levelObjects.Clear();
         popupManager.UpdateFloorText();
@@ -1255,14 +1301,13 @@ public class GameManager : MonoBehaviour
 
     public void LoadGame()
     {
-        Debug.LogError("fuck");
         popupManager.startScreen.SetActive(false);
         saveManager.LoadGame(this);
-        SpawnRandomStartingChar();
+        SpawnLoadedCharacters();
         
-        StartGame();
+        StartGame(isLoadedGame: true);
 
-        MovePlayerToFloorStartingPoint();
+        //MovePlayerToFloorStartingPoint();
     }
    
 }

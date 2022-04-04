@@ -17,7 +17,7 @@ public class Scholar : MonoBehaviour
         foreach (Skill skill in allowedSkills)
         {
             bool available = true;
-            foreach (Skill apprenticeSkills in apprentice.stats.skills)
+            foreach (Skill apprenticeSkills in apprentice.currentSkills)
             {
                 if (skill.name == apprenticeSkills.name)
                 {

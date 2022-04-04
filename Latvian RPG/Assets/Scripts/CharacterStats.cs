@@ -33,6 +33,12 @@ public enum CharStat
 [Serializable]
 public class CharacterStats
 {
+    // data for saving
+    public CharType savedCharType; // player/neutral/enemy
+    public float lastSavedPosX; // only used for saving/loading
+    public float lastSavedPosY; // only used for saving/loading
+    public Character savedCharacter;
+
     // game progress
     public int lightPoints;
     public int darkPoints;
@@ -58,7 +64,7 @@ public class CharacterStats
 
     public int speed; // number of tiles that char can walk in single turn
     
-    public List<Skill> skills;
+    public List<String> skills;
 
     // flair
     public Alignment alignment;
@@ -114,7 +120,7 @@ public class CharacterStats
 
         speed = 2; // number of tiles that char can walk in single turn
 
-        skills = new List<Skill>();
+        skills = new List<string>();
 
         // flair
         alignment = Alignment.Piety;
@@ -136,7 +142,7 @@ public class CharacterStats
 
         speed = 2; // number of tiles that char can walk in single turn
 
-        skills = new List<Skill>();
+        skills = new List<string>();
 
         // flair
         alignment = Alignment.Might;
@@ -157,7 +163,7 @@ public class CharacterStats
 
         speed = 2; // number of tiles that char can walk in single turn
 
-        skills = new List<Skill>();
+        skills = new List<string>();
 
         // flair
         alignment = Alignment.Might;
@@ -180,7 +186,7 @@ public class CharacterStats
 
         speed = 2; // number of tiles that char can walk in single turn
 
-        skills = new List<Skill>();
+        skills = new List<string>();
 
         // flair
         alignment = Alignment.Might;
@@ -201,7 +207,7 @@ public class CharacterStats
 
         speed = 2; // number of tiles that char can walk in single turn
 
-        skills = new List<Skill>();
+        skills = new List<string>();
 
         // flair
         alignment = Alignment.Might;
@@ -217,16 +223,16 @@ public class CharacterStats
         switch (stat)
         {
             case CharStat.life:
-                amount = Random.Range(2, 4);
+                amount = UnityEngine.Random.Range(2, 4);
                 break;
             case CharStat.offense:
-                amount = Random.Range(1, 3);
+                amount = UnityEngine.Random.Range(1, 3);
                 break;
             case CharStat.defense:
-                amount = Random.Range(1, 3);
+                amount = UnityEngine.Random.Range(1, 3);
                 break;
             case CharStat.mana:
-                amount = Random.Range(2, 4);
+                amount = UnityEngine.Random.Range(2, 4);
                 break;
             case CharStat.speed:
                 amount = 1;

@@ -7,14 +7,29 @@ using System.IO;
 
 public class SaveLoad : MonoBehaviour
 {
+    public List<CharacterStats> loadedCharStats = new List<CharacterStats>();
+
     public void SaveGame(GameManager gameManager)
     {
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath
                      + "/MySaveData.dat");
+
+        #region SAVE CHAR STATS
+        List<CharacterStats> charsToSave = new List<CharacterStats>();
+        foreach (PlayerControls character in gameManager.allCharacters)
+        {
+            character.stats.savedCharType = character.charType;
+            character.stats.lastSavedPosX = character.xCoord;
+            character.stats.lastSavedPosY = character.yCoord;
+            character.stats.savedCharacter = character.character;
+            charsToSave.Add(character.stats);
+        }
+        #endregion
+
         SaveData data = new SaveData(
             dungeonFloor: GameData.current.dungeonFloor,
-            characters: gameManager.allCharacters);
+            characterStats: charsToSave);
 
 
         data.floorReached = GameData.current.dungeonFloor;
@@ -39,13 +54,16 @@ public class SaveLoad : MonoBehaviour
             SaveData data = (SaveData)bf.Deserialize(file);
             file.Close();
 
+           
 
             GameData.current.dungeonFloor = data.floorReached;
+            loadedCharStats = data.charStats;
             //gameManager.allCharacters = data.activeCharacters;
 
             Debug.LogError("Game data loaded! Floor reached - " + GameData.current.RealFloor());
-            foreach (PlayerControls player in gameManager.allCharacters)
-                Debug.LogError(player.stats.name);
+            foreach (CharacterStats player in loadedCharStats)
+                Debug.LogError(player.name);
+
         }
         else
             Debug.LogError("There is no save data!");
@@ -72,8 +90,10 @@ class SaveData
      * - SKILLS
      * - MANA, LIFE, XP, SPEED
      * - POSITION
+     * - STATUS EFFECTS
+     * - enemy / neutal / player
      */
-    //public List<PlayerControls> activeCharacters = new List<PlayerControls>();
+    public List<CharacterStats> charStats = new List<CharacterStats>();
 
     /* 
      * FLOOR
@@ -83,10 +103,11 @@ class SaveData
     public int floorReached;
 
     public SaveData(
-        List<PlayerControls> characters,
+        List<CharacterStats> characterStats,
         int dungeonFloor)
     {
         floorReached = dungeonFloor;
+        charStats = characterStats;
         //activeCharacters = characters;
     }
 }

@@ -15,10 +15,11 @@ public class DungeonFloor : MonoBehaviour
     int npcCount;
     bool repeatNPCs = false;
 
-    private void Start()
+    public void InitializeFloor(bool spawnEnemies = true)
     {
         gameManager = FindObjectOfType<GameManager>().GetComponent<GameManager>();
-        SpawnNPCs();
+        if (spawnEnemies)
+            SpawnNPCs();
     }
     private void SpawnNPCs()
     {

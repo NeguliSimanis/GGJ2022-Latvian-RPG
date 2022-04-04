@@ -526,11 +526,66 @@ MonoBehaviour:
   yCoord: 0
   npcController: {fileID: -6362190921303917739}
   character: 3
+  stats:
+    savedCharType: 0
+    lastSavedPosX: 0
+    lastSavedPosY: 0
+    savedCharacter: 0
+    lightPoints: 0
+    darkPoints: 0
+    level: 1
+    currExp: 0
+    expRequired: 10
+    darkLevelUpStat: 0
+    lightLevelUpStat: 0
+    maxLife: 10
+    currLife: 10
+    maxMana: 10
+    currMana: 10
+    manaRegen: 1
+    offense: 9
+    defense: 10
+    speed: 2
+    skills:
+    - Snipe
+    - Punch
+    alignment: 2
+    bio: Take heed, a great general is before you!His armies dead, his land barren
+      and his children murdered by their mother.For even a great general can be defeated,
+      if a God craves for a tragedy.
+    name: Cellach
   playerSpeed: 2
   tilesWalked: 0
   characterIsSelected: 0
   characterSelector: {fileID: 5263861361188574544}
   startingSkills:
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  currentSkills:
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
+  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
+  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
   - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
   - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
   manaBar: {fileID: 4659494982444674830}

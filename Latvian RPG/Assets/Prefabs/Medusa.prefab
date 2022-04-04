@@ -526,11 +526,65 @@ MonoBehaviour:
   yCoord: 0
   npcController: {fileID: -6362190921303917739}
   character: 0
+  stats:
+    savedCharType: 0
+    lastSavedPosX: 0
+    lastSavedPosY: 0
+    savedCharacter: 0
+    lightPoints: 0
+    darkPoints: 0
+    level: 1
+    currExp: 0
+    expRequired: 10
+    darkLevelUpStat: 0
+    lightLevelUpStat: 0
+    maxLife: 10
+    currLife: 10
+    maxMana: 10
+    currMana: 10
+    manaRegen: 1
+    offense: 10
+    defense: 10
+    speed: 2
+    skills:
+    - Tickle
+    - Seduce
+    alignment: 0
+    bio: She used to be a queen beloved by her people!Benevolent and righteous, she
+      was.Ah, how quickly the righteous turn on their friends and slaughter them.
+    name: Luna
   playerSpeed: 2
   tilesWalked: 0
   characterIsSelected: 0
   characterSelector: {fileID: 5263861361188574544}
   startingSkills:
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  currentSkills:
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
+  - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
   - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
   - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
   manaBar: {fileID: 6282360774337940444}

@@ -33,6 +33,11 @@ public enum ExpAction
 [Serializable]
 public class PlayerControls : MonoBehaviour
 {
+    #region MANAGERS
+    private GameManager gameManager;
+    private SkillManager skillManager;
+    #endregion
+
     public bool availableInRoster = false;
     public bool hasActedThisTurn = false;
     public CharType charType;
@@ -53,9 +58,14 @@ public class PlayerControls : MonoBehaviour
 
     [SerializeField]
     private CharacterSelectArea characterSelector;
-    GameManager gameManager;
+
+    #region SKILLS
+    [Header("SKILLS")]
     [SerializeField]
     public Skill[] startingSkills;
+    [HideInInspector]
+    public List<Skill> currentSkills = new List<Skill>();
+    #endregion
 
     #region UI
     [Header("HUD")]
@@ -105,10 +115,14 @@ public class PlayerControls : MonoBehaviour
         stats = new CharacterStats(character);
         if (charType != CharType.Player)
             UpdateStatsToCurrDungeonFloor();
+
         foreach (Skill newSkill in startingSkills)
         {
-            stats.skills.Add(newSkill);
+            stats.skills.Add(newSkill.skillName);
+            currentSkills.Add(newSkill);
         }
+
+
         name = stats.name;
         playerSpeed = stats.speed;
         characterIsSelected = false;
@@ -256,6 +270,16 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Make player character spend movement points to go to target location
+    /// 
+    /// OR
+    /// 
+    /// instantly move player to location without spending move points
+    /// </summary>
+    /// <param name="targetX"></param>
+    /// <param name="targetY"></param>
+    /// <param name="instantTeleport"></param>
     public void TeleportPlayerCharacter (float targetX, float targetY, bool instantTeleport = false)
     {
         
@@ -613,6 +637,12 @@ public class PlayerControls : MonoBehaviour
         statBar.fillAmount = (currStatAmount * 1f) / maxStatAmount;
     }
 
+    public void InstantUpdateStatBars()
+    {
+        lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
+        manaBar.fillAmount = (stats.currMana * 1f) / stats.currMana;
+    }
+
     public void SpendMana(float amount)
     {
         stats.currMana -= amount;
@@ -629,9 +659,9 @@ public class PlayerControls : MonoBehaviour
 
     public Skill GetLongestRangeDamageSkill()
     {
-        Skill longestSkill = stats.skills[0];
+        Skill longestSkill = currentSkills[0];
         
-        foreach (Skill skilly in stats.skills)
+        foreach (Skill skilly in currentSkills)
         {
             foreach (SkillType skillType in skilly.type)
             {
@@ -746,6 +776,8 @@ public class PlayerControls : MonoBehaviour
 
     }
 
+ 
+
     private void UpdateStatsToCurrDungeonFloor()
     {
         int statIncrease = GameData.current.dungeonFloor;
@@ -818,7 +850,8 @@ public class PlayerControls : MonoBehaviour
     {
         int newSkillCount = startingSkills.Length + 1;
 
-        stats.skills.Add(skillToLearn);
+        stats.skills.Add(skillToLearn.skillName);
+        currentSkills.Add(skillToLearn);
         //Skill[] newSkills = new Skill[newSkillCount];
 
         //for (int i = 0; i < newSkillCount; i++)
