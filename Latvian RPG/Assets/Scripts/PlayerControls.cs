@@ -640,7 +640,7 @@ public class PlayerControls : MonoBehaviour
     public void InstantUpdateStatBars()
     {
         lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
-        manaBar.fillAmount = (stats.currMana * 1f) / stats.currMana;
+        manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
     }
 
     public void SpendMana(float amount)

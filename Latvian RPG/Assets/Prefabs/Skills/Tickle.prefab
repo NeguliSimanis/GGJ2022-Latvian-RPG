@@ -43,6 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c34369e6c218c4aacb27bdcfa07139, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skillID: 0
   skillDamage: 2
   manaCost: 2
   skillName: Tickle
@@ -50,6 +51,6 @@ MonoBehaviour:
   type: 00000000
   description: Weak close range attack
   skillEffects: []
-  skillAnimation: {fileID: 153183041852810696, guid: 18bd9f7e6b28c834f9358fefcdaa9ed0,
+  skillAnimation: {fileID: 153183041852810696, guid: f266ae2b2d7a0f14ba329994c9860fb1,
     type: 3}
   animationOffset: {x: 0, y: 0}

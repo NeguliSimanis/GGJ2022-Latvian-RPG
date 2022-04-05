@@ -28,7 +28,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Comp 1_00000
+  m_Name: Control_skill_snipe
   serializedVersion: 5
   m_AnimatorParameters: []
   m_AnimatorLayers:
@@ -52,7 +52,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: snipe1
-  m_Speed: 13
+  m_Speed: 12
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
