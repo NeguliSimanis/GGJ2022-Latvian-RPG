@@ -379,6 +379,7 @@ public class NPC : MonoBehaviour
                 {
                     if (npcControls.RandomMoveNPC())
                     {
+                        yield return new WaitForSeconds(GameData.current.npcMoveDuration * 1f);
                         hasRandomMoved = true;
                         movedThisLoop = true;
                     }

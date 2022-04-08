@@ -280,10 +280,11 @@ public class PlayerControls : MonoBehaviour
     /// <param name="instantTeleport"></param>
     public void TeleportPlayerCharacter (float targetX, float targetY, bool instantTeleport = false)
     {
-       
-        if (isMovingNow)
+        if (isMovingNow && !instantTeleport)
+        {
             return;
-        isMovingNow = !instantTeleport;
+        }
+        isMovingNow = true;
         float currX = transform.position.x;
         float currY = transform.position.y;
 
@@ -295,18 +296,20 @@ public class PlayerControls : MonoBehaviour
 
         if (instantTeleport)
         {
-            Debug.Log("should teleport");
-            transform.position = new Vector3(targetX, targetY, transform.position.z);   
+            Vector3 targetPos = new Vector3(targetX, targetY, transform.position.z);
+            Debug.Log("should teleport to " + targetPos);
+            transform.position = targetPos;
             UpdateCoordAndSortOrder();
             gameManager.HideActionRange();
             gameManager.DisplayActionRange(ActionType.Walk);
+            isMovingNow = false;
             return;
         }
 
         // MOVE CHARACTER
         StartCoroutine(MovePlayerCloserToTarget(new Vector2(targetX, targetY),walkedTiles));
 
-        isMovingNow = false;
+       
     }
 
     private bool IsTileFree(float x, float y)
@@ -390,6 +393,7 @@ public class PlayerControls : MonoBehaviour
                     ConsumeHealthPack();
                     break;
                 case ObjectType.LevelExit:
+                    isMovingNow = true;
                     EnterNextLevel();
                     break;
                 case ObjectType.LearnSkill:
@@ -404,7 +408,7 @@ public class PlayerControls : MonoBehaviour
     private void EnterNextLevel()
     {
         GameData.current.EnterNextFloor();
-
+        
         // FADE TRANSITION?
 
         // ANIMATE TEXT - NEW LEVEL REACHED
@@ -731,10 +735,11 @@ public class PlayerControls : MonoBehaviour
             stats.tilesWalked++;
             distance--;
         }
-        Debug.Log("walk over");
-        yield return new WaitForSeconds(GameData.current.playerMoveDuration*0.8f);
+
+        yield return null; //new WaitForSeconds(GameData.current.playerMoveDuration*0.8f);
         gameManager.HideActionRange();
         gameManager.DisplayActionRange(ActionType.Walk);
+        isMovingNow = false;
     }
 
 

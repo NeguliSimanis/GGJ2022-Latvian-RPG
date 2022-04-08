@@ -58,6 +58,7 @@ public class PopupManager : MonoBehaviour
     [Header("Character popup")]
     [SerializeField]
     GameObject charPopup;
+    private PlayerControls charToDisplay;
 
     // sections
     CharPopupSection activeCharPopupSection = CharPopupSection.Bio;
@@ -156,6 +157,8 @@ public class PopupManager : MonoBehaviour
     Sprite brightMoon1;
     [SerializeField]
     Sprite brightMoon2;
+    [SerializeField]
+    Sprite brightMoon3;
     [SerializeField]
     Sprite darkMoon1;
     [SerializeField]
@@ -478,7 +481,7 @@ public class PopupManager : MonoBehaviour
             mooningImage.sprite = neutralMoon;
         }
         // bright
-        if (moonPoints > GameData.current.pointsRequiredPhase2)
+        if (moonPoints > GameData.current.pointsRequiredPhase1)
         {
             mooningImage.sprite = brightMoon1;
         }
@@ -486,6 +489,10 @@ public class PopupManager : MonoBehaviour
         if (moonPoints > GameData.current.pointsRequiredPhase2)
         {
             mooningImage.sprite = brightMoon2;
+        }
+        if (moonPoints > GameData.current.pointsRequiredPhase25)
+        {
+            mooningImage.sprite = brightMoon3;
         }
     }
 
@@ -498,6 +505,7 @@ public class PopupManager : MonoBehaviour
             charPopup.SetActive(false);
             return;
         }
+        charToDisplay = playerControls;
         charPopup.SetActive(true);
 
         if (intializePopup)
@@ -595,7 +603,7 @@ public class PopupManager : MonoBehaviour
     public void UpdateBigCharText(CharPopupSection charPopupSection)
     {
         activeCharPopupSection = charPopupSection;
-        DisplayBigCharPopupText(gameManager.selectedChar);
+        DisplayBigCharPopupText(gameManager.highlightedChar);
         gameManager.audioManager.PlayButtonSFX();
     }
 

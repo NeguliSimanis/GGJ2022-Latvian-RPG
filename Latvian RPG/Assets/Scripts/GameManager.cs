@@ -171,6 +171,7 @@ public class GameManager : MonoBehaviour
         SpawnNewFloor(isLoadedProgress: isLoadedGame);
 
         GameData.current.gameStarted = true;
+        GameData.current.PauseGame(false);
         GameData.current.playerTurnStartTime = Time.time;
         GameData.current.playerTurnEndTime = GameData.current.playerTurnStartTime + GameData.current.playerTurnTimer + 4f;
     }
@@ -412,8 +413,8 @@ public class GameManager : MonoBehaviour
         {
             if (curPlayer.charType == CharType.Player)
             {
-                Debug.Log("TELEPORTING " + curPlayer.name);
-                curPlayer.TeleportPlayerCharacter(startingPoint.x, startingPoint.y, instantTeleport: true);
+                Debug.Log("TELEPORTING " + curPlayer.name + " to " + levelStartPoint.position);
+                curPlayer.TeleportPlayerCharacter(levelStartPoint.position.x, levelStartPoint.position.y, instantTeleport: true);
                 if (playerID == 1)
                     curPlayer.TeleportPlayerCharacter(startingPoint2.x, startingPoint2.y, instantTeleport: true);
                 if (playerID == 2)
@@ -452,6 +453,11 @@ public class GameManager : MonoBehaviour
 
     public void SelectSkill(int skillID)
     {
+        if (selectedChar.isMovingNow)
+        {
+            Debug.Log("moving, cant do this");
+            return;
+        }
         HideActionRange();
 
         // DETERMINE IF A BUTTON WAS SELECTED BEFORE
@@ -1195,7 +1201,8 @@ public class GameManager : MonoBehaviour
 
         // 4 - remove spent mana
         // 5 - play animation
-        Instantiate(selectedSkill.skillAnimation, target.transform);
+        GameObject newAnimation = Instantiate(selectedSkill.skillAnimation, target.transform);
+        newAnimation.transform.SetParent(null);
         selectedChar.SpendMana(selectedSkill.manaCost);
 
     }
@@ -1285,10 +1292,15 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-
+        
         Debug.LogError("spawning floor. is saved previously?: " + isLoadedProgress);
         DestroyImmediate(currFloor);
+
         int newFloorID = GameData.current.dungeonFloor;
+
+        // MANAGE MUSIC 
+        audioManager.ManageMusicSwitch();
+
         //newFloorID = dungeonFloors.Length - 4;
         if (newFloorID >= dungeonFloors.Length)
         {

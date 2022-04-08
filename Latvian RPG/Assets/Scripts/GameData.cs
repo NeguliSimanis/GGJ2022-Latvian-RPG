@@ -1,7 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
+[Serializable]
 public class GameData
 {
     public static GameData current;
@@ -45,7 +49,8 @@ public class GameData
     #region MOON BALANCE
     public int currMoonPoints = 0;
     public int pointsRequiredPhase1 = 1;
-    public int pointsRequiredPhase2 = 35;
+    public int pointsRequiredPhase2 = 55;
+    public int pointsRequiredPhase25 = 120;
     public int pointsRequiredPhase3 = 190;
 
     public int killPointsReward = 5;

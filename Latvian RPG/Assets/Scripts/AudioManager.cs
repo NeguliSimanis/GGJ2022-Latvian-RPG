@@ -2,10 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum MusicTrack
+{
+    Ogotu1,
+    Medniex1,
+    undefined
+}
+
 public class AudioManager : MonoBehaviour
 {
-
+    private float musicVolume = 1f;
     private float sfxVolume = 1f;
+
+    #region MUSIC
+    [Header("Music")]
+
+    [SerializeField]
+    AudioClip ogotu1;
+    [SerializeField]
+    AudioClip medniex1;
+    MusicTrack currMusicTrack = MusicTrack.Ogotu1;
+    #endregion
+
+    #region SFX
+    [Header("sfx's")]
     [SerializeField]
     AudioSource audioSource;
 
@@ -39,6 +59,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField]
     AudioClip[] stepSounds;
     int stepSoundCount;
+    #endregion
 
     private void Start()
     {
@@ -108,17 +129,48 @@ public class AudioManager : MonoBehaviour
     }
 
 
-    //public static IEnumerator FadeToDifferentMusic(float duration, float targetVolume, AudioClip targetMusic)
-    //{
-    //    float currentTime = 0;
-    //    float start = audioSource.volume;
+    public void ManageMusicSwitch()
+    {
+        if (GameData.current.dungeonFloor == 3)
+            StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f));
+        if (GameData.current.dungeonFloor == 6)
+            StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f, targetTrack: MusicTrack.Ogotu1));
+    }
 
-    //    while (currentTime < duration)
-    //    {
-    //        currentTime += Time.deltaTime;
-    //        audioSource.volume = Mathf.Lerp(start, targetVolume, currentTime / duration);
-    //        yield return null;
-    //    }
-    //    yield break;
-    //}
+    public IEnumerator FadeToDifferentMusic(float duration, float silenceDuration, MusicTrack targetTrack = MusicTrack.undefined)
+    {
+        float currentTime = 0;
+        float start = audioSource.volume;
+
+        AudioClip targetAudioClip = medniex1;
+        if (targetTrack == MusicTrack.Ogotu1)
+        {
+            targetAudioClip = ogotu1;
+        }
+
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            audioSource.volume = Mathf.Lerp(start, 0, currentTime / duration);
+            yield return null;
+        }
+
+        currentTime = 0;
+        while (currentTime < silenceDuration)
+        {
+            currentTime += Time.deltaTime;
+            yield return null;
+        }
+
+        audioSource.clip = targetAudioClip;
+        audioSource.Play();
+        currentTime = 0;
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            audioSource.volume = Mathf.Lerp(start, musicVolume, currentTime / duration);
+            yield return null;
+        }
+        yield break;
+    }
 }

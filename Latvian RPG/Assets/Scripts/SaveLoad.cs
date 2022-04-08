@@ -40,7 +40,8 @@ public class SaveLoad : MonoBehaviour
             dungeonFloor: GameData.current.dungeonFloor,
             characterStats: charsToSave,
             gameManager: gameManager,
-            desObjNames: destroyedObjects);
+            desObjNames: destroyedObjects,
+            gameDataToSave: GameData.current);
 
 
         data.floorReached = GameData.current.dungeonFloor;
@@ -65,6 +66,8 @@ public class SaveLoad : MonoBehaviour
             SaveData data = (SaveData)bf.Deserialize(file);
             file.Close();
 
+            // general
+            GameData.current = data.savedGameData;
            
             // ENVIRONMENT
             GameData.current.dungeonFloor = data.floorReached;
@@ -102,29 +105,13 @@ public class SaveLoad : MonoBehaviour
 [Serializable]
 class SaveData
 {
-    /* 
-     * CHARACTERS
-     * - SKILLS
-     * - MANA, LIFE, XP, SPEED
-     * - POSITION
-     * - STATUS EFFECTS
-     * - enemy / neutal / player
-     */
+
     public List<CharacterStats> charStats = new List<CharacterStats>();
 
-    /* 
-     * FLOOR
-     *  - collectibles 
-     *  - floor level
-     */
+    public GameData savedGameData;
     public int floorReached;
     public List<string> destroyedObjNames = new List<string>();
 
-    /* 
-     * OTHER
-     *  - CAMERA 
-     * 
-     */
     public float cameraPosX;
     public float cameraPosY;
     public float cameraPosZ;
@@ -133,7 +120,8 @@ class SaveData
         List<CharacterStats> characterStats,
         int dungeonFloor,
         GameManager gameManager,
-        List<string> desObjNames)
+        List<string> desObjNames,
+        GameData gameDataToSave)
     {
 
         floorReached = dungeonFloor;
@@ -144,5 +132,7 @@ class SaveData
         cameraPosZ = gameManager.cameraController.transform.position.z;
 
         destroyedObjNames = desObjNames;
+
+        savedGameData = gameDataToSave;
     }
 }
