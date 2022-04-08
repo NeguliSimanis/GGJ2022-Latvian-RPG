@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7225139782170318055}
   - component: {fileID: 2076941935685868744}
   m_Layer: 0
-  m_Name: Guard
+  m_Name: skill1_Guard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,7 +49,7 @@ MonoBehaviour:
   skillName: Guard
   skillRange: 1
   type: 02000000
-  description: Increases defense of target by 30% for 3 turns
+  description: Increases defense of target by 30% for 4 turns
   skillEffects:
   - {fileID: -6489593602666348602, guid: 795be75fb153b1b4ca144e3767de1585, type: 3}
   skillAnimation: {fileID: 153183041852810696, guid: c3f5a35cff8f2084eba6e45f0972f04d,

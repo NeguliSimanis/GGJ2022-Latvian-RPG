@@ -49,7 +49,7 @@ MonoBehaviour:
   armorIncrease: 0
   increasedArmor: 0
   armorIncreased: 0
-  speedIncrease: -1
+  speedIncrease: -2
   finalSpeed: 0
   speedIncreased: 0
   manaIncrease: 0

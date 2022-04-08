@@ -211,11 +211,12 @@ public class PlayerControls : MonoBehaviour
         return true;
     }
 
-    public void AddMana(float amount, bool addedBySkill, bool removeMana = false)
+    public void AddMana(float amount, bool addedBySkill, bool removeMana = false, bool addToFull = false)
     {
         if (isDead)
             return;
-
+        if (addToFull)
+            amount = stats.maxMana - stats.currMana;
         if(removeMana)
             charAnimatedText.text = "" + amount + " mana";
         if (stats.currMana < stats.maxMana || removeMana)
@@ -226,7 +227,6 @@ public class PlayerControls : MonoBehaviour
                 if (addedBySkill)
                 {
                     GameData.current.currMoonPoints += GameData.current.healPointsReward;
-                    
                 }
                 charAnimatedText.text = "+" + amount + " mana";
             }
@@ -433,7 +433,7 @@ public class PlayerControls : MonoBehaviour
 
         // MOVE OTHER PLAYER CHARS TO NEW POS
         // MOVE main PLAYER CHAR TO NEW POSITION
-        gameManager.MovePlayerToFloorStartingPoint();
+        gameManager.MovePlayerToFloorStart();
     }
 
     private void ConsumeHealthPack()

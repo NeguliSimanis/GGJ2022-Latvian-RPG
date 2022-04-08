@@ -260,7 +260,7 @@ public class GameManager : MonoBehaviour
             RebirthManager.instance.ApplyRebirthBonus(newControls);
         cameraController.IntializeCamera(newPlayerInstance.transform, this);
         newControls.charMarker.UpdateMarkerColor(CharType.Player);
-        MovePlayerToFloorStartingPoint();
+        MovePlayerToFloorStart();
     }
     #endregion
 
@@ -391,7 +391,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void MovePlayerToFloorStartingPoint()
+    public void MovePlayerToFloorStart(bool recoverMana = true)
     {
         DungeonFloor dungeonFloor = currFloor.GetComponent<DungeonFloor>();
         Transform levelStartPoint = dungeonFloor.levelStartPoint[0];
@@ -415,6 +415,7 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log("TELEPORTING " + curPlayer.name + " to " + levelStartPoint.position);
                 curPlayer.TeleportPlayerCharacter(levelStartPoint.position.x, levelStartPoint.position.y, instantTeleport: true);
+                curPlayer.AddMana(amount: 0, addedBySkill: false, addToFull: true);
                 if (playerID == 1)
                     curPlayer.TeleportPlayerCharacter(startingPoint2.x, startingPoint2.y, instantTeleport: true);
                 if (playerID == 2)

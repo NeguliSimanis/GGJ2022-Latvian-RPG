@@ -44,10 +44,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inflictedStatus: 1
-  effectDuration: 4
+  effectDuration: 5
   armorPercentIncrease: 0.3
   armorIncrease: 0
   increasedArmor: 0
   armorIncreased: 0
+  speedIncrease: 0
+  finalSpeed: 0
+  speedIncreased: 0
   manaIncrease: 0
   canTargetOnlySelf: 0
