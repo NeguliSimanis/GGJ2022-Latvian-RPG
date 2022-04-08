@@ -324,7 +324,7 @@ public class PopupManager : MonoBehaviour
                 playerToLevel.stats.defense += lightStatIncrease;
                 break;
             case CharStat.speed:
-                playerToLevel.playerSpeed += lightStatIncrease;
+                playerToLevel.stats.speed += lightStatIncrease;
                 break;
             case CharStat.mana:
                 playerToLevel.stats.maxMana += lightStatIncrease;
@@ -539,7 +539,10 @@ public class PopupManager : MonoBehaviour
         lifeText.text = ((int)playerControls.stats.currLife).ToString() + "/" + ((int)playerControls.stats.maxLife).ToString();
         manaText.text = "Mana: " + playerControls.stats.currMana.ToString() + "/" + playerControls.stats.maxMana.ToString();
 
-        speedText.text = "Speed: " + (playerControls.stats.speed - playerControls.stats.tilesWalked) + "/" + playerControls.stats.speed;
+        int remainingSpeed = playerControls.stats.speed - playerControls.stats.tilesWalked;
+        if (remainingSpeed < 0)
+            remainingSpeed = 0;
+        speedText.text = "Speed: " + remainingSpeed + "/" + playerControls.stats.speed;
 
         switch (playerControls.charType)
         {

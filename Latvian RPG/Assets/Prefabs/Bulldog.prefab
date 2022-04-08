@@ -338,11 +338,11 @@ MonoBehaviour:
   characterIsSelected: 0
   characterSelector: {fileID: 5263861361188574544}
   startingSkills:
+  - {fileID: 2076941935685868744, guid: 3e19c9226ffc14d499f1298330e3a4db, type: 3}
   - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
   currentSkills:
+  - {fileID: 2076941935685868744, guid: 3e19c9226ffc14d499f1298330e3a4db, type: 3}
   - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
   manaBar: {fileID: 3045547726859551702}
   lifeBar: {fileID: 5329660703797503824}
   charAnimatedText: {fileID: 4725300266882547443}

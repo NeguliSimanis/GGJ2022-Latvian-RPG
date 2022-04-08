@@ -53,7 +53,8 @@ public class PlayerControls : MonoBehaviour
     public NPC npcController;
     public Character character;
     public CharacterStats stats;
-    public int playerSpeed; // how many tiles can char move in single turn
+    [SerializeField]
+    private int playerSpeed; // how many tiles can char move in single turn
     public bool characterIsSelected;
 
     [SerializeField]
@@ -210,25 +211,35 @@ public class PlayerControls : MonoBehaviour
         return true;
     }
 
-    public void AddMana(float amount, bool addedBySkill)
+    public void AddMana(float amount, bool addedBySkill, bool removeMana = false)
     {
         if (isDead)
             return;
-        if (stats.currMana < stats.maxMana)
+
+        if(removeMana)
+            charAnimatedText.text = "" + amount + " mana";
+        if (stats.currMana < stats.maxMana || removeMana)
         {
             // UI
-            charAnimatedText.text = "+" + amount + " mana";
+            if (!removeMana)
+            {
+                if (addedBySkill)
+                {
+                    GameData.current.currMoonPoints += GameData.current.healPointsReward;
+                    
+                }
+                charAnimatedText.text = "+" + amount + " mana";
+            }
             charTextAnimator.SetTrigger("appear");
 
-            if (addedBySkill)
-            {
-                GameData.current.currMoonPoints += GameData.current.healPointsReward;
+            if(addedBySkill)
                 gameManager.audioManager.PlayUtilitySFX();
-            }
+
             // HUD
             StartCoroutine(ShowManaBarForXSeconds(3f));
             StartCoroutine(UpdateStatBarWithDelay(false));
         }
+
 
         // ADD MANA
         stats.currMana += amount;
@@ -236,13 +247,14 @@ public class PlayerControls : MonoBehaviour
         {
             stats.currMana = stats.maxMana;
         }
-
+        if (stats.currMana < 0)
+            stats.currMana = 0;
        
     }
 
     public void ManagePlayerMovement()
     {
-        if (stats.tilesWalked < playerSpeed && characterIsSelected)
+        if (stats.tilesWalked < stats.speed && characterIsSelected)
         {
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
@@ -359,7 +371,7 @@ public class PlayerControls : MonoBehaviour
         
         MoveCharacterOneTile(direction);
         stats.tilesWalked++;
-        gameManager.UpdateRemainingMovesText(playerSpeed - stats.tilesWalked);
+        gameManager.UpdateRemainingMovesText(stats.speed - stats.tilesWalked);
         return true;
     }
 
@@ -367,7 +379,7 @@ public class PlayerControls : MonoBehaviour
 
     public void MoveCharacterOneTile(Direction moveDirection)
     {
-        gameManager.UpdateRemainingMovesText(playerSpeed - stats.tilesWalked);
+        gameManager.UpdateRemainingMovesText(stats.speed - stats.tilesWalked);
         switch (moveDirection)
         {
             case Direction.Up:
@@ -583,7 +595,7 @@ public class PlayerControls : MonoBehaviour
 
     public bool CanCharacterAct()
     {
-        if (stats.tilesWalked < playerSpeed || !hasUsedSkillThisTurn)
+        if (stats.tilesWalked < stats.speed || !hasUsedSkillThisTurn)
             return true;
         else
             return false;
@@ -833,6 +845,21 @@ public class PlayerControls : MonoBehaviour
                 }
             }
 
+            // SPEED FLAT
+            if (effect.speedIncrease != 0)
+            {
+                if (!effect.speedIncreased)
+                {
+                    Debug.Log("modyfing speed!");
+                    effect.speedIncreased = true;
+                    effect.finalSpeed = stats.speed + effect.speedIncrease;
+                    if (effect.finalSpeed < 0)
+                        stats.speed = 0;
+                    else
+                        stats.speed = effect.finalSpeed;
+                }
+            }
+
             effect.effectDuration--;
             if (effect.effectDuration <= 0)
             {
@@ -842,6 +869,9 @@ public class PlayerControls : MonoBehaviour
                 // REMOVE ACTIVE EFFECTS
                 if (effect.armorIncreased)
                      stats.defense -= effect.armorIncrease;
+
+                if (effect.speedIncreased)
+                    stats.speed = effect.finalSpeed - effect.speedIncrease;
 
                 i--;
                 effectCount--;

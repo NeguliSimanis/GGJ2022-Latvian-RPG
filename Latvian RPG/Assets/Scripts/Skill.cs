@@ -75,4 +75,19 @@ public class Skill : MonoBehaviour
 
         return totalDescription;
     }
+
+
+    public void ApplySkillEffects(PlayerControls target)
+    {
+        foreach (SkillEffectObject skillEffect in skillEffects)
+        {
+            GameObject newEffectObject = Instantiate(skillEffect.gameObject);
+            SkillEffectObject newSkillEffectObj = newEffectObject.GetComponent<SkillEffectObject>();
+            SkillEffect newSkillEffect = newSkillEffectObj.GetSkillEffect();
+            target.stats.activeStatusEffects.Add(newSkillEffect);
+            Destroy(newSkillEffectObj);
+            Debug.Log("Added " + skillEffect.name + " skill effect to " + target.name);
+            target.ActivateStatusEffects();
+        }
+    }
 }

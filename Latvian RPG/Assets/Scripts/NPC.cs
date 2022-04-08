@@ -147,7 +147,7 @@ public class NPC : MonoBehaviour
         DisplayNPCWalkRange();
         yield return new WaitForSeconds(delayBeforeActionStart);
         int whileCounter = 10;
-        while (npcControls.stats.tilesWalked < npcControls.playerSpeed && whileCounter > 0)
+        while (npcControls.stats.tilesWalked < npcControls.stats.speed && whileCounter > 0)
         {
             if (npcControls.RandomMoveNPC())
                 yield return new WaitForSeconds(GameData.current.npcMoveDuration);
@@ -238,7 +238,7 @@ public class NPC : MonoBehaviour
     {
         Debug.Log(npcControls.name + "MOVING CLOSER TO TARGET. Method called by " + callerName);
         bool movedThisLoop = false;
-        while (npcControls.stats.tilesWalked < npcControls.playerSpeed)// && IsMyTurn())
+        while (npcControls.stats.tilesWalked < npcControls.stats.speed)// && IsMyTurn())
         {
             bool canMoveCloser = false;
 
@@ -430,10 +430,10 @@ public class NPC : MonoBehaviour
         Debug.Log("FLEEING ENEMY COORD = " + npcControls.xCoord + "." + npcControls.yCoord);
         DisplayNPCWalkRange();
 
-        float xMin = npcControls.xCoord - npcControls.playerSpeed;
-        float xMax = npcControls.xCoord + npcControls.playerSpeed;
-        float yMin = npcControls.yCoord - npcControls.playerSpeed;
-        float yMax = npcControls.yCoord + npcControls.playerSpeed;
+        float xMin = npcControls.xCoord - npcControls.stats.speed;
+        float xMax = npcControls.xCoord + npcControls.stats.speed;
+        float yMin = npcControls.yCoord - npcControls.stats.speed;
+        float yMax = npcControls.yCoord + npcControls.stats.speed;
 
         Vector2 npcCoord = new Vector2(npcControls.xCoord, npcControls.yCoord);
         Vector2Int defaultSafestCoord = new Vector2Int(99999, 99999);
@@ -503,7 +503,7 @@ public class NPC : MonoBehaviour
             target: coord,                                                  // npc
             damageSource: new Vector2(player.xCoord, player.yCoord),    // player
             damageSkill: player.GetLongestRangeDamageSkill(),               // 
-            moveSpeed: player.playerSpeed);
+            moveSpeed: player.stats.speed);
 
         return !isInDanger;
     }
@@ -614,7 +614,11 @@ public class NPC : MonoBehaviour
         gameManager.HideActionRange();
         gameManager.DisplayActionRange(ActionType.UseCombatSkill, CharType.Enemy);
         yield return new WaitForSeconds(GameData.current.npcActionDuration * 3);
-        target.TakeDamage(amount: -skill.skillDamage, damageSource: npcControls);
+        selectedSkill.ApplySkillEffects(target);
+        if (skill.type[0] == SkillType.Damage)
+            target.TakeDamage(amount: -skill.skillDamage, damageSource: npcControls);
+        
+
         Instantiate(skill.skillAnimation, target.transform);
         npcControls.SpendMana(skill.manaCost);
         hasUsedSkillThisTurn = true;

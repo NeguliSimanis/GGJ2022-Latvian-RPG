@@ -514,7 +514,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            int speedLeft = selectedChar.playerSpeed - selectedChar.stats.tilesWalked;
+            int speedLeft = selectedChar.stats.speed - selectedChar.stats.tilesWalked;
             if (charType == CharType.Player)
             {
                 if (speedLeft > 0)
@@ -539,7 +539,7 @@ public class GameManager : MonoBehaviour
         }
 
         // spawn a tile below the character
-        if ((actionType == ActionType.Walk && selectedChar.stats.tilesWalked < selectedChar.playerSpeed)
+        if ((actionType == ActionType.Walk && selectedChar.stats.tilesWalked < selectedChar.stats.speed)
             || (actionType == ActionType.UseUtilitySkill))
         {
             Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x,
@@ -832,7 +832,7 @@ public class GameManager : MonoBehaviour
             {
                 isAnyCharSelected = true;
                 character.SelectCharacter(true);
-                UpdateRemainingMovesText(character.playerSpeed - character.stats.tilesWalked);
+                UpdateRemainingMovesText(character.stats.speed - character.stats.tilesWalked);
                 characterSelected = true;
                 selectedChar = characterToSelect;
                 HideActionRange();
@@ -960,7 +960,8 @@ public class GameManager : MonoBehaviour
             ShowTurnTimerBar(true);
             ShowSkillButton(true);
             DisplayActionRange(ActionType.Walk);
-            UpdateRemainingMovesText(selectedChar.playerSpeed);
+            skillSelected = false;
+            UpdateRemainingMovesText(selectedChar.stats.speed);
         }
 
         // MAKE NEUTRAL/ENEMY CHARS ACT
@@ -1128,7 +1129,7 @@ public class GameManager : MonoBehaviour
                 }
             }
             selectedChar.TeleportPlayerCharacter(xCoordinate, yCoordinate);
-            UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.stats.tilesWalked);
+            UpdateRemainingMovesText(selectedChar.stats.speed - selectedChar.stats.tilesWalked);
             return;
         }
 
@@ -1171,7 +1172,18 @@ public class GameManager : MonoBehaviour
         // 3 - apply skill effect
         if (selectedSkill.type[0] == SkillType.Damage)
         {
-            target.TakeDamage(-selectedSkill.skillDamage, selectedChar);
+            if (selectedSkill.skillName == "Sap")
+            {
+                target.AddMana(-selectedSkill.skillDamage, addedBySkill: true, removeMana: true);
+            }
+            else
+            {
+                if (selectedSkill.skillName == "Wound")
+                {
+                    selectedSkill.ApplySkillEffects(target);
+                }
+                target.TakeDamage(-selectedSkill.skillDamage, selectedChar);
+            }
             selectedChar.hasUsedSkillThisTurn = true;
         }
         else if (selectedSkill.type[0] == SkillType.Recruit)
@@ -1184,16 +1196,7 @@ public class GameManager : MonoBehaviour
             }
         else if (selectedSkill.type[0] == SkillType.Buff)
         {
-            foreach (SkillEffectObject skillEffect in selectedSkill.skillEffects)
-            {
-                GameObject newEffectObject = Instantiate(skillEffect.gameObject);
-                SkillEffectObject newSkillEffectObj = newEffectObject.GetComponent<SkillEffectObject>();
-                SkillEffect newSkillEffect = newSkillEffectObj.GetSkillEffect();
-                target.stats.activeStatusEffects.Add(newSkillEffect);
-                Destroy(newSkillEffectObj);
-                Debug.Log("Added " + skillEffect.name + " skill effect to " + target.name);
-                target.ActivateStatusEffects();
-            }
+            selectedSkill.ApplySkillEffects(target);
             audioManager.PlayUtilitySFX();
             selectedChar.hasUsedSkillThisTurn = true;
         }
@@ -1206,6 +1209,8 @@ public class GameManager : MonoBehaviour
         selectedChar.SpendMana(selectedSkill.manaCost);
 
     }
+
+
 
     public void RestartGame()
     {
