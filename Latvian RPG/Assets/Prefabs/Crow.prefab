@@ -294,6 +294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f890c518830274e48ab50334ec9bdfdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMovingNow: 0
   availableInRoster: 1
   hasActedThisTurn: 0
   charType: 2
@@ -308,6 +309,7 @@ MonoBehaviour:
     lastSavedPosX: 0
     lastSavedPosY: 0
     savedCharacter: 0
+    savedIsDead: 0
     lightPoints: 0
     darkPoints: 0
     level: 1
@@ -315,62 +317,29 @@ MonoBehaviour:
     expRequired: 10
     darkLevelUpStat: 0
     lightLevelUpStat: 0
-    maxLife: 9
-    currLife: 9
+    maxLife: 10
+    currLife: 10
     maxMana: 10
     currMana: 10
     manaRegen: 1
     offense: 10
-    defense: 10
+    defense: 9
+    tilesWalked: 0
     speed: 2
-    skills:
-    - Spit
-    - Inspire
+    skills: []
     alignment: 2
-    bio: They say after the battle of Tripeak, there were no survivors.This is false.Before
-      you is the child that survived the flames and blades.But will it survive you
+    bio: They say after the battle of Tripeak, there were no survivors. This is false.Before
+      you is the child that survived the flames and blades. But will it survive you
       ?
     name: Koyanagi
+    activeStatusEffects: []
   playerSpeed: 2
-  tilesWalked: 0
   characterIsSelected: 0
   characterSelector: {fileID: 5263861361188574544}
   startingSkills:
   - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
   - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
   currentSkills:
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
-  - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
-  - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
   - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
   - {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7, type: 3}
   manaBar: {fileID: 4734224236474661545}
@@ -382,7 +351,6 @@ MonoBehaviour:
   bigCharSprite: {fileID: 21300000, guid: 7e8ba39ec2b6192438c42d5f2e939df5, type: 3}
   spriteRenderer: {fileID: 5263861361188574545}
   hurtAnimator: {fileID: 1671162231256336809}
-  activeStatusEffects: []
 --- !u!114 &5701418463263706139
 MonoBehaviour:
   m_ObjectHideFlags: 0

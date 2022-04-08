@@ -151,8 +151,8 @@ public class StartScreen : MonoBehaviour
         selectCharButton.charPortrait.sprite = charToDisplay.charPortrait;
         selectCharButton.charName.text = charToDisplay.name;
         selectCharButton.charSkills.text = "Starting skills: " +
-            charToDisplay.startingSkills[0].name + ", " +
-            charToDisplay.startingSkills[1].name;
+            charToDisplay.startingSkills[0].skillName + ", " +
+            charToDisplay.startingSkills[1].skillName;
     }
 
     /// <summary>

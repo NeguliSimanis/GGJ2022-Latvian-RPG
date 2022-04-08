@@ -91,6 +91,8 @@ public class TileHighlight : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (GameData.current.isGamePaused)
+            return;
         if (active && allowInteraction)
         {
             gameManager.ProcessInteractionRequest(xCoord, yCoord, tileActionType);

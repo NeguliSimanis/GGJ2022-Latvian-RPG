@@ -147,7 +147,7 @@ public class NPC : MonoBehaviour
         DisplayNPCWalkRange();
         yield return new WaitForSeconds(delayBeforeActionStart);
         int whileCounter = 10;
-        while (npcControls.tilesWalked < npcControls.playerSpeed && whileCounter > 0)
+        while (npcControls.stats.tilesWalked < npcControls.playerSpeed && whileCounter > 0)
         {
             if (npcControls.RandomMoveNPC())
                 yield return new WaitForSeconds(GameData.current.npcMoveDuration);
@@ -189,7 +189,7 @@ public class NPC : MonoBehaviour
         {
             Debug.Log("TARGET NOT IN SKILL RANGE");
             DisplayNPCWalkRange();
-            if (npcControls.tilesWalked < npcControls.stats.speed)
+            if (npcControls.stats.tilesWalked < npcControls.stats.speed)
                 StartCoroutine(MoveCloserToTarget(
                     target: new Vector2(closestPlayer.xCoord, closestPlayer.yCoord),
                     endTurnAfter: false,
@@ -238,7 +238,7 @@ public class NPC : MonoBehaviour
     {
         Debug.Log(npcControls.name + "MOVING CLOSER TO TARGET. Method called by " + callerName);
         bool movedThisLoop = false;
-        while (npcControls.tilesWalked < npcControls.playerSpeed)// && IsMyTurn())
+        while (npcControls.stats.tilesWalked < npcControls.playerSpeed)// && IsMyTurn())
         {
             bool canMoveCloser = false;
 
@@ -387,7 +387,7 @@ public class NPC : MonoBehaviour
             }
             
             if (!hasRandomMoved)
-                npcControls.tilesWalked++;
+                npcControls.stats.tilesWalked++;
             movedThisLoop = false;
         }
         if (attemptAttackAfter)

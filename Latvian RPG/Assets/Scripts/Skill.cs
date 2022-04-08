@@ -19,7 +19,7 @@ public class Skill : MonoBehaviour
     public int skillRange;
     public SkillType[] type;
     public string description;
-    public SkillEffect[] skillEffects;
+    public SkillEffectObject[] skillEffects;
     public GameObject skillAnimation;
     public Vector2 animationOffset;
 
@@ -47,6 +47,32 @@ public class Skill : MonoBehaviour
                 + "\n Range: " + skillRange;
         }
          
+        return totalDescription;
+    }
+
+    public string GetCharPanelDescription()
+    {
+
+        string totalDescription = skillName.ToUpper() + ": " + description;
+
+        if (type[0] == SkillType.Recruit)
+        {
+            totalDescription +=
+                "\n Mana cost: " + (int)manaCost
+                + "\n Range: " + skillRange;
+        }
+        else if (type[0] == SkillType.Buff)
+        {
+            totalDescription += "\n Mana cost: " + (int)manaCost
+                + "\n Range: " + skillRange;
+        }
+        else
+        {
+            totalDescription += "\n Base damage: " + (int)skillDamage
+                + "\n Mana cost: " + (int)manaCost
+                + "\n Range: " + skillRange;
+        }
+
         return totalDescription;
     }
 }

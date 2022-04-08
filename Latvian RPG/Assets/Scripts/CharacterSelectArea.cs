@@ -42,6 +42,8 @@ public class CharacterSelectArea : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (GameData.current.isGamePaused)
+            return;
 
         gameManager.HighlightChar(characterController);
         if (characterController.charType != CharType.Player)

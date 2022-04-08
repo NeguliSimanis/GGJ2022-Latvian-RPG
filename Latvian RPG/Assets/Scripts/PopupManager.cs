@@ -2,6 +2,13 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+public enum CharPopupSection
+{
+    Bio,
+    Skills,
+    Status
+}
+
 public class PopupManager : MonoBehaviour
 {
     GameManager gameManager;
@@ -11,6 +18,11 @@ public class PopupManager : MonoBehaviour
 
     [SerializeField]
     Text currFloorText;
+
+    [SerializeField]
+    Sprite darkButtonGraphic;
+    [SerializeField]
+    Sprite lightButtonGraphic;
 
     #region START SCREEN
     [Header("START SCREEN")]
@@ -47,11 +59,23 @@ public class PopupManager : MonoBehaviour
     [SerializeField]
     GameObject charPopup;
 
+    // sections
+    CharPopupSection activeCharPopupSection = CharPopupSection.Bio;
+    [SerializeField]
+    Button charPopupBioButt;
+    Text bioButtText;
+    [SerializeField]
+    Button charPopupSkillButt;
+    Text skillButtText;
+    [SerializeField]
+    Button charPopupStatusButt;
+    Text statusButtText;
+
     // flair
     [SerializeField]
     Text charName;
     [SerializeField]
-    Text charBioText;
+    Text charBigText;
     [SerializeField]
     Image charPopupImage;
 
@@ -220,7 +244,7 @@ public class PopupManager : MonoBehaviour
         ShowWarningPopup(false);
         DisplayRebirthPopup(false);
         InitializeScholarInfo();
-        ShowCharPopup(new PlayerControls(), false);
+        InitializeCharPopup();
         ShowPausePanel(false);
 
         startScreen.SetActive(true);
@@ -286,7 +310,7 @@ public class PopupManager : MonoBehaviour
     private void LightLevelUp()
     {
         ShowLevelUpPopup(new PlayerControls(), false);
-        gameManager.PauseGameAfterSeconds(false, seconds: 1.5f);
+        gameManager.PauseGameAfterSeconds(false, seconds: 0.5f);
         if (playerToLevel.stats.UpdateProgressToGameVictory(ExpAction.LevelUpLight))
         {
             gameManager.Victory();
@@ -315,7 +339,7 @@ public class PopupManager : MonoBehaviour
     private void DarkLevelUp()
     {
         ShowLevelUpPopup(new PlayerControls(), false);
-        gameManager.PauseGameAfterSeconds(false, seconds: 1.5f);
+        gameManager.PauseGameAfterSeconds(false, seconds: 0.5f);
         if (playerToLevel.stats.UpdateProgressToGameVictory(ExpAction.LevelUpDark))
         {
             gameManager.Victory();
@@ -465,7 +489,8 @@ public class PopupManager : MonoBehaviour
         }
     }
 
-    public void ShowCharPopup(PlayerControls playerControls, bool show = true)
+    #region CHARACTER POPUP
+    public void ShowCharPopup(PlayerControls playerControls, bool show = true, bool intializePopup = false)
     {
         if (!show)
         {
@@ -473,15 +498,27 @@ public class PopupManager : MonoBehaviour
             charPopup.SetActive(false);
             return;
         }
+        charPopup.SetActive(true);
+
+        if (intializePopup)
+        {
+            bioButtText = charPopupBioButt.transform.GetChild(0).gameObject.GetComponent<Text>();
+            skillButtText = charPopupSkillButt.transform.GetChild(0).gameObject.GetComponent<Text>();
+            statusButtText = charPopupStatusButt.transform.GetChild(0).gameObject.GetComponent<Text>();
+            return;
+        }
+
         GameData.current.PauseGame(true);
         GameData.current.playerTurnEndTime += 5f;
-        charPopup.SetActive(true);
+        
 
         SetMooningLevelHUD();
 
-        /// REPLACE THIS STUFF WITH TEXTMESHJ
+        
         charName.text = playerControls.stats.name;
-        charBioText.text = playerControls.stats.bio;
+
+        DisplayBigCharPopupText(playerControls);
+        
 
         charPopupImage.sprite = playerControls.bigCharSprite;
 
@@ -494,7 +531,7 @@ public class PopupManager : MonoBehaviour
         lifeText.text = ((int)playerControls.stats.currLife).ToString() + "/" + ((int)playerControls.stats.maxLife).ToString();
         manaText.text = "Mana: " + playerControls.stats.currMana.ToString() + "/" + playerControls.stats.maxMana.ToString();
 
-        speedText.text = "Speed: " + playerControls.stats.speed;
+        speedText.text = "Speed: " + (playerControls.stats.speed - playerControls.stats.tilesWalked) + "/" + playerControls.stats.speed;
 
         switch (playerControls.charType)
         {
@@ -511,6 +548,59 @@ public class PopupManager : MonoBehaviour
 
     }
 
+    private void DisplayBigCharPopupText(PlayerControls playerControls)
+    {
+        switch(activeCharPopupSection)
+        {
+            case CharPopupSection.Bio:
+                charBigText.text = playerControls.stats.bio;
+                charPopupBioButt.image.sprite = lightButtonGraphic;
+                bioButtText.color = Color.black;
+                charPopupSkillButt.image.sprite = darkButtonGraphic;
+                skillButtText.color = Color.white;
+                charPopupStatusButt.image.sprite = darkButtonGraphic;
+                statusButtText.color = Color.white;
+                break;
+            case CharPopupSection.Skills:
+                charBigText.text = playerControls.GetAllSkillDescriptions();
+                charPopupBioButt.image.sprite = darkButtonGraphic;
+                bioButtText.color = Color.white;
+                charPopupSkillButt.image.sprite = lightButtonGraphic;
+                skillButtText.color = Color.black;
+                charPopupStatusButt.image.sprite = darkButtonGraphic;
+                statusButtText.color = Color.white;
+                break;
+            case CharPopupSection.Status:
+                charBigText.text = playerControls.GetStatusEffectDescript();
+                charPopupBioButt.image.sprite = darkButtonGraphic;
+                bioButtText.color = Color.white;
+                charPopupSkillButt.image.sprite = darkButtonGraphic;
+                skillButtText.color = Color.white;
+                charPopupStatusButt.image.sprite = lightButtonGraphic;
+                statusButtText.color = Color.black;
+                break;
+        }
+    }
+
+
+    private void InitializeCharPopup()
+    {
+        ShowCharPopup(new PlayerControls(), true, true);
+        charPopupBioButt.onClick.AddListener((delegate { UpdateBigCharText(CharPopupSection.Bio); }));
+        charPopupSkillButt.onClick.AddListener((delegate { UpdateBigCharText(CharPopupSection.Skills); }));
+        charPopupStatusButt.onClick.AddListener((delegate { UpdateBigCharText(CharPopupSection.Status); }));
+        ShowCharPopup(new PlayerControls(), false);
+    }
+
+    public void UpdateBigCharText(CharPopupSection charPopupSection)
+    {
+        activeCharPopupSection = charPopupSection;
+        DisplayBigCharPopupText(gameManager.selectedChar);
+        gameManager.audioManager.PlayButtonSFX();
+    }
+
+    #endregion
+
     public void ShowLevelUpPopup(PlayerControls player, bool show = true)
     {
         if (player.charType != CharType.Player)
@@ -524,7 +614,7 @@ public class PopupManager : MonoBehaviour
         playerToLevel = player;
         levelUpPopup.SetActive(true);
 
-        StartCoroutine(gameManager.PauseGameAfterSeconds(true, seconds: 1.5f));
+        StartCoroutine(gameManager.PauseGameAfterSeconds(true, seconds: 0.5f));
         GameData.current.playerTurnEndTime += 3f;
 
 
@@ -562,7 +652,7 @@ public class PopupManager : MonoBehaviour
         {
             case CharStat.offense:
                 levelUpButt2Text.text = darkStatIncrease.ToString();
-                levelUpExplanation2.text = "offense\n\n+" + levelUpStatAmount + "darkness";
+                levelUpExplanation2.text = "offense\n\n+" + levelUpStatAmount + " darkness";
                 levelUp2StatImage.sprite = offenseIcon;
                 break;
             case CharStat.life:
@@ -587,10 +677,11 @@ public class PopupManager : MonoBehaviour
         if (!display)
         {
             scholarPopupObject.SetActive(false);
-            GameData.current.PauseGame(false);
+            gameManager.PauseGame(false);
             return;
         }
-        GameData.current.PauseGame(true);
+        StartCoroutine(gameManager.PauseGameAfterSeconds(true, seconds: 0.4f, debug: true));
+        
         scholarPopup.skillToTeach = skillToDisplay;
         scholarPopupObject.SetActive(true);
 
@@ -610,7 +701,8 @@ public class PopupManager : MonoBehaviour
     public void ScholarButtPress(bool isLight = true)
     {
         scholarPopupObject.SetActive(false);
-        GameData.current.PauseGame(false);
+
+        gameManager.PauseGame(false);
 
         if (isLight)
         {
@@ -627,6 +719,7 @@ public class PopupManager : MonoBehaviour
     {
         int skillCount = charToDisplay.stats.skills.Count;
         int lastSkillCount = skillButtCount;
+       
 
         while (skillButtCount < skillCount)
         {
@@ -637,18 +730,20 @@ public class PopupManager : MonoBehaviour
 
         if (lastSkillCount < skillButtCount)
             InitializeSkillButts(lastSkillCount);
-
         int currSkillID = 0;
-        foreach(SkillButton skillButt in skillButts)
+        foreach (SkillButton skillButt in skillButts)
         {
             skillButt.gameObject.SetActive(display);
-
             if (display)
             {
-                if (currSkillID < charToDisplay.stats.skills.Count)
+
+                if (currSkillID < skillCount)
                 {
+
                     skillButt.skillButtonText.text = charToDisplay.currentSkills[currSkillID].skillName;
+                    
                     skillButt.skill = charToDisplay.currentSkills[currSkillID];
+                   
                 }
                 else
                     skillButt.gameObject.SetActive(false);

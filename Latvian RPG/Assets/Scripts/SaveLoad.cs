@@ -9,6 +9,12 @@ public class SaveLoad : MonoBehaviour
 {
     public List<CharacterStats> loadedCharStats = new List<CharacterStats>();
 
+    public float loadedCamPosX;
+    public float loadedCamPosY;
+    public float loadedCamPosZ;
+
+    public List<string> destroyedObjects = new List<string>();
+
     public void SaveGame(GameManager gameManager)
     {
         BinaryFormatter bf = new BinaryFormatter();
@@ -23,13 +29,18 @@ public class SaveLoad : MonoBehaviour
             character.stats.lastSavedPosX = character.xCoord;
             character.stats.lastSavedPosY = character.yCoord;
             character.stats.savedCharacter = character.character;
+            character.stats.savedIsDead = character.isDead;
             charsToSave.Add(character.stats);
         }
         #endregion
 
+        gameManager.SaveDestroyedObjects();
+
         SaveData data = new SaveData(
             dungeonFloor: GameData.current.dungeonFloor,
-            characterStats: charsToSave);
+            characterStats: charsToSave,
+            gameManager: gameManager,
+            desObjNames: destroyedObjects);
 
 
         data.floorReached = GameData.current.dungeonFloor;
@@ -55,14 +66,20 @@ public class SaveLoad : MonoBehaviour
             file.Close();
 
            
-
+            // ENVIRONMENT
             GameData.current.dungeonFloor = data.floorReached;
+            destroyedObjects = data.destroyedObjNames;
+
+            // CHARACTERS
             loadedCharStats = data.charStats;
             //gameManager.allCharacters = data.activeCharacters;
 
+            // CAMERA
+            loadedCamPosX = data.cameraPosX;
+            loadedCamPosY = data.cameraPosY;
+            loadedCamPosZ = data.cameraPosZ;
+
             Debug.LogError("Game data loaded! Floor reached - " + GameData.current.RealFloor());
-            foreach (CharacterStats player in loadedCharStats)
-                Debug.LogError(player.name);
 
         }
         else
@@ -98,16 +115,34 @@ class SaveData
     /* 
      * FLOOR
      *  - collectibles 
-     * 
+     *  - floor level
      */
     public int floorReached;
+    public List<string> destroyedObjNames = new List<string>();
+
+    /* 
+     * OTHER
+     *  - CAMERA 
+     * 
+     */
+    public float cameraPosX;
+    public float cameraPosY;
+    public float cameraPosZ;
 
     public SaveData(
         List<CharacterStats> characterStats,
-        int dungeonFloor)
+        int dungeonFloor,
+        GameManager gameManager,
+        List<string> desObjNames)
     {
+
         floorReached = dungeonFloor;
         charStats = characterStats;
-        //activeCharacters = characters;
+
+        cameraPosX = gameManager.cameraController.transform.position.x;
+        cameraPosY = gameManager.cameraController.transform.position.y;
+        cameraPosZ = gameManager.cameraController.transform.position.z;
+
+        destroyedObjNames = desObjNames;
     }
 }

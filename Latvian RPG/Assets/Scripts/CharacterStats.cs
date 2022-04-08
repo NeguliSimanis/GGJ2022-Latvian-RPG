@@ -38,6 +38,7 @@ public class CharacterStats
     public float lastSavedPosX; // only used for saving/loading
     public float lastSavedPosY; // only used for saving/loading
     public Character savedCharacter;
+    public bool savedIsDead;
 
     // game progress
     public int lightPoints;
@@ -62,14 +63,17 @@ public class CharacterStats
     public int offense;
     public int defense;
 
+    public int tilesWalked = 0;
     public int speed; // number of tiles that char can walk in single turn
     
-    public List<String> skills;
+    public List<string> skills;
 
     // flair
     public Alignment alignment;
     public string bio;
     public string name;
+
+    public List<SkillEffect> activeStatusEffects = new List<SkillEffect>();
 
     public CharacterStats (Character newCharacter)
     {
@@ -147,8 +151,8 @@ public class CharacterStats
         // flair
         alignment = Alignment.Might;
         bio = "They say after the battle of Tripeak, there were no survivors." +
-            "This is false.Before you is the child that survived the flames and blades." +
-            "But will it survive you ?";
+            " This is false.Before you is the child that survived the flames and blades." +
+            " But will it survive you ?";
         name = "Koyanagi";
     }
 
@@ -168,8 +172,8 @@ public class CharacterStats
         // flair
         alignment = Alignment.Might;
         bio = "Take heed, a great general is before you!" +
-            "His armies dead, his land barren and his children murdered by their mother." +
-            "For even a great general can be defeated, if a God craves for a tragedy.";
+            " His armies dead, his land barren and his children murdered by their mother." +
+            " For even a great general can be defeated, if a God craves for a tragedy.";
         name = "Cellach";
     }
 
@@ -191,8 +195,8 @@ public class CharacterStats
         // flair
         alignment = Alignment.Might;
         bio = "Oh, you found one of my favorites!" +
-            "Many are those, who reach me through their might or cunning, great people of war and politics." +
-            "This one raised entire forests and gave shelter to men and beast alike, after a calamity struck their land." +
+            " Many are those, who reach me through their might or cunning, great people of war and politics." +
+            " This one raised entire forests and gave shelter to men and beast alike, after a calamity struck their land." +
             "";
         name = "Zurabi";
     }

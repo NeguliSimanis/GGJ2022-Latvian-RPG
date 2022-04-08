@@ -45,9 +45,8 @@ public class GameManager : MonoBehaviour
     public PopupManager popupManager;
     public SaveLoad saveManager;
     public SkillManager skillManager;
-    
-    [SerializeField]
-    private CameraController cameraController;
+    public CameraController cameraController;
+
     [SerializeField]
     private GameObject rebirthManagerObj;
     private TurnManager turnManager;
@@ -170,8 +169,6 @@ public class GameManager : MonoBehaviour
     public void StartGame(bool isLoadedGame = false)
     {
         SpawnNewFloor(isLoadedProgress: isLoadedGame);
-        // SpawnRandomStartingChar();
-        //SpawnStartingChar(Character.Goat);
 
         GameData.current.gameStarted = true;
         GameData.current.playerTurnStartTime = Time.time;
@@ -183,38 +180,51 @@ public class GameManager : MonoBehaviour
     {
         foreach (CharacterStats loadedCharStats in saveManager.loadedCharStats)
         {
-            GameObject newCharacterObject = charRoster[0];
-
-            // FIND THE SAVED CHARACTER IN THE ROSTER
-            foreach (GameObject currChar in charRoster)
+            if (!loadedCharStats.savedIsDead)
             {
-                if (currChar.GetComponent<PlayerControls>().character == loadedCharStats.savedCharacter)
+                GameObject newCharacterObject = charRoster[0];
+
+                // FIND THE SAVED CHARACTER IN THE ROSTER
+                foreach (GameObject currChar in charRoster)
                 {
-                    newCharacterObject = currChar;
+                    if (currChar.GetComponent<PlayerControls>().character == loadedCharStats.savedCharacter)
+                    {
+                        newCharacterObject = currChar;
+                    }
                 }
-            }
+                GameObject newPlayerInstance = Instantiate(newCharacterObject);
+                PlayerControls newControls = newPlayerInstance.GetComponent<PlayerControls>();
 
-            GameObject newPlayerInstance = Instantiate(newCharacterObject);
-            PlayerControls newControls = newPlayerInstance.GetComponent<PlayerControls>();
+                // LOAD CHAR ALIGNMENT
+                newControls.charType = loadedCharStats.savedCharType;
+                newControls.stats = loadedCharStats;
+                allCharacters.Add(newControls);
+                newControls.LoadSavedSkills(skillManager);
 
-            // LOAD CHAR ALIGNMENT
-            newControls.charType = loadedCharStats.savedCharType;
-            newControls.stats = loadedCharStats;
-            allCharacters.Add(newControls);
-            if (newControls.charType == CharType.Player)
-            {
-                cameraController.startTarget = newPlayerInstance.transform;
-                highlightedChar = newControls;
-                HighlightChar(newControls, highlight: true);
-                SelectChar(newControls);
-                cameraController.IntializeCamera(newPlayerInstance.transform);
+                if (newControls.charType == CharType.Player)
+                {
+                    cameraController.startTarget = newPlayerInstance.transform;
+                    highlightedChar = newControls;
+                    HighlightChar(newControls, highlight: true);
+
+                    SelectChar(newControls);
+                    cameraController.IntializeCamera(newPlayerInstance.transform, this, loadCamPos: true);
+                }
+                else
+                {
+                    NPC newNPC = newControls.gameObject.GetComponent<NPC>();
+                    newNPC.npcControls = newControls;
+                    newNPC.gameManager = this;
+                }
+                
+                newControls.charMarker.UpdateMarkerColor(loadedCharStats.savedCharType);
+                newControls.TeleportPlayerCharacter(loadedCharStats.lastSavedPosX, loadedCharStats.lastSavedPosY,
+                    instantTeleport: true);
+                newControls.InstantUpdateStatBars();
             }
-           
-            newControls.charMarker.UpdateMarkerColor(loadedCharStats.savedCharType);
-            newControls.TeleportPlayerCharacter(loadedCharStats.lastSavedPosX, loadedCharStats.lastSavedPosY,
-                instantTeleport: true);
-            newControls.InstantUpdateStatBars();
         }
+        SelectChar(allCharacters[0]);
+        HighlightChar(allCharacters[0], true);
     }
 
     public void SpawnRandomStartingChar()
@@ -247,7 +257,7 @@ public class GameManager : MonoBehaviour
         SelectChar(newControls);
         if (GameData.totalFloorsCleared > 0 && applyRebirthBonus)
             RebirthManager.instance.ApplyRebirthBonus(newControls);
-        cameraController.IntializeCamera(newPlayerInstance.transform);
+        cameraController.IntializeCamera(newPlayerInstance.transform, this);
         newControls.charMarker.UpdateMarkerColor(CharType.Player);
         MovePlayerToFloorStartingPoint();
     }
@@ -297,13 +307,37 @@ public class GameManager : MonoBehaviour
             allObstacles.Add(obstacle);
         }
     }
-    private void FindFloorObjects()
+
+    #region Interactable object management
+    private void FindFloorObjects(bool isLoadedFloor = false)
     {
         levelObjects.Clear();
         foreach (InteractableObject interObject in FindObjectsOfType<InteractableObject>())
         {
             levelObjects.Add(interObject);
+            if (isLoadedFloor)
+            {
+                foreach (string objName in saveManager.destroyedObjects)
+                {
+                    if (objName == interObject.name)
+                    {
+                        interObject.Disable();
+                    }
+                }
+            }
+            
         }
+    }
+
+    public void SaveDestroyedObjects()
+    {
+        List<string> destroyedObjNames = new List<string>();
+        foreach (InteractableObject iObj in levelObjects)
+        {
+            if (iObj.consumed)
+                destroyedObjNames.Add(iObj.name);
+        }
+        saveManager.destroyedObjects = destroyedObjNames;
     }
 
     public ObjectType CheckInteractableObject(Vector2 coord)
@@ -315,8 +349,7 @@ public class GameManager : MonoBehaviour
             {
                 if (iObject.objType == ObjectType.HealingPotion && !iObject.consumed)
                 {
-                    iObject.consumed = true;
-                    iObject.gameObject.SetActive(false);
+                    iObject.Disable();
                     return ObjectType.HealingPotion;
                 }
                 else if (iObject.objType == ObjectType.LevelExit)
@@ -325,18 +358,17 @@ public class GameManager : MonoBehaviour
                 }
                 else if (iObject.objType == ObjectType.LearnSkill && !iObject.consumed)
                 {
-                    iObject.consumed = true;
-                    iObject.gameObject.SetActive(false);
+                    iObject.Disable();
                     Skill skillToDisplay = iObject.GetComponent<Scholar>().SelectSkillToTeach(selectedChar);
                     popupManager.DisplayScholarPopup(skillToDisplay);
                    
                     return ObjectType.LearnSkill;
                 }
             }
-
         }
         return ObjectType.Undefined;
     }
+    #endregion
 
     /// <summary>
     /// REMOVE CHARS THAT STAY IN OLD LEVEL
@@ -360,12 +392,19 @@ public class GameManager : MonoBehaviour
 
     public void MovePlayerToFloorStartingPoint()
     {
-        Transform levelStartPoint = currFloor.GetComponent<DungeonFloor>().levelStartPoint;
+        DungeonFloor dungeonFloor = currFloor.GetComponent<DungeonFloor>();
+        Transform levelStartPoint = dungeonFloor.levelStartPoint[0];
+        Transform levelStartPoint2 = dungeonFloor.levelStartPoint[1];
+        Transform levelStartPoint3 = dungeonFloor.levelStartPoint[2];
         Vector2 startingPoint = new Vector2(
             (levelStartPoint.position.x),
             (levelStartPoint.position.y));
-        Vector2 startingPoint2 = new Vector2((startingPoint.x-1), startingPoint.y + 1);
-        Vector2 startingPoint3 = new Vector2(startingPoint.x-1, startingPoint.y - 1);
+        Vector2 startingPoint2 = new Vector2(
+          (levelStartPoint2.position.x),
+          (levelStartPoint2.position.y));
+        Vector2 startingPoint3 = new Vector2(
+          (levelStartPoint3.position.x),
+          (levelStartPoint3.position.y));
 
         Debug.Log("start poi " + startingPoint);
         int playerID = 0;
@@ -463,13 +502,13 @@ public class GameManager : MonoBehaviour
         int actionRange;
         if (actionType == ActionType.UseCombatSkill || actionType == ActionType.UseUtilitySkill)
         {
-            popupManager.UpdateGuideText("Use " + selectedSkill.name);
-            UnityEngine.Debug.Log("Use " + selectedSkill.name);
+            popupManager.UpdateGuideText("Use " + selectedSkill.skillName);
+            UnityEngine.Debug.Log("Use " + selectedSkill.skillName);
             actionRange = selectedSkill.skillRange;
         }
         else
         {
-            int speedLeft = selectedChar.playerSpeed - selectedChar.tilesWalked;
+            int speedLeft = selectedChar.playerSpeed - selectedChar.stats.tilesWalked;
             if (charType == CharType.Player)
             {
                 if (speedLeft > 0)
@@ -494,7 +533,7 @@ public class GameManager : MonoBehaviour
         }
 
         // spawn a tile below the character
-        if ((actionType == ActionType.Walk && selectedChar.tilesWalked < selectedChar.playerSpeed)
+        if ((actionType == ActionType.Walk && selectedChar.stats.tilesWalked < selectedChar.playerSpeed)
             || (actionType == ActionType.UseUtilitySkill))
         {
             Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x,
@@ -781,14 +820,13 @@ public class GameManager : MonoBehaviour
 
         if (characterToSelect.charType == CharType.Player && GameData.current.turnType != CharType.Player)
             return characterSelected;
-
         foreach (PlayerControls character in allCharacters)
         {
             if (character == characterToSelect)
             {
                 isAnyCharSelected = true;
                 character.SelectCharacter(true);
-                UpdateRemainingMovesText(character.playerSpeed - character.tilesWalked);
+                UpdateRemainingMovesText(character.playerSpeed - character.stats.tilesWalked);
                 characterSelected = true;
                 selectedChar = characterToSelect;
                 HideActionRange();
@@ -799,7 +837,6 @@ public class GameManager : MonoBehaviour
                 lastSelectedPlayerChar = selectedChar;
                 DisplayActionRange(ActionType.Walk, character.charType);
                 ShowSkillButton();
-                return characterSelected;
             }
             else
             {
@@ -1021,6 +1058,8 @@ public class GameManager : MonoBehaviour
             return;
         if (!GameData.current.gameStarted)
             return;
+        if (selectedChar.isMovingNow)
+            return;
 
         #region Unknown Action type
         // Determine action type and call method again if valid request
@@ -1083,7 +1122,7 @@ public class GameManager : MonoBehaviour
                 }
             }
             selectedChar.TeleportPlayerCharacter(xCoordinate, yCoordinate);
-            UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.tilesWalked);
+            UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.stats.tilesWalked);
             return;
         }
 
@@ -1139,11 +1178,13 @@ public class GameManager : MonoBehaviour
             }
         else if (selectedSkill.type[0] == SkillType.Buff)
         {
-            foreach (SkillEffect skillEffect in selectedSkill.skillEffects)
+            foreach (SkillEffectObject skillEffect in selectedSkill.skillEffects)
             {
                 GameObject newEffectObject = Instantiate(skillEffect.gameObject);
-                SkillEffect newSkill = newEffectObject.GetComponent<SkillEffect>();
-                target.activeStatusEffects.Add(newSkill);
+                SkillEffectObject newSkillEffectObj = newEffectObject.GetComponent<SkillEffectObject>();
+                SkillEffect newSkillEffect = newSkillEffectObj.GetSkillEffect();
+                target.stats.activeStatusEffects.Add(newSkillEffect);
+                Destroy(newSkillEffectObj);
                 Debug.Log("Added " + skillEffect.name + " skill effect to " + target.name);
                 target.ActivateStatusEffects();
             }
@@ -1158,7 +1199,6 @@ public class GameManager : MonoBehaviour
         selectedChar.SpendMana(selectedSkill.manaCost);
 
     }
-
 
     public void RestartGame()
     {
@@ -1245,6 +1285,7 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
+
         Debug.LogError("spawning floor. is saved previously?: " + isLoadedProgress);
         DestroyImmediate(currFloor);
         int newFloorID = GameData.current.dungeonFloor;
@@ -1262,7 +1303,7 @@ public class GameManager : MonoBehaviour
 
         levelObjects.Clear();
         popupManager.UpdateFloorText();
-        FindFloorObjects();
+        FindFloorObjects(isLoadedProgress);
 
 
         // FIND OBSTACLES
@@ -1282,9 +1323,10 @@ public class GameManager : MonoBehaviour
         GameData.current.PauseGame(pause);
     }
 
-    public IEnumerator PauseGameAfterSeconds(bool pause, float seconds = 0f)
+    public IEnumerator PauseGameAfterSeconds(bool pause, float seconds = 0f, bool debug = false)
     {
         yield return new WaitForSeconds(seconds);
+
         PauseGame(pause);
     }
 
@@ -1304,7 +1346,6 @@ public class GameManager : MonoBehaviour
         popupManager.startScreen.SetActive(false);
         saveManager.LoadGame(this);
         SpawnLoadedCharacters();
-        
         StartGame(isLoadedGame: true);
 
         //MovePlayerToFloorStartingPoint();

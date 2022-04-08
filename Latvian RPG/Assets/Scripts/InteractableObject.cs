@@ -26,4 +26,10 @@ public class InteractableObject : MonoBehaviour
         yCoord = transform.position.y;
         spriteRenderer.sortingOrder = -(int)yCoord;
     }
+
+    public void Disable()
+    {
+        consumed = true;
+        gameObject.SetActive(false);
+    }
 }

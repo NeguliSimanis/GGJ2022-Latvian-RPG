@@ -38,6 +38,7 @@ public class PlayerControls : MonoBehaviour
     private SkillManager skillManager;
     #endregion
 
+    public bool isMovingNow = false;
     public bool availableInRoster = false;
     public bool hasActedThisTurn = false;
     public CharType charType;
@@ -53,7 +54,6 @@ public class PlayerControls : MonoBehaviour
     public Character character;
     public CharacterStats stats;
     public int playerSpeed; // how many tiles can char move in single turn
-    public int tilesWalked = 0;
     public bool characterIsSelected;
 
     [SerializeField]
@@ -63,7 +63,6 @@ public class PlayerControls : MonoBehaviour
     [Header("SKILLS")]
     [SerializeField]
     public Skill[] startingSkills;
-    [HideInInspector]
     public List<Skill> currentSkills = new List<Skill>();
     #endregion
 
@@ -96,12 +95,9 @@ public class PlayerControls : MonoBehaviour
     Animator hurtAnimator;
     #endregion
 
-    #region STATUS EFFECTS
-    public List<SkillEffect> activeStatusEffects;
-    #endregion
-
     private void Awake()
     {
+        currentSkills.Clear();
         UpdateCoordAndSortOrder();
         GetCharData();
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
@@ -116,12 +112,14 @@ public class PlayerControls : MonoBehaviour
         if (charType != CharType.Player)
             UpdateStatsToCurrDungeonFloor();
 
-        foreach (Skill newSkill in startingSkills)
+        if (currentSkills.Count < startingSkills.Length)
         {
-            stats.skills.Add(newSkill.skillName);
-            currentSkills.Add(newSkill);
+            foreach (Skill newSkill in startingSkills)
+            {
+                stats.skills.Add(newSkill.skillName);
+                currentSkills.Add(newSkill);
+            }
         }
-
 
         name = stats.name;
         playerSpeed = stats.speed;
@@ -244,27 +242,27 @@ public class PlayerControls : MonoBehaviour
 
     public void ManagePlayerMovement()
     {
-        if (tilesWalked < playerSpeed && characterIsSelected)
+        if (stats.tilesWalked < playerSpeed && characterIsSelected)
         {
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 MoveCharacterOneTile(Direction.Up);
-                tilesWalked++;
+                stats.tilesWalked++;
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
                 MoveCharacterOneTile(Direction.Down);
-                tilesWalked++;
+                stats.tilesWalked++;
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
                 MoveCharacterOneTile(Direction.Left);
-                tilesWalked++;
+                stats.tilesWalked++;
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
                 MoveCharacterOneTile(Direction.Right);
-                tilesWalked++;
+                stats.tilesWalked++;
             }
             
         }
@@ -282,7 +280,10 @@ public class PlayerControls : MonoBehaviour
     /// <param name="instantTeleport"></param>
     public void TeleportPlayerCharacter (float targetX, float targetY, bool instantTeleport = false)
     {
-        
+       
+        if (isMovingNow)
+            return;
+        isMovingNow = !instantTeleport;
         float currX = transform.position.x;
         float currY = transform.position.y;
 
@@ -304,8 +305,8 @@ public class PlayerControls : MonoBehaviour
 
         // MOVE CHARACTER
         StartCoroutine(MovePlayerCloserToTarget(new Vector2(targetX, targetY),walkedTiles));
-        
-        //transform.position = new Vector3((float)(targetX), (float)targetY, transform.position.z);
+
+        isMovingNow = false;
     }
 
     private bool IsTileFree(float x, float y)
@@ -354,8 +355,8 @@ public class PlayerControls : MonoBehaviour
         }
         
         MoveCharacterOneTile(direction);
-        tilesWalked++;
-        gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
+        stats.tilesWalked++;
+        gameManager.UpdateRemainingMovesText(playerSpeed - stats.tilesWalked);
         return true;
     }
 
@@ -363,7 +364,7 @@ public class PlayerControls : MonoBehaviour
 
     public void MoveCharacterOneTile(Direction moveDirection)
     {
-        gameManager.UpdateRemainingMovesText(playerSpeed - tilesWalked);
+        gameManager.UpdateRemainingMovesText(playerSpeed - stats.tilesWalked);
         switch (moveDirection)
         {
             case Direction.Up:
@@ -572,13 +573,13 @@ public class PlayerControls : MonoBehaviour
     {
         Debug.Log("resetting");
         ActivateStatusEffects();
-        tilesWalked = 0;
+        stats.tilesWalked = 0;
         hasUsedSkillThisTurn = false;
     }
 
     public bool CanCharacterAct()
     {
-        if (tilesWalked < playerSpeed || !hasUsedSkillThisTurn)
+        if (stats.tilesWalked < playerSpeed || !hasUsedSkillThisTurn)
             return true;
         else
             return false;
@@ -727,7 +728,7 @@ public class PlayerControls : MonoBehaviour
                     MoveCharacterOneTile(Direction.Down);
                 }
             }
-            tilesWalked++;
+            stats.tilesWalked++;
             distance--;
         }
         Debug.Log("walk over");
@@ -802,14 +803,14 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
+    #region STATUS EFFECTS
     public void ActivateStatusEffects()
     {
-    
-        int effectCount = activeStatusEffects.Count;
+        int effectCount = stats.activeStatusEffects.Count;
         Debug.Log("hello " + effectCount);
         for  (int i = 0; i < effectCount && i > -1; i++)
         {
-            SkillEffect effect = activeStatusEffects[i];
+            SkillEffect effect = stats.activeStatusEffects[i];
 
             // MANA FLAT
             if (effect.manaIncrease != 0)
@@ -822,8 +823,8 @@ public class PlayerControls : MonoBehaviour
                 {
                     Debug.Log("increasing armor!");
                     effect.armorIncreased = true;
-                    effect.originalArmor = stats.defense;
-                    stats.defense = (int)(stats.defense*(1f + effect.armorPercentIncrease));
+                    effect.armorIncrease = (int)(stats.defense * (1f + effect.armorPercentIncrease)) - stats.defense;
+                    stats.defense += effect.armorIncrease;
                 }
             }
 
@@ -831,41 +832,104 @@ public class PlayerControls : MonoBehaviour
             if (effect.effectDuration <= 0)
             {
                 Debug.Log("effect run out");
-                activeStatusEffects.RemoveAt(i);
+                stats.activeStatusEffects.RemoveAt(i);
 
                 // REMOVE ACTIVE EFFECTS
                 if (effect.armorIncreased)
-                     stats.defense = effect.originalArmor;
+                     stats.defense -= effect.armorIncrease;
 
-                Destroy(effect);
                 i--;
                 effectCount--;
             }
 
         }
-        
     }
 
-    public void LearnSkill(Skill skillToLearn)
+    public string GetStatusEffectDescript()
     {
-        int newSkillCount = startingSkills.Length + 1;
+        string description = "";
 
-        stats.skills.Add(skillToLearn.skillName);
-        currentSkills.Add(skillToLearn);
-        //Skill[] newSkills = new Skill[newSkillCount];
+        int effectCount = stats.activeStatusEffects.Count;
+        Debug.Log("hello " + effectCount);
+        for (int i = 0; i < effectCount && i > -1; i++)
+        {
+            SkillEffect effect = stats.activeStatusEffects[i];
 
-        //for (int i = 0; i < newSkillCount; i++)
-        //{
-        //    if (i < newSkillCount - 1)
-        //        newSkills[i] = startingSkills[i];
-        //    else
-        //        newSkills[i] = skillToLearn;
-        //}
+            string currStatusDescr = "";
 
-        //startingSkills = newSkills;
+            currStatusDescr = stats.activeStatusEffects[i].GetSkillEffectDescr();
+            description += currStatusDescr;
 
-        gameManager.popupManager.DisplayCharSkillButts(this);
 
+            if (i < effectCount - 1)
+                description += "\n \n";
+        }
+        if (effectCount <= 0)
+        {
+            description = "NO ACTIVE STATUS EFFECTS";
+        }
+
+        return description;
     }
+
+    #endregion
+
+    #region SKILL MANAGEMENT
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="skillToLearn"></param>
+    /// <param name="isLoadedSkill">has this skill been learned in a previous save file?</param>
+    public void LearnSkill(Skill skillToLearn, bool isLoadedSkill = false)
+    {
+        if (!isLoadedSkill)
+        {
+            stats.skills.Add(skillToLearn.skillName);
+        }
+        currentSkills.Add(skillToLearn);
+        
+        if (!isLoadedSkill)
+            gameManager.popupManager.DisplayCharSkillButts(this);
+    }
+
+    public void LoadSavedSkills(SkillManager skillManager)
+    {
+        foreach (string loadedSkillName in stats.skills)
+        {
+            bool skillLearned = false;
+            foreach (Skill currSkill in currentSkills)
+            {
+                if (currSkill.skillName == loadedSkillName)
+                    skillLearned = true;
+            }
+            if (!skillLearned)
+            {
+                LearnSkill(skillManager.GetSkill(loadedSkillName), isLoadedSkill: true);
+            }
+        }
+        gameManager.popupManager.DisplayCharSkillButts(this);
+    }
+
+    public string GetAllSkillDescriptions()
+    {
+        string description = "";
+
+
+        int skillCount = currentSkills.Count;
+
+        for (int i = 0; i < skillCount; i++)
+        {
+            string currSkillDescr = "";
+
+            currSkillDescr = currentSkills[i].GetCharPanelDescription();
+            description += currSkillDescr;
+            if (i < skillCount-1)
+                description += "\n \n";
+        }
+
+        return description;
+    }
+
+    #endregion
 
 }

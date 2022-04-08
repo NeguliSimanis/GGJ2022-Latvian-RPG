@@ -517,6 +517,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f890c518830274e48ab50334ec9bdfdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMovingNow: 0
   availableInRoster: 0
   hasActedThisTurn: 0
   charType: 1
@@ -531,6 +532,7 @@ MonoBehaviour:
     lastSavedPosX: 0
     lastSavedPosY: 0
     savedCharacter: 0
+    savedIsDead: 0
     lightPoints: 0
     darkPoints: 0
     level: 1
@@ -543,57 +545,24 @@ MonoBehaviour:
     maxMana: 10
     currMana: 10
     manaRegen: 1
-    offense: 9
-    defense: 10
+    offense: 10
+    defense: 9
+    tilesWalked: 0
     speed: 2
-    skills:
-    - Snipe
-    - Punch
+    skills: []
     alignment: 2
-    bio: Take heed, a great general is before you!His armies dead, his land barren
-      and his children murdered by their mother.For even a great general can be defeated,
-      if a God craves for a tragedy.
+    bio: Take heed, a great general is before you! His armies dead, his land barren
+      and his children murdered by their mother. For even a great general can be
+      defeated, if a God craves for a tragedy.
     name: Cellach
+    activeStatusEffects: []
   playerSpeed: 2
-  tilesWalked: 0
   characterIsSelected: 0
   characterSelector: {fileID: 5263861361188574544}
   startingSkills:
   - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
   - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
   currentSkills:
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
-  - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
-  - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
   - {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13, type: 3}
   - {fileID: 2076941935685868744, guid: 44d5f4de34c610947a640f39152300e5, type: 3}
   manaBar: {fileID: 4659494982444674830}
@@ -605,7 +574,6 @@ MonoBehaviour:
   bigCharSprite: {fileID: 21300000, guid: 63176013964be214884f6f57139a0b69, type: 3}
   spriteRenderer: {fileID: 5263861361188574545}
   hurtAnimator: {fileID: 7913881009425419282}
-  activeStatusEffects: []
 --- !u!114 &-6362190921303917739
 MonoBehaviour:
   m_ObjectHideFlags: 0

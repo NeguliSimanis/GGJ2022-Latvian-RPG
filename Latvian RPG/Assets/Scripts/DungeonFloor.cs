@@ -8,7 +8,7 @@ public class DungeonFloor : MonoBehaviour
     private GameObject [] npcRooster;
     private GameManager gameManager;
 
-    public Transform levelStartPoint;
+    public Transform[] levelStartPoint;
     public Transform[] spawnPoints;
 
     int spawnPointCount;

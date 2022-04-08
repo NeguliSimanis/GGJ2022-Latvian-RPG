@@ -22,17 +22,22 @@ public class CameraController : MonoBehaviour
     private Vector2 m_screenBounds;
     private bool initialized = false;
 
-    public void IntializeCamera(Transform newStart)
+    public void IntializeCamera(Transform newStart, GameManager gameManager, bool loadCamPos = false)
     {
         startTarget = newStart;
         
-        //if (m_levelRenderer != null)
-        //{
-        //    m_levelBounds = m_levelRenderer.bounds;
-        //}
+        if (loadCamPos)
+        {
+            startTarget.position = new Vector3(
+                gameManager.saveManager.loadedCamPosX,
+                gameManager.saveManager.loadedCamPosY,
+                startTarget.position.z);
+        }
 
         m_targetCamPosition = new Vector3(startTarget.position.x, startTarget.position.y + 2, transform.position.z);
         m_prevCamPosition = transform.position;
+
+
         SetPosition(m_targetCamPosition, instant: true);
 
         m_screenBounds = new Vector2(Screen.width * (m_screenDragBounds * 0.01f), Screen.height * (m_screenDragBounds * 0.01f));
