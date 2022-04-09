@@ -79,8 +79,17 @@ public class PlayerControls : MonoBehaviour
     Image lifeBarBG;
     [SerializeField]
     Text charAnimatedText;
+    StatChangeAnim statChangeAnim;
     [SerializeField]
     Animator charTextAnimator;
+
+
+    [SerializeField]
+    Text roundManaText;
+    float currManaText;
+    [SerializeField]
+    Text roundLifeText;
+    float currLifeText;
     #endregion
 
     [Header("VISUAL")]
@@ -107,6 +116,14 @@ public class PlayerControls : MonoBehaviour
         InitializePlayerStatUI();
     }
 
+    private void Start()
+    {
+        statChangeAnim = charAnimatedText.transform.parent.gameObject.GetComponent<StatChangeAnim>();
+
+        currLifeText = stats.currLife;
+        currManaText = stats.currMana;
+        StartCoroutine(AnimateStatNumbersForXSeconds(xSeconds: 0.1f, charStat:CharStat.life, animateAll: true));
+    }
     public void GetCharData()
     {
         stats = new CharacterStats(character);
@@ -211,14 +228,12 @@ public class PlayerControls : MonoBehaviour
         return true;
     }
 
-    public void AddMana(float amount, bool addedBySkill, bool removeMana = false, bool addToFull = false)
+    public void AddMana(float amount, bool addedBySkill, bool removeMana = false, bool addToFull = false, bool animate = true)
     {
         if (isDead)
             return;
         if (addToFull)
             amount = stats.maxMana - stats.currMana;
-        if(removeMana)
-            charAnimatedText.text = "" + amount + " mana";
         if (stats.currMana < stats.maxMana || removeMana)
         {
             // UI
@@ -228,18 +243,16 @@ public class PlayerControls : MonoBehaviour
                 {
                     GameData.current.currMoonPoints += GameData.current.healPointsReward;
                 }
-                charAnimatedText.text = "+" + amount + " mana";
             }
-            charTextAnimator.SetTrigger("appear");
+            if (animate)
+                AnimateCharStatus(CharStat.mana, amount);
 
             if(addedBySkill)
                 gameManager.audioManager.PlayUtilitySFX();
 
             // HUD
-            StartCoroutine(ShowManaBarForXSeconds(3f));
-            StartCoroutine(UpdateStatBarWithDelay(false));
+            StartCoroutine(AnimateStatNumbersForXSeconds(xSeconds: 1f, charStat: CharStat.mana));
         }
-
 
         // ADD MANA
         stats.currMana += amount;
@@ -249,7 +262,27 @@ public class PlayerControls : MonoBehaviour
         }
         if (stats.currMana < 0)
             stats.currMana = 0;
-       
+        gameManager.popupManager.HideUnusableButts(this);
+    }
+
+    public void AnimateCharStatus(CharStat charStat, float amount)
+    {
+        if (CharStat.mana == charStat)
+        {
+            charAnimatedText.text = amount + " mana";
+            statChangeAnim.statImage.sprite = statChangeAnim.manaSprite;
+
+
+        }
+        else if (charStat == CharStat.life)
+        {
+            charAnimatedText.text = amount + " life";
+            statChangeAnim.statImage.sprite = statChangeAnim.lifeSprite;
+        }
+        if (amount > 0)
+            charAnimatedText.text = "+" + charAnimatedText.text;
+        
+        charTextAnimator.SetTrigger("appear");
     }
 
     public void ManagePlayerMovement()
@@ -472,12 +505,14 @@ public class PlayerControls : MonoBehaviour
             damageDealt = MathUtils.CalculateDamage(amount, this.stats.defense, damageSource.stats.offense);
             gameManager.audioManager.PlayAttackSound();
             hurtAnimator.SetTrigger("hurt");
+            AnimateCharStatus(CharStat.life, amount);
         }
         // HEALING
         else if (amount > 0)
         {
             gameManager.popupManager.UpdateGuideText(damageSource.name + " is healed!");
             gameManager.audioManager.PlayUtilitySFX();
+            AnimateCharStatus(CharStat.life, amount);
         }
         stats.currLife += damageDealt;
 
@@ -505,8 +540,7 @@ public class PlayerControls : MonoBehaviour
         else if (!Mathf.Approximately(damageDealt,0f))
         {
             // UPDATE HUD BARS
-            StartCoroutine(ShowLifeBarForXSeconds(3f));
-            StartCoroutine(UpdateStatBarWithDelay(isLifeBar: true));
+            StartCoroutine(AnimateStatNumbersForXSeconds(xSeconds: 0.5f, charStat: CharStat.life));
         }
 
         return damageDealt;
@@ -601,70 +635,10 @@ public class PlayerControls : MonoBehaviour
             return false;
     }
 
-    private IEnumerator UpdateStatBarWithDelay(bool isLifeBar)
-    {
-        yield return new WaitForSeconds(0.2f);
-       
-        
-        float targetFill = (stats.currLife * 1f) / stats.maxLife;
-        float maxStatAmount = stats.maxLife;
-        float currStatAmount = stats.currLife;
-        Image statBar = lifeBar;
-        int safetyCounter = 90;
-        float fillSpeed = 0.01f;
-        
-        if (!isLifeBar)
-        {
-            
-            targetFill = (stats.currMana * 1f) / stats.maxMana;
-            statBar = manaBar;
-            maxStatAmount = stats.maxMana;
-            currStatAmount = stats.currMana;
-        }
-       
-        // regeneration
-        if (targetFill > statBar.fillAmount)
-            fillSpeed *= -1;
-
-
-        float diff = Mathf.Abs(Mathf.Abs(targetFill) - Mathf.Abs(statBar.fillAmount));
-        fillSpeed *= maxStatAmount * 0.15f * diff;
-        while (!MathUtils.FastApproximately(statBar.fillAmount, targetFill, 0.001f))
-        {
-            // regenration
-            if (fillSpeed < 0)
-            {
-                if (statBar.fillAmount >= targetFill)
-                    break;
-            }
-            // taking damage
-            else if (fillSpeed > 0)
-            {
-                if (statBar.fillAmount <= targetFill)
-                    break;
-            }
-
-
-            statBar.fillAmount = statBar.fillAmount - (fillSpeed);
-            yield return new WaitForSeconds(0.01f);
-            safetyCounter--;
-            if (safetyCounter < 0)
-                break;
-        }
-        statBar.fillAmount = (currStatAmount * 1f) / maxStatAmount;
-    }
-
-    public void InstantUpdateStatBars()
-    {
-        lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
-        manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
-    }
-
     public void SpendMana(float amount)
     {
         stats.currMana -= amount;
-        StartCoroutine(ShowManaBarForXSeconds(3f));
-        StartCoroutine(UpdateStatBarWithDelay(false));
+        StartCoroutine(AnimateStatNumbersForXSeconds(xSeconds: 0.5f, charStat: CharStat.mana));
     }
 
     //private IEnumerator UpdateManaBarWithDelay()
@@ -711,7 +685,7 @@ public class PlayerControls : MonoBehaviour
 
     public void RegenMana()
     {
-        AddMana(stats.manaRegen, false);
+        AddMana(stats.manaRegen, false, animate: false);
     }
 
     private IEnumerator MovePlayerCloserToTarget(Vector2 target, int distance)
@@ -754,7 +728,80 @@ public class PlayerControls : MonoBehaviour
         isMovingNow = false;
     }
 
+    #region STATS HUD
+    public IEnumerator AnimateStatNumbersForXSeconds(float xSeconds, CharStat charStat, bool animateAll = false)
+    {
+        int incrementCount = 90;
+        float incrementDuration;
+        float incrementSize;
+        float currStat = stats.currLife;
+        float targetStat = currStat;
+        Text statText = roundLifeText;
 
+        if (charStat == CharStat.life && !animateAll)
+        {
+            currStat = currLifeText;
+            targetStat = Mathf.Round(stats.currLife * 10f) * 0.1f; // round to 1 decimal
+           
+        }
+        else if (charStat == CharStat.mana && !animateAll)
+        {
+            statText = roundManaText;
+            currStat = currManaText;
+            targetStat = Mathf.Round(stats.currMana * 10f) * 0.1f; // round to 1 decimal
+        }
+        else if (animateAll)
+        {
+            StartCoroutine(AnimateStatNumbersForXSeconds(xSeconds, CharStat.mana));
+            StartCoroutine(AnimateStatNumbersForXSeconds(xSeconds, CharStat.life));
+            yield break;
+        }
+
+        
+        float statDiff = Mathf.Abs(targetStat - currStat);
+        incrementSize = statDiff / incrementCount;
+        incrementDuration = xSeconds / incrementCount;
+        int currentIncrement = 0;
+
+        while (currentIncrement < incrementCount)
+        {
+            if (targetStat < currStat)
+            {;
+                currStat -= incrementSize;
+            }
+            else
+                currStat += incrementSize;
+            float displayStat = Mathf.Round(currStat * 10);
+            displayStat *= 0.1f;
+            string displayText = displayStat.ToString();
+            string finalDisplayText = "";
+            for (int i = 0; i < displayText.Length && i < 3; i++)
+            {
+                finalDisplayText += displayText[i];
+            }
+            statText.text = finalDisplayText;
+            yield return new WaitForSeconds(incrementDuration);
+            currentIncrement++;
+        }
+        float targetDisplay = Mathf.Round(stats.currLife * 10f) * 0.1f;
+        if (Mathf.Approximately(targetDisplay, 0f))
+            targetDisplay = 0.1f;
+        if (charStat == CharStat.mana)
+            targetDisplay = Mathf.Round(stats.currMana * 10f) * 0.1f;
+        statText.text = targetDisplay.ToString();
+
+        if (charStat == CharStat.mana)
+            currManaText = stats.currMana;
+        else if (charStat == CharStat.life)
+            currLifeText = stats.currLife;
+        
+
+        yield return new WaitForSeconds(xSeconds);
+
+
+    }
+
+    /*
     private IEnumerator ShowLifeBarForXSeconds(float xSeconds)
     {
 
@@ -793,8 +840,66 @@ public class PlayerControls : MonoBehaviour
                 endColor: new Color(manaColor.r, manaColor.g, manaColor.b, 0.3f)));
 
     }
+    private IEnumerator UpdateStatBarWithDelay(bool isLifeBar)
+    {
+        yield return new WaitForSeconds(0.2f);
 
- 
+
+        float targetFill = (stats.currLife * 1f) / stats.maxLife;
+        float maxStatAmount = stats.maxLife;
+        float currStatAmount = stats.currLife;
+        Image statBar = lifeBar;
+        int safetyCounter = 90;
+        float fillSpeed = 0.01f;
+
+        if (!isLifeBar)
+        {
+
+            targetFill = (stats.currMana * 1f) / stats.maxMana;
+            statBar = manaBar;
+            maxStatAmount = stats.maxMana;
+            currStatAmount = stats.currMana;
+        }
+
+        // regeneration
+        if (targetFill > statBar.fillAmount)
+            fillSpeed *= -1;
+
+
+        float diff = Mathf.Abs(Mathf.Abs(targetFill) - Mathf.Abs(statBar.fillAmount));
+        fillSpeed *= maxStatAmount * 0.15f * diff;
+        while (!MathUtils.FastApproximately(statBar.fillAmount, targetFill, 0.001f))
+        {
+            // regenration
+            if (fillSpeed < 0)
+            {
+                if (statBar.fillAmount >= targetFill)
+                    break;
+            }
+            // taking damage
+            else if (fillSpeed > 0)
+            {
+                if (statBar.fillAmount <= targetFill)
+                    break;
+            }
+
+
+            statBar.fillAmount = statBar.fillAmount - (fillSpeed);
+            yield return new WaitForSeconds(0.01f);
+            safetyCounter--;
+            if (safetyCounter < 0)
+                break;
+        }
+        statBar.fillAmount = (currStatAmount * 1f) / maxStatAmount;
+    }
+
+    public void InstantUpdateStatBars()
+    {
+        lifeBar.fillAmount = (stats.currLife * 1f) / stats.maxLife;
+        manaBar.fillAmount = (stats.currMana * 1f) / stats.maxMana;
+    }
+    */
+    #endregion
 
     private void UpdateStatsToCurrDungeonFloor()
     {

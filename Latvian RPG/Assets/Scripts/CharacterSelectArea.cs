@@ -21,7 +21,7 @@ public class CharacterSelectArea : MonoBehaviour
 
     private void Start()
     {
-        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        spriteRenderer = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
         spriteRenderer.color = defaultCharColor;
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         selectCharAnimation.SetActive(false);
@@ -58,10 +58,14 @@ public class CharacterSelectArea : MonoBehaviour
                 return;
             }
         }
-        if (gameManager.selectedSkill.type[0] == SkillType.Buff)
+        if (gameManager.skillSelected) 
         {
-            gameManager.ProcessInteractionRequest(characterController.xCoord, characterController.yCoord, ActionType.UseUtilitySkill);
-            return;
+            Debug.LogError(gameManager.selectedSkill.type[0]);
+            if (gameManager.selectedSkill.type[0] == SkillType.Buff)
+            {
+                gameManager.ProcessInteractionRequest(characterController.xCoord, characterController.yCoord, ActionType.UseUtilitySkill);
+                return;
+            }
         }
         gameManager.SelectChar(characterController);
             //characterFrame.SetActive(characterController.characterIsSelected);

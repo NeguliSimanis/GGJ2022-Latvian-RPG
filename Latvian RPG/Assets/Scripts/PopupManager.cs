@@ -19,10 +19,9 @@ public class PopupManager : MonoBehaviour
     [SerializeField]
     Text currFloorText;
 
-    [SerializeField]
-    Sprite darkButtonGraphic;
-    [SerializeField]
-    Sprite lightButtonGraphic;
+    
+    public Sprite darkButtonGraphic;
+    public Sprite lightButtonGraphic;
 
     #region START SCREEN
     [Header("START SCREEN")]
@@ -536,7 +535,10 @@ public class PopupManager : MonoBehaviour
         offenseText.text = "Offense: " + playerControls.stats.offense.ToString();
         armorText.text = "Defense: " + playerControls.stats.defense.ToString();
 
-        lifeText.text = ((int)playerControls.stats.currLife).ToString() + "/" + ((int)playerControls.stats.maxLife).ToString();
+        float currlife = Mathf.Round(playerControls.stats.currLife * 10f) * 0.1f;
+        if (Mathf.Approximately(currlife, 0f))
+            currlife = 0.1f;
+        lifeText.text = (currlife.ToString() + "/" + ((int)playerControls.stats.maxLife).ToString());
         manaText.text = "Mana: " + playerControls.stats.currMana.ToString() + "/" + playerControls.stats.maxMana.ToString();
 
         int remainingSpeed = playerControls.stats.speed - playerControls.stats.tilesWalked;
@@ -726,6 +728,7 @@ public class PopupManager : MonoBehaviour
         }
     }
 
+    #region SKILL BUTTONS
     public void DisplayCharSkillButts(PlayerControls charToDisplay, bool display = true)
     {
         int skillCount = charToDisplay.stats.skills.Count;
@@ -761,6 +764,7 @@ public class PopupManager : MonoBehaviour
             }
             currSkillID++;
         }
+        HideUnusableButts(charToDisplay);
     }
 
     private void InitializeSkillButts(int startingID)
@@ -772,13 +776,42 @@ public class PopupManager : MonoBehaviour
         }
     }
 
-    public void ColorSkillButts(Color newColor)
+    public void ColorSkillButts(SkillButton thisButton, bool isSelected = false, bool colorAll = true)
     {
+        if (isSelected)
+        {
+            thisButton.skillButtonImage.sprite = lightButtonGraphic;
+            thisButton.skillButtonText.color = Color.black;
+        }
+
+        if (!colorAll)
+            return;
         foreach(SkillButton skillButton in skillButts)
         {
-            skillButton.skillButtonImage.color = newColor;
+            skillButton.skillButtonImage.sprite = darkButtonGraphic;
+            skillButton.skillButtonText.color = Color.white;
         }
     }
+
+    public void HideUnusableButts(PlayerControls charToDisplay, bool hideAll = false)
+    {
+        foreach (SkillButton skillButt in skillButts)
+        {
+            if ((charToDisplay.stats.currMana < skillButt.skill.manaCost) || hideAll)
+            {
+                Debug.LogError("yo cant use this");
+                skillButt.skillButtonImage.color = new Color(1, 1, 1, 0.1f);
+                skillButt.skillButtonText.color = new Color(1, 1, 1, 0.1f);
+            }
+            else
+            {
+                skillButt.skillButtonImage.color = Color.white;
+                skillButt.skillButtonText.color = Color.white;
+            }
+
+        }
+    }
+    #endregion
 
     public void UpdateFloorText()
     {

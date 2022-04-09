@@ -510,6 +510,7 @@ public class NPC : MonoBehaviour
 
     private bool SelectDamagingSkill()
     {
+        bool skillFound = false;
         foreach (Skill skill in npcControls.startingSkills)
         {
             foreach (SkillType type in skill.type)
@@ -518,16 +519,24 @@ public class NPC : MonoBehaviour
                 {
                     if (npcControls.stats.currMana >= skill.manaCost)
                     {
-                        selectedSkill = skill;
-                        gameManager.selectedSkill = skill;
-                        return true;
+                        if (skillFound && selectedSkill.skillRange < skill.skillRange)
+                        {
+                            selectedSkill = skill;
+                            gameManager.selectedSkill = skill;
+                        }
+                        else if (!skillFound)
+                        {
+                            selectedSkill = skill;
+                            gameManager.selectedSkill = skill;
+                            skillFound = true;
+                        }
                     }
                     else
                         Debug.Log("NOT ENOUGH MANA TO USE SKILL");
                 }
             }
         }
-        return false;
+        return skillFound;
     }
 
     
@@ -613,10 +622,18 @@ public class NPC : MonoBehaviour
         yield return new WaitForSeconds(GameData.current.npcActionDuration * 1);
         gameManager.HideActionRange();
         gameManager.DisplayActionRange(ActionType.UseCombatSkill, CharType.Enemy);
-        yield return new WaitForSeconds(GameData.current.npcActionDuration * 3);
+        yield return new WaitForSeconds(GameData.current.npcActionDuration * 2);
         selectedSkill.ApplySkillEffects(target);
-        if (skill.type[0] == SkillType.Damage)
+        if (skill.skillName == "Sap")
+        {
+            target.AddMana(-selectedSkill.skillDamage, addedBySkill: true, removeMana: true);
+            gameManager.audioManager.PlayUtilitySFX();
+            
+        }
+        else if (skill.type[0] == SkillType.Damage)
+        {
             target.TakeDamage(amount: -skill.skillDamage, damageSource: npcControls);
+        }
         
 
         Instantiate(skill.skillAnimation, target.transform);
@@ -624,7 +641,7 @@ public class NPC : MonoBehaviour
         hasUsedSkillThisTurn = true;
 
         // DECIDE ON WHAT TO DO AFTER ATTACKING
-        
+        yield return new WaitForSeconds(GameData.current.npcActionDuration * 2);
 
         // flee if dont have mana
         bool allCharsDead = true;

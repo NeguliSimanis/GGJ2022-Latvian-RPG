@@ -9,7 +9,7 @@ public class CharacterMarker : MonoBehaviour
 {
 
     private bool animateMarker = false;
-    private float rotationSpeed = 0.5f;
+    private float rotationSpeed = 0.25f;
     [SerializeField]
     Color playerColor;
     [SerializeField]
@@ -85,7 +85,7 @@ public class CharacterMarker : MonoBehaviour
         }
         else if (transform.rotation.z > 0)
         {
-            transform.Rotate(0, 0, -rotationSpeed*4, Space.Self);
+            transform.Rotate(0, 0, -rotationSpeed*8, Space.Self);
         }
         //transform.Rotate(new Vector3(0,0,rotationSpeed), Space.Self);
         //transform.eulerAngles = Vector3.forward * 50;

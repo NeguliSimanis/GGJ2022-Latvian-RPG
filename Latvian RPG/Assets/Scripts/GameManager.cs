@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region SKILLS
-    bool skillSelected = false;
+    public bool skillSelected = false;
     [HideInInspector]
     public Skill selectedSkill;
     private int targetHighlightCounter = 0;
@@ -221,7 +221,9 @@ public class GameManager : MonoBehaviour
                 newControls.charMarker.UpdateMarkerColor(loadedCharStats.savedCharType);
                 newControls.TeleportPlayerCharacter(loadedCharStats.lastSavedPosX, loadedCharStats.lastSavedPosY,
                     instantTeleport: true);
-                newControls.InstantUpdateStatBars();
+                StartCoroutine(newControls.AnimateStatNumbersForXSeconds(xSeconds: 0.1f,
+                    charStat: CharStat.life,
+                    animateAll: true));
             }
         }
         SelectChar(allCharacters[0]);
@@ -471,7 +473,8 @@ public class GameManager : MonoBehaviour
             skillSelected = true;
         lastSelectedSkillButton = skillID;
 
-        popupManager.ColorSkillButts(skillButtonDefaultColor);
+        popupManager.ColorSkillButts(popupManager.skillButts[0], isSelected: false,
+            colorAll: true);
 
         // SKILL DESELECTED
         if (!skillSelected)
@@ -490,7 +493,8 @@ public class GameManager : MonoBehaviour
 
         // SUCCESSFUL SKILL SELECT
         selectedSkill = selectedChar.currentSkills[skillID];
-        popupManager.skillButts[skillID].skillButtonImage.color = skillButtonSelectedColor;
+        popupManager.ColorSkillButts(popupManager.skillButts[skillID], isSelected: true,
+           colorAll: false);
         if (selectedSkill.type[0] == SkillType.Damage)
         {
             DisplayActionRange();
@@ -670,7 +674,8 @@ public class GameManager : MonoBehaviour
         //    UpdateRemainingMovesText(selectedChar.playerSpeed - selectedChar.tilesWalked);
         if (skillSelected)
         {
-            popupManager.ColorSkillButts(skillButtonDefaultColor);
+            popupManager.ColorSkillButts(popupManager.skillButts[0], isSelected: false,
+          colorAll: true);
         }
 
         foreach (HighlightTileObject skillHighlight in skillHighlights)
@@ -1166,8 +1171,14 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        if (selectedChar.hasUsedSkillThisTurn == true)
+        {
+            popupManager.UpdateGuideText(selectedChar.stats.name + " has already used skill this turn!");
+            return;
+        }
+
         // 2.5 - hide current skill highlights
-       // SelectSkill(0);
+        // SelectSkill(0);
         HideActionRange();
 
 
@@ -1186,21 +1197,21 @@ public class GameManager : MonoBehaviour
                 }
                 target.TakeDamage(-selectedSkill.skillDamage, selectedChar);
             }
-            selectedChar.hasUsedSkillThisTurn = true;
+            DisableSkillActions();
         }
         else if (selectedSkill.type[0] == SkillType.Recruit)
         {
             if (target.Convert(CharType.Player))
             {
                 selectedChar.GainExp(ExpAction.Hire);
-                selectedChar.hasUsedSkillThisTurn = true;
+                DisableSkillActions();
             }
             }
         else if (selectedSkill.type[0] == SkillType.Buff)
         {
             selectedSkill.ApplySkillEffects(target);
             audioManager.PlayUtilitySFX();
-            selectedChar.hasUsedSkillThisTurn = true;
+            DisableSkillActions();
         }
 
 
@@ -1212,7 +1223,11 @@ public class GameManager : MonoBehaviour
 
     }
 
-
+    public void DisableSkillActions (bool disable = true)
+    {
+        popupManager.HideUnusableButts(selectedChar, disable);
+        selectedChar.hasUsedSkillThisTurn = disable;
+    }
 
     public void RestartGame()
     {
