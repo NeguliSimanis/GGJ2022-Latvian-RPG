@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2785303261803931187}
   - component: {fileID: 2157206496298226645}
   m_Layer: 9
-  m_Name: TileHighlight
+  m_Name: _TileHighlight
   m_TagString: AttackArea
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -146,10 +146,20 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 4775608146307001102, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4775608146449293161, guid: a0a4937c8ceb6d745a439d99acdc90c1,
         type: 3}
       propertyPath: m_Layer
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4775608146449293163, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4775608146871529739, guid: a0a4937c8ceb6d745a439d99acdc90c1,
         type: 3}
@@ -216,10 +226,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4775608147557865704, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4775608147557865710, guid: a0a4937c8ceb6d745a439d99acdc90c1,
         type: 3}
       propertyPath: m_Layer
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4775608148096070592, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4775608148096070598, guid: a0a4937c8ceb6d745a439d99acdc90c1,
         type: 3}

@@ -375,6 +375,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5263861361776117327}
     m_Modifications:
+    - target: {fileID: 507689344059315527, guid: a0a4937c8ceb6d745a439d99acdc90c1,
+        type: 3}
+      propertyPath: showUpMarker
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4775608146307001102, guid: a0a4937c8ceb6d745a439d99acdc90c1,
         type: 3}
       propertyPath: m_Color.r

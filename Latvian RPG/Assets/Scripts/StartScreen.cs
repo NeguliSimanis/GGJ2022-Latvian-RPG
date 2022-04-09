@@ -61,6 +61,9 @@ public class StartScreen : MonoBehaviour
 
     public void StartIntro()
     {
+        if (RebirthManager.instance.HasRebirthBonus())
+            SkipScene(skipToEnd: true);
+        else
         StartCoroutine(PlayCutScene1());
     }
 

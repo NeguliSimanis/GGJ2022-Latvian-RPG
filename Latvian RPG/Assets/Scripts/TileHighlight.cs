@@ -41,10 +41,17 @@ public class TileHighlight : MonoBehaviour
     public float yCoord;
 
     private List<SpriteRenderer> markerSprites = new List<SpriteRenderer>();
+    private BoxCollider2D boxCollider;
+
+    private void Awake()
+    {
+        boxCollider = gameObject.GetComponent<BoxCollider2D>();
+    }
 
     private void Start()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+       
         marker.SetActive(false);
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         defaultSortingOrder = spriteRenderer.sortingOrder;
@@ -162,6 +169,10 @@ public class TileHighlight : MonoBehaviour
     public void EnableTile(ActionType actionType, bool show = true, bool allowInteracting = true)
     {
         allowInteraction = allowInteracting;
+        if (!allowInteracting)
+            boxCollider.enabled = false;
+        else
+            boxCollider.enabled = true;
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         active = show;
         if (!show)

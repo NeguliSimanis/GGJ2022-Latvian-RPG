@@ -32,6 +32,17 @@ public class RebirthManager : MonoBehaviour
         }
     }
 
+    public bool HasRebirthBonus()
+    {
+        bool hasRebirthBonus = false;
+        foreach (RebirthBonus rebirthBonus in rebirthBonuses)
+        {
+            if (rebirthBonus.amount > 0)
+                return true;
+        }
+        return hasRebirthBonus;
+    }
+
 
     private void Start()
     {

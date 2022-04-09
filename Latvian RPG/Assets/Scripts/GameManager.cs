@@ -541,7 +541,8 @@ public class GameManager : MonoBehaviour
 
         // spawn a tile below the character
         if ((actionType == ActionType.Walk && selectedChar.stats.tilesWalked < selectedChar.stats.speed)
-            || (actionType == ActionType.UseUtilitySkill))
+            || (actionType == ActionType.UseUtilitySkill)
+            || (actionType == ActionType.UseCombatSkill))
         {
             Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x,
             selectedChar.transform.position.y, selectedChar.transform.position.z);

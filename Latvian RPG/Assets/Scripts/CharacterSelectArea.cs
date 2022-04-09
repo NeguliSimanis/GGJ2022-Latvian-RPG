@@ -58,6 +58,11 @@ public class CharacterSelectArea : MonoBehaviour
                 return;
             }
         }
+        if (gameManager.selectedSkill.type[0] == SkillType.Buff)
+        {
+            gameManager.ProcessInteractionRequest(characterController.xCoord, characterController.yCoord, ActionType.UseUtilitySkill);
+            return;
+        }
         gameManager.SelectChar(characterController);
             //characterFrame.SetActive(characterController.characterIsSelected);
         //characterSelectedCount++;
