@@ -106,6 +106,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject [] dungeonFloors;
     [SerializeField]
+    private GameObject[] endGameDungeonFloors;
+    [SerializeField]
     private GameObject currFloor;
     [HideInInspector]
     public LevelBounds levelTopBorder;
@@ -1323,14 +1325,20 @@ public class GameManager : MonoBehaviour
         // MANAGE MUSIC 
         audioManager.ManageMusicSwitch();
 
-        //newFloorID = dungeonFloors.Length - 4;
+        bool spawnEndGame = false;
+        
         if (newFloorID >= dungeonFloors.Length)
         {
-            newFloorID = dungeonFloors.Length - 2;
+            spawnEndGame = true;
+            newFloorID = Random.Range(0, endGameDungeonFloors.Length);
         }
 
 
-        GameObject newFloorObj = Instantiate(dungeonFloors[newFloorID]);
+        GameObject newFloorObj;
+        if (!spawnEndGame)
+            newFloorObj = Instantiate(dungeonFloors[newFloorID]);
+        else
+            newFloorObj = Instantiate(endGameDungeonFloors[newFloorID]);
         currFloor = newFloorObj;
         DungeonFloor newFloor = newFloorObj.GetComponent<DungeonFloor>();
         newFloor.InitializeFloor(spawnEnemies: !isLoadedProgress);

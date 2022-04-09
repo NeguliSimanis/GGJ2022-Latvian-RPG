@@ -799,7 +799,6 @@ public class PopupManager : MonoBehaviour
         {
             if ((charToDisplay.stats.currMana < skillButt.skill.manaCost) || hideAll)
             {
-                Debug.LogError("yo cant use this");
                 skillButt.skillButtonImage.color = new Color(1, 1, 1, 0.1f);
                 skillButt.skillButtonText.color = new Color(1, 1, 1, 0.1f);
             }

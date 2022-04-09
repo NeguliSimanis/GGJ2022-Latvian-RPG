@@ -10024,6 +10024,11 @@ MonoBehaviour:
   - {fileID: 4568654058478110076, guid: c451f5f936a57ea4aa38ca357940ce92, type: 3}
   - {fileID: 4568654058478110076, guid: d89c7f240b240f643a8a07a37192f809, type: 3}
   - {fileID: 4568654058478110076, guid: 0811f74ea6b05e240ac5800ea9c243e8, type: 3}
+  - {fileID: 4568654058478110076, guid: 471ad65a3a541a047a200f0a3c76de11, type: 3}
+  endGameDungeonFloors:
+  - {fileID: 4568654058478110076, guid: fb46057a713bcd8419b34ecd84bd5f09, type: 3}
+  - {fileID: 4568654058478110076, guid: 0811f74ea6b05e240ac5800ea9c243e8, type: 3}
+  - {fileID: 4568654058478110076, guid: d89c7f240b240f643a8a07a37192f809, type: 3}
   currFloor: {fileID: 1104640800}
   levelTopBorder: {fileID: 0}
   levelBottomBorder: {fileID: 0}

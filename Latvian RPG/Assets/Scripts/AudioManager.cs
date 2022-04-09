@@ -13,6 +13,9 @@ public class AudioManager : MonoBehaviour
 {
     private float musicVolume = 1f;
     private float sfxVolume = 1f;
+    private float lastMusicLength;
+    private float nextMusicStartTime;
+    private AudioClip nextBackgroundMusic;
 
     #region MUSIC
     [Header("Music")]
@@ -131,13 +134,37 @@ public class AudioManager : MonoBehaviour
 
     public void ManageMusicSwitch()
     {
-        if (GameData.current.dungeonFloor == 3)
-            StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f));
-        if (GameData.current.dungeonFloor == 6)
-            StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f, targetTrack: MusicTrack.Ogotu1));
+        if (GameData.current.dungeonFloor == 2)
+            StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f,
+                nextMusic: medniex1));
+        if (GameData.current.dungeonFloor == 5)
+        {
+            StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f,
+                nextMusic: ogotu1, targetTrack: MusicTrack.Ogotu1));
+            nextMusicStartTime = Time.time + ogotu1.length;
+            nextBackgroundMusic = medniex1;
+        }
+        else if (Time.time > nextMusicStartTime)
+        {
+            if (nextBackgroundMusic == medniex1)
+            {
+                nextBackgroundMusic = ogotu1;
+                nextMusicStartTime = Time.time + medniex1.length;
+                StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f,
+                    nextMusic: medniex1, targetTrack: MusicTrack.Medniex1));
+            }
+            else
+            {
+                nextBackgroundMusic = medniex1;
+                nextMusicStartTime = Time.time + ogotu1.length;
+                StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f,
+                    nextMusic: ogotu1, targetTrack: MusicTrack.Ogotu1));
+            }
+        }
     }
 
-    public IEnumerator FadeToDifferentMusic(float duration, float silenceDuration, MusicTrack targetTrack = MusicTrack.undefined)
+    public IEnumerator FadeToDifferentMusic(float duration, float silenceDuration, AudioClip nextMusic, 
+        MusicTrack targetTrack = MusicTrack.undefined)
     {
         float currentTime = 0;
         float start = audioSource.volume;
