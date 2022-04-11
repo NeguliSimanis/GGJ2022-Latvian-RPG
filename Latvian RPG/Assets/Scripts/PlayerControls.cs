@@ -234,6 +234,7 @@ public class PlayerControls : MonoBehaviour
             return;
         if (addToFull)
             amount = stats.maxMana - stats.currMana;
+        Debug.LogError("ADDING " + amount + "MANA. aDDTOFULL: " + addToFull);
         if (stats.currMana < stats.maxMana || removeMana)
         {
             // UI
@@ -245,7 +246,17 @@ public class PlayerControls : MonoBehaviour
                 }
             }
             if (animate)
-                AnimateCharStatus(CharStat.mana, amount);
+            {
+                if (removeMana && (MathUtils.FastApproximately(stats.currMana + amount,0,0.01f)||
+                    stats.currMana + amount < 0))
+                {
+                    Debug.LogError("heeyey");
+                    float animatedAmount = amount - (stats.currMana + amount);
+                    AnimateCharStatus(CharStat.mana, animatedAmount);
+                }
+                else
+                    AnimateCharStatus(CharStat.mana, amount);
+            }
 
             if(addedBySkill)
                 gameManager.audioManager.PlayUtilitySFX();

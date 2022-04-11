@@ -6,6 +6,7 @@ public enum MusicTrack
 {
     Ogotu1,
     Medniex1,
+    Medniex2,
     undefined
 }
 
@@ -24,6 +25,8 @@ public class AudioManager : MonoBehaviour
     AudioClip ogotu1;
     [SerializeField]
     AudioClip medniex1;
+    [SerializeField]
+    AudioClip medniex2;
     MusicTrack currMusicTrack = MusicTrack.Ogotu1;
     #endregion
 
@@ -144,16 +147,23 @@ public class AudioManager : MonoBehaviour
             nextMusicStartTime = Time.time + ogotu1.length;
             nextBackgroundMusic = medniex1;
         }
-        else if (Time.time > nextMusicStartTime)
+        else if (Time.time > nextMusicStartTime && GameData.current.dungeonFloor > 5)
         {
             if (nextBackgroundMusic == medniex1)
             {
-                nextBackgroundMusic = ogotu1;
+                nextBackgroundMusic = medniex2;
                 nextMusicStartTime = Time.time + medniex1.length;
                 StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f,
                     nextMusic: medniex1, targetTrack: MusicTrack.Medniex1));
             }
-            else
+            else if (nextBackgroundMusic == medniex2)
+            {
+                nextBackgroundMusic = ogotu1;
+                nextMusicStartTime = Time.time + medniex2.length;
+                StartCoroutine(FadeToDifferentMusic(0.4f, silenceDuration: 0.5f,
+                    nextMusic: medniex2, targetTrack: MusicTrack.Medniex2));
+            }
+            else // ogotu1
             {
                 nextBackgroundMusic = medniex1;
                 nextMusicStartTime = Time.time + ogotu1.length;
@@ -173,6 +183,10 @@ public class AudioManager : MonoBehaviour
         if (targetTrack == MusicTrack.Ogotu1)
         {
             targetAudioClip = ogotu1;
+        }
+        if (targetTrack == MusicTrack.Medniex2)
+        {
+            targetAudioClip = medniex2;
         }
 
         while (currentTime < duration)

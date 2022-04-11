@@ -327,6 +327,7 @@ public class PopupManager : MonoBehaviour
                 break;
             case CharStat.mana:
                 playerToLevel.stats.maxMana += lightStatIncrease;
+                StartCoroutine(playerToLevel.AnimateStatNumbersForXSeconds(0.9f, CharStat.life));
                 break;
         }
 
@@ -354,6 +355,7 @@ public class PopupManager : MonoBehaviour
             case CharStat.life:
                 playerToLevel.stats.maxLife += darkStatIncrease;
                 playerToLevel.stats.currLife += darkStatIncrease;
+                StartCoroutine(playerToLevel.AnimateStatNumbersForXSeconds(0.9f, CharStat.life));
                 break;
         }
     }

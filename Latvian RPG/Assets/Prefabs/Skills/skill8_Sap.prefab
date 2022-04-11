@@ -51,7 +51,7 @@ MonoBehaviour:
   type: 00000000
   description: Destroys target mana
   skillEffects:
-  - {fileID: -6489593602666348602, guid: 55d642d4ae8c214489e40555498f4dc8, type: 3}
+  - {fileID: -6489593602666348602, guid: c4f9ecf7e8b32c0439e4064adfdb329d, type: 3}
   skillAnimation: {fileID: 153183041852810696, guid: e0cf930235026ea4b802d55f06c58275,
     type: 3}
   animationOffset: {x: 0, y: 0}

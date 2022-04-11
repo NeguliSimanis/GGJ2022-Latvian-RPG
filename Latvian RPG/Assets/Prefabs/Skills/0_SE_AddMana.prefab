@@ -43,11 +43,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 163a7b8df5b18fa4e9324abc390a2834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inflictedStatus: 2
+  inflictedStatus: 0
   effectDuration: 1
   armorPercentIncrease: 0
   armorIncrease: 0
   increasedArmor: 0
   armorIncreased: 0
+  speedIncrease: 0
+  finalSpeed: 0
+  speedIncreased: 0
   manaIncrease: 5
   canTargetOnlySelf: 0
