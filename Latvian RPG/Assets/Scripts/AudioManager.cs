@@ -10,6 +10,12 @@ public enum MusicTrack
     undefined
 }
 
+public enum AudioType
+{
+    Music,
+    SFX
+}
+
 public class AudioManager : MonoBehaviour
 {
     private float musicVolume = 1f;
@@ -20,7 +26,8 @@ public class AudioManager : MonoBehaviour
 
     #region MUSIC
     [Header("Music")]
-
+    [SerializeField]
+    AudioSource musicAudioSource;
     [SerializeField]
     AudioClip ogotu1;
     [SerializeField]
@@ -34,6 +41,7 @@ public class AudioManager : MonoBehaviour
     [Header("sfx's")]
     [SerializeField]
     AudioSource audioSource;
+
 
     [SerializeField]
     AudioClip buttonSFX;
@@ -177,7 +185,7 @@ public class AudioManager : MonoBehaviour
         MusicTrack targetTrack = MusicTrack.undefined)
     {
         float currentTime = 0;
-        float start = audioSource.volume;
+        float start = musicAudioSource.volume;
 
         AudioClip targetAudioClip = medniex1;
         if (targetTrack == MusicTrack.Ogotu1)
@@ -192,7 +200,7 @@ public class AudioManager : MonoBehaviour
         while (currentTime < duration)
         {
             currentTime += Time.deltaTime;
-            audioSource.volume = Mathf.Lerp(start, 0, currentTime / duration);
+            musicAudioSource.volume = Mathf.Lerp(start, 0, currentTime / duration);
             yield return null;
         }
 
@@ -203,15 +211,30 @@ public class AudioManager : MonoBehaviour
             yield return null;
         }
 
-        audioSource.clip = targetAudioClip;
-        audioSource.Play();
+        musicAudioSource.clip = targetAudioClip;
+        musicAudioSource.Play();
         currentTime = 0;
         while (currentTime < duration)
         {
             currentTime += Time.deltaTime;
-            audioSource.volume = Mathf.Lerp(start, musicVolume, currentTime / duration);
+            musicAudioSource.volume = Mathf.Lerp(start, musicVolume, currentTime / duration);
             yield return null;
         }
         yield break;
+    }
+
+    public void SetVolume(float volume, AudioType audioType)
+    {
+        if (audioType == AudioType.Music)
+        {
+            Debug.LogError("music baby");
+            musicAudioSource.volume = volume * 0.01f;
+            musicVolume = volume * 0.01f;
+        }
+        else if (audioType == AudioType.SFX)
+        {
+            Debug.LogError("setting sfx babvy");
+            sfxVolume = volume * 0.01f;
+        }
     }
 }

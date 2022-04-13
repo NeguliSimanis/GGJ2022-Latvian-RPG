@@ -364,7 +364,7 @@ public class GameManager : MonoBehaviour
                 else if (iObject.objType == ObjectType.LearnSkill && !iObject.consumed)
                 {
                     iObject.Disable();
-                    Skill skillToDisplay = iObject.GetComponent<Scholar>().SelectSkillToTeach(selectedChar);
+                    Skill skillToDisplay = iObject.GetComponent<Scholar>().SelectSkillsToTeach(selectedChar);
                     popupManager.DisplayScholarPopup(skillToDisplay);
                    
                     return ObjectType.LearnSkill;
@@ -456,7 +456,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SelectSkill(int skillID)
+    public void SelectSkill(int skillID, bool select = true)
     {
         if (selectedChar.isMovingNow)
         {
@@ -467,7 +467,7 @@ public class GameManager : MonoBehaviour
 
         // DETERMINE IF A BUTTON WAS SELECTED BEFORE
 
-        if (skillSelected && lastSelectedSkillButton == skillID)
+        if ((skillSelected && lastSelectedSkillButton == skillID) || !select)
         {
             skillSelected = false;
         }
@@ -1229,6 +1229,7 @@ public class GameManager : MonoBehaviour
     {
         popupManager.HideUnusableButts(selectedChar, disable);
         selectedChar.hasUsedSkillThisTurn = disable;
+        SelectSkill(-1, select: false);
     }
 
     public void RestartGame()

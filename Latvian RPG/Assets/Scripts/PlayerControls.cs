@@ -65,6 +65,7 @@ public class PlayerControls : MonoBehaviour
     [SerializeField]
     public Skill[] startingSkills;
     public List<Skill> currentSkills = new List<Skill>();
+    public List<Skill> scholarOfferedSkills = new List<Skill>();
     #endregion
 
     #region UI

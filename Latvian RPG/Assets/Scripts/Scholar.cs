@@ -8,12 +8,15 @@ public class Scholar : MonoBehaviour
     [SerializeField]
     Skill []allowedSkills;
 
-    public Skill SelectSkillToTeach(PlayerControls apprentice)
+    public void SelectSkillsToTeach(PlayerControls apprentice)
     {
         
 
         // CREATE A LIST OF SKILLS TO CHOOSE FROM
-        List<Skill> availableSkills = new List<Skill>();
+        //List<Skill> availableSkills = new List<Skill>();
+        apprentice.scholarOfferedSkills.Clear();
+
+
         foreach (Skill skill in allowedSkills)
         {
             bool available = true;
@@ -26,16 +29,17 @@ public class Scholar : MonoBehaviour
                 }
             }
             if (available)
-                availableSkills.Add(skill);
+                apprentice.scholarOfferedSkills.Add(skill);
         }
 
         // roll a random skill from available
-        int skillCount = availableSkills.Count;
+        int skillCount = apprentice.scholarOfferedSkills.Count;
+
 
 
 
         int skillRoll = Random.Range(0, skillCount);
-        Skill skillToTeach = availableSkills[skillRoll];
-        return skillToTeach;
+        Skill skillToTeach = apprentice.scholarOfferedSkills[skillRoll];
+        
     }
 }

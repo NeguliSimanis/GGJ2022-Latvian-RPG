@@ -704,9 +704,9 @@ public class PopupManager : MonoBehaviour
             "An old man offers to teach you a new skill. Learn " +
             skillToDisplay.skillName + "?";
 
-        scholarPopup.skillName.text = skillToDisplay.skillName;
+        scholarPopup.lightSkillName.text = skillToDisplay.skillName;
 
-        scholarPopup.skillText.text = skillToDisplay.GetDescription();
+        scholarPopup.lightSkillText.text = skillToDisplay.GetDescription();
 
         scholarPopup.darkSmallText.text = "\n\n+" + GameData.current.levelUpPointsReward + " darkness";
         scholarPopup.lightSmallText.text = "\n\n+" + GameData.current.levelUpPointsReward + " lightness";
