@@ -354,8 +354,8 @@ MonoBehaviour:
     maxMana: 10
     currMana: 10
     manaRegen: 1
-    offense: 10
-    defense: 9
+    offense: 9
+    defense: 10
     tilesWalked: 0
     speed: 2
     skills: []

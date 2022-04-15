@@ -37,7 +37,7 @@ public class Scholar : MonoBehaviour
         int selectedSkillCount = 0;
         int safetyCounter = 30;
 
-        while (selectedSkillCount < 2 || safetyCounter < 0)
+        while (selectedSkillCount < 2 && safetyCounter > 0)
         {
             int skillRoll = Random.Range(0, skillCount);
             Skill skillToTeach = availableSkills[skillRoll];

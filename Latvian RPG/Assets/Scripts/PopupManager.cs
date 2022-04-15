@@ -699,21 +699,38 @@ public class PopupManager : MonoBehaviour
 
         int skillsToLearnCount = apprentice.scholarOfferedSkills.Count;
 
-        scholarPopup.lightSkillToTeach = apprentice.scholarOfferedSkills[0];
-        scholarPopup.darkSkillToTeach = apprentice.scholarOfferedSkills[1];
-        scholarPopupObject.SetActive(true);
+        if (skillsToLearnCount > 0)
+        {
+            scholarPopup.lightSkillToTeach = apprentice.scholarOfferedSkills[0];
+            scholarPopup.scholarText.text =
+            "An old man offers to teach you a new skil. Learn "
+            + apprentice.scholarOfferedSkills[0].skillName + "?";
 
-        scholarPopup.scholarText.text =
+            scholarPopup.lightSkillName.text = scholarPopup.lightSkillToTeach.skillName;
+            scholarPopup.lightSkillText.text = scholarPopup.lightSkillToTeach.GetDescription();
+            scholarPopup.lightButtonText.text = "Learn " + scholarPopup.lightSkillToTeach.skillName;
+
+            scholarPopup.darkSkillName.gameObject.SetActive(false);
+            scholarPopup.darkSkillText.gameObject.SetActive(false);
+
+            scholarPopup.darkButtonText.text = "Ignore";
+        }
+        if (skillsToLearnCount > 1)
+        {
+            scholarPopup.scholarText.text =
             "An old man offers to teach you one of two skils.";
+            scholarPopup.darkSkillToTeach = apprentice.scholarOfferedSkills[1];
 
-        scholarPopup.lightSkillName.text = scholarPopup.lightSkillToTeach.skillName;
-        scholarPopup.lightSkillText.text = scholarPopup.lightSkillToTeach.GetDescription();
-        scholarPopup.lightButtonText.text = "Learn " + scholarPopup.lightSkillToTeach.skillName;
+            scholarPopup.darkSkillName.gameObject.SetActive(true);
+            scholarPopup.darkSkillText.gameObject.SetActive(true);
 
+            scholarPopup.darkSkillName.text = scholarPopup.darkSkillToTeach.skillName;
+            scholarPopup.darkSkillText.text = scholarPopup.darkSkillToTeach.GetDescription();
+            scholarPopup.darkButtonText.text = "Learn " + scholarPopup.darkSkillToTeach.skillName;
+        }
 
-        scholarPopup.darkSkillName.text = scholarPopup.darkSkillToTeach.skillName;
-        scholarPopup.darkSkillText.text = scholarPopup.darkSkillToTeach.GetDescription();
-        scholarPopup.darkButtonText.text = "Learn " + scholarPopup.darkSkillToTeach.skillName;
+        scholarPopupObject.SetActive(true);
+      
 
         scholarPopup.darkSmallText.text = "\n\n+" + GameData.current.levelUpPointsReward + " darkness";
         scholarPopup.lightSmallText.text = "\n\n+" + GameData.current.levelUpPointsReward + " lightness";
@@ -733,7 +750,8 @@ public class PopupManager : MonoBehaviour
         }
         else
         {
-            gameManager.selectedChar.LearnSkill(scholarPopup.darkSkillToTeach);
+            if (gameManager.selectedChar.scholarOfferedSkills.Count>1)
+                gameManager.selectedChar.LearnSkill(scholarPopup.darkSkillToTeach);
             gameManager.VictoryCheck(ExpAction.LevelUpDark);
         }
     }
