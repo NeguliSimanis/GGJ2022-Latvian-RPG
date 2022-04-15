@@ -5,14 +5,11 @@ using UnityEngine.UI;
 
 public class ScholarPopup : MonoBehaviour
 {
-
-   
     public Text scholarText;
-
-    
 
     [Header("Light option")]
     public Button lightOptionButton;
+    public Text lightButtonText;
     public Text lightBigText;
     public Text lightSmallText;
 
@@ -21,6 +18,7 @@ public class ScholarPopup : MonoBehaviour
 
     [Header("Dark option")]
     public Button darkOptionButton;
+    public Text darkButtonText;
     public Text darkBigText;
     public Text darkSmallText;
 
@@ -28,5 +26,7 @@ public class ScholarPopup : MonoBehaviour
     public Text darkSkillText;
 
     [HideInInspector]
-    public Skill skillToTeach;
+    public Skill lightSkillToTeach;
+    [HideInInspector]
+    public Skill darkSkillToTeach;
 }

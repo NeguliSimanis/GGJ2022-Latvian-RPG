@@ -687,7 +687,7 @@ public class PopupManager : MonoBehaviour
         darkVictoryScreen.SetActive(true);
     }
 
-    public void DisplayScholarPopup(Skill skillToDisplay = null, bool display = true)
+    public void DisplayScholarPopup(PlayerControls apprentice = null, bool display = true)
     {
         if (!display)
         {
@@ -696,17 +696,24 @@ public class PopupManager : MonoBehaviour
             return;
         }
         StartCoroutine(gameManager.PauseGameAfterSeconds(true, seconds: 0.4f, debug: true));
-        
-        scholarPopup.skillToTeach = skillToDisplay;
+
+        int skillsToLearnCount = apprentice.scholarOfferedSkills.Count;
+
+        scholarPopup.lightSkillToTeach = apprentice.scholarOfferedSkills[0];
+        scholarPopup.darkSkillToTeach = apprentice.scholarOfferedSkills[1];
         scholarPopupObject.SetActive(true);
 
         scholarPopup.scholarText.text =
-            "An old man offers to teach you a new skill. Learn " +
-            skillToDisplay.skillName + "?";
+            "An old man offers to teach you one of two skils.";
 
-        scholarPopup.lightSkillName.text = skillToDisplay.skillName;
+        scholarPopup.lightSkillName.text = scholarPopup.lightSkillToTeach.skillName;
+        scholarPopup.lightSkillText.text = scholarPopup.lightSkillToTeach.GetDescription();
+        scholarPopup.lightButtonText.text = "Learn " + scholarPopup.lightSkillToTeach.skillName;
 
-        scholarPopup.lightSkillText.text = skillToDisplay.GetDescription();
+
+        scholarPopup.darkSkillName.text = scholarPopup.darkSkillToTeach.skillName;
+        scholarPopup.darkSkillText.text = scholarPopup.darkSkillToTeach.GetDescription();
+        scholarPopup.darkButtonText.text = "Learn " + scholarPopup.darkSkillToTeach.skillName;
 
         scholarPopup.darkSmallText.text = "\n\n+" + GameData.current.levelUpPointsReward + " darkness";
         scholarPopup.lightSmallText.text = "\n\n+" + GameData.current.levelUpPointsReward + " lightness";
@@ -721,11 +728,12 @@ public class PopupManager : MonoBehaviour
 
         if (isLight)
         {
-            gameManager.selectedChar.LearnSkill(scholarPopup.skillToTeach);
+            gameManager.selectedChar.LearnSkill(scholarPopup.lightSkillToTeach);
             gameManager.VictoryCheck(ExpAction.LevelUpLight);
         }
         else
         {
+            gameManager.selectedChar.LearnSkill(scholarPopup.darkSkillToTeach);
             gameManager.VictoryCheck(ExpAction.LevelUpDark);
         }
     }

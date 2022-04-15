@@ -349,13 +349,13 @@ MonoBehaviour:
     expRequired: 10
     darkLevelUpStat: 0
     lightLevelUpStat: 0
-    maxLife: 9
-    currLife: 9
+    maxLife: 10
+    currLife: 10
     maxMana: 10
     currMana: 10
     manaRegen: 1
     offense: 10
-    defense: 10
+    defense: 9
     tilesWalked: 0
     speed: 2
     skills: []
@@ -374,6 +374,7 @@ MonoBehaviour:
   currentSkills:
   - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
   - {fileID: 2076941935685868744, guid: 8221f9aa724f5e648897509b4f38e677, type: 3}
+  scholarOfferedSkills: []
   manaBar: {fileID: 4734224236474661545}
   lifeBar: {fileID: 1918163350017964131}
   charAnimatedText: {fileID: 5361427295985306136}

@@ -30,21 +30,21 @@ public class Skill : MonoBehaviour
         if (type[0] == SkillType.Recruit)
         {
             totalDescription = description 
-                 + "\n Mana cost: " + (int)manaCost
-                + "\n Range: " + skillRange;
+                 + "\n\nMana cost: " + (int)manaCost
+                + "\nRange: " + skillRange;
         }
         else if (type[0] == SkillType.Buff)
         {
             totalDescription = description
-                 + "\n\n Mana cost: " + (int)manaCost
-                + "\n Range: " + skillRange;
+                 + "\n\nMana cost: " + (int)manaCost
+                + "\nRange: " + skillRange;
         }
         else
         {
             totalDescription = description
-                + "\n \n Base damage: " + (int)skillDamage
-                + "\n Mana cost: " + (int)manaCost
-                + "\n Range: " + skillRange;
+                + "\n \nBase damage: " + (int)skillDamage
+                + "\nMana cost: " + (int)manaCost
+                + "\nRange: " + skillRange;
         }
          
         return totalDescription;

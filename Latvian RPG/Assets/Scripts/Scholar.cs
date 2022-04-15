@@ -8,12 +8,12 @@ public class Scholar : MonoBehaviour
     [SerializeField]
     Skill []allowedSkills;
 
-    public void SelectSkillsToTeach(PlayerControls apprentice)
+    public int SelectSkillsToTeach(PlayerControls apprentice)
     {
-        
+        int skillsToTeach = 0;
 
         // CREATE A LIST OF SKILLS TO CHOOSE FROM
-        //List<Skill> availableSkills = new List<Skill>();
+        List<Skill> availableSkills = new List<Skill>();
         apprentice.scholarOfferedSkills.Clear();
 
 
@@ -29,17 +29,34 @@ public class Scholar : MonoBehaviour
                 }
             }
             if (available)
-                apprentice.scholarOfferedSkills.Add(skill);
+                availableSkills.Add(skill);
         }
 
         // roll a random skill from available
-        int skillCount = apprentice.scholarOfferedSkills.Count;
+        int skillCount = availableSkills.Count;
+        int selectedSkillCount = 0;
+        int safetyCounter = 30;
+
+        while (selectedSkillCount < 2 || safetyCounter < 0)
+        {
+            int skillRoll = Random.Range(0, skillCount);
+            Skill skillToTeach = availableSkills[skillRoll];
+            if (apprentice.scholarOfferedSkills.Count < 1 ||
+                apprentice.scholarOfferedSkills[0].skillName != skillToTeach.skillName)
+            {
+                apprentice.scholarOfferedSkills.Add(skillToTeach);
+                skillsToTeach++;
+                selectedSkillCount++;
+            }
+            safetyCounter--;
+        }
+        return skillsToTeach;
 
 
 
 
-        int skillRoll = Random.Range(0, skillCount);
-        Skill skillToTeach = apprentice.scholarOfferedSkills[skillRoll];
+        //int skillRoll = Random.Range(0, skillCount);
+        //Skill skillToTeach = apprentice.scholarOfferedSkills[skillRoll];
         
     }
 }

@@ -271,6 +271,7 @@ MonoBehaviour:
   currentSkills:
   - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
   - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
+  scholarOfferedSkills: []
   manaBar: {fileID: 6282360774337940444}
   lifeBar: {fileID: 5512605230241633197}
   charAnimatedText: {fileID: 5593579935697332582}

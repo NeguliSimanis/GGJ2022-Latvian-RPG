@@ -558,12 +558,22 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 123272113, guid: f7cc2dc2e1fe637409fbb7946b13fd50, type: 3}
       propertyPath: allowedSkills.Array.size
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 123272113, guid: f7cc2dc2e1fe637409fbb7946b13fd50, type: 3}
       propertyPath: allowedSkills.Array.data[0]
       value: 
-      objectReference: {fileID: 2076941935685868744, guid: 2710b7b4076324d428be2672a46e78f7,
+      objectReference: {fileID: 2076941935685868744, guid: 8afbfb64e56278b498cbd075a7d008ac,
+        type: 3}
+    - target: {fileID: 123272113, guid: f7cc2dc2e1fe637409fbb7946b13fd50, type: 3}
+      propertyPath: allowedSkills.Array.data[1]
+      value: 
+      objectReference: {fileID: 2076941935685868744, guid: bd7992c7b7468ae439af415eeea1cd13,
+        type: 3}
+    - target: {fileID: 123272113, guid: f7cc2dc2e1fe637409fbb7946b13fd50, type: 3}
+      propertyPath: allowedSkills.Array.data[2]
+      value: 
+      objectReference: {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f,
         type: 3}
     - target: {fileID: 5497703000954599421, guid: f7cc2dc2e1fe637409fbb7946b13fd50,
         type: 3}
@@ -573,7 +583,7 @@ PrefabInstance:
     - target: {fileID: 5497703000954599421, guid: f7cc2dc2e1fe637409fbb7946b13fd50,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5497703000954599422, guid: f7cc2dc2e1fe637409fbb7946b13fd50,
         type: 3}

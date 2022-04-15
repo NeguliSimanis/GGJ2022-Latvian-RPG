@@ -364,8 +364,9 @@ public class GameManager : MonoBehaviour
                 else if (iObject.objType == ObjectType.LearnSkill && !iObject.consumed)
                 {
                     iObject.Disable();
-                    Skill skillToDisplay = iObject.GetComponent<Scholar>().SelectSkillsToTeach(selectedChar);
-                    popupManager.DisplayScholarPopup(skillToDisplay);
+                    int i = iObject.GetComponent<Scholar>().SelectSkillsToTeach(selectedChar);
+                    Debug.LogError("has to learn " + i + " skils0");
+                    popupManager.DisplayScholarPopup(selectedChar);
                    
                     return ObjectType.LearnSkill;
                 }
