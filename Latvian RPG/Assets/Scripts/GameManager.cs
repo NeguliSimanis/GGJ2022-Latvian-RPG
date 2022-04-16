@@ -1212,6 +1212,8 @@ public class GameManager : MonoBehaviour
             }
         else if (selectedSkill.type[0] == SkillType.Buff)
         {
+            //if (selectedSkill.skillName == "Teleport")
+             
             selectedSkill.ApplySkillEffects(target);
             audioManager.PlayUtilitySFX();
             DisableSkillActions();

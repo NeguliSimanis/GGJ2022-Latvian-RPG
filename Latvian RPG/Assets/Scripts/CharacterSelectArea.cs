@@ -61,7 +61,9 @@ public class CharacterSelectArea : MonoBehaviour
         if (gameManager.skillSelected) 
         {
             Debug.LogError(gameManager.selectedSkill.type[0]);
-            if (gameManager.selectedSkill.type[0] == SkillType.Buff)
+            Skill selectedSkill = gameManager.selectedSkill;
+            if (selectedSkill.type[0] == SkillType.Buff
+                && selectedSkill.skillName != "Teleport")
             {
                 gameManager.ProcessInteractionRequest(characterController.xCoord, characterController.yCoord, ActionType.UseUtilitySkill);
                 return;

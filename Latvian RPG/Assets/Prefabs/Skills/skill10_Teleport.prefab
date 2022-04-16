@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7225139782170318055}
   - component: {fileID: 2076941935685868744}
   m_Layer: 0
-  m_Name: skill9_Wound
+  m_Name: skill10_Teleport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,14 +44,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skillID: 0
-  skillDamage: 5
+  skillDamage: 0
   manaCost: 3
-  skillName: Wound
-  skillRange: 1
-  type: 00000000
-  description: Deals damage and decreases enemy speed by 2 for 3 turns
-  skillEffects:
-  - {fileID: -6489593602666348602, guid: 9846cab867f44fc4fa108b6d0899a2ff, type: 3}
-  skillAnimation: {fileID: 153183041852810696, guid: f266ae2b2d7a0f14ba329994c9860fb1,
+  skillName: Teleport
+  skillRange: 2
+  type: 02000000
+  description: Teleports to unoccupied target location
+  skillEffects: []
+  skillAnimation: {fileID: 153183041852810696, guid: e0cf930235026ea4b802d55f06c58275,
     type: 3}
   animationOffset: {x: 0, y: 0}
