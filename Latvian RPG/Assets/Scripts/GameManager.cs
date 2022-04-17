@@ -266,7 +266,7 @@ public class GameManager : MonoBehaviour
             RebirthManager.instance.ApplyRebirthBonus(newControls);
         cameraController.IntializeCamera(newPlayerInstance.transform, this);
         newControls.charMarker.UpdateMarkerColor(CharType.Player);
-        MovePlayerToFloorStart();
+        MovePlayerCharsToFloorStart();
     }
     #endregion
 
@@ -398,7 +398,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void MovePlayerToFloorStart(bool recoverMana = true)
+    /// <summary>
+    /// Moves player characters to initial positions in the floor and resets their movement
+    /// </summary>
+    /// <param name="recoverMana"></param>
+    public void MovePlayerCharsToFloorStart(bool recoverMana = true)
     {
         DungeonFloor dungeonFloor = currFloor.GetComponent<DungeonFloor>();
         Transform levelStartPoint = dungeonFloor.levelStartPoint[0];
@@ -416,6 +420,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("start poi " + startingPoint);
         int playerID = 0;
+        //PlayerControls oldSelected = selectedChar;
         foreach (PlayerControls curPlayer in allCharacters)
         {
             if (curPlayer.charType == CharType.Player)
@@ -428,6 +433,10 @@ public class GameManager : MonoBehaviour
                 if (playerID == 2)
                     curPlayer.TeleportPlayerCharacter(startingPoint3.x, startingPoint3.y, instantTeleport: true);
                 playerID++;
+                curPlayer.stats.ChangeWalkedTiles(reset: true);
+                DisplayActionRange(ActionType.Walk);
+                Debug.LogError("RESETTING TO 0");
+                Debug.LogError("speed " + curPlayer.stats.tilesWalked);
             }
         }
         // move camera
@@ -741,6 +750,18 @@ public class GameManager : MonoBehaviour
 
     private void ListenForShortcuts()
     {
+        #if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            selectedChar.EnterNextLevel();
+        }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            selectedChar.LevelUp();
+        }
+
+#endif
         if (!isAnyCharSelected)
             return;
         // TURN MANAGEMENT
@@ -1277,7 +1298,7 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public bool IsTileOccupiedByObstacle(Vector2 coord)
+    public bool IsTileOccupiedByObstacle(Vector2 coord, bool characterIsObstacle = false)
     {
         foreach (Obstacle obstacle in allObstacles)
         {
@@ -1286,6 +1307,18 @@ public class GameManager : MonoBehaviour
             {
                 UnityEngine.Debug.Log(coord + " occuppied by obstacle");
                 return true;
+            }
+        }
+        if (characterIsObstacle)
+        {
+            foreach (PlayerControls obstacle in allCharacters)
+            {
+                if (MathUtils.FastApproximately(obstacle.xCoord, coord.x, 0.1F) &&
+                    MathUtils.FastApproximately(obstacle.yCoord, coord.y, 0.1f))
+                {
+                    UnityEngine.Debug.Log(coord + " occuppied by character");
+                    return true;
+                }
             }
         }
         UnityEngine.Debug.Log("game manage " + coord + " not occupied by obstacle");

@@ -38,7 +38,10 @@ public class PlayerControls : MonoBehaviour
     private SkillManager skillManager;
     #endregion
 
+    #region movement
     public bool isMovingNow = false;
+    private Coroutine currMovementCoroutine;
+    #endregion
     public bool availableInRoster = false;
     public bool hasActedThisTurn = false;
     public CharType charType;
@@ -303,22 +306,22 @@ public class PlayerControls : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 MoveCharacterOneTile(Direction.Up);
-                stats.tilesWalked++;
+                stats.ChangeWalkedTiles(1);
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
                 MoveCharacterOneTile(Direction.Down);
-                stats.tilesWalked++;
+                stats.ChangeWalkedTiles(1);
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
                 MoveCharacterOneTile(Direction.Left);
-                stats.tilesWalked++;
+                stats.ChangeWalkedTiles(1);
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
                 MoveCharacterOneTile(Direction.Right);
-                stats.tilesWalked++;
+                stats.ChangeWalkedTiles(1);
             }
             
         }
@@ -340,7 +343,6 @@ public class PlayerControls : MonoBehaviour
         {
             return;
         }
-        isMovingNow = true;
         float currX = transform.position.x;
         float currY = transform.position.y;
 
@@ -358,12 +360,17 @@ public class PlayerControls : MonoBehaviour
             UpdateCoordAndSortOrder();
             gameManager.HideActionRange();
             gameManager.DisplayActionRange(ActionType.Walk);
-            isMovingNow = false;
+            if (isMovingNow)
+            {
+                isMovingNow = false;
+                StopCoroutine(currMovementCoroutine);
+            }
             return;
         }
-
+        isMovingNow = true;
+        Debug.LogError("MOVING CHAR");
         // MOVE CHARACTER
-        StartCoroutine(MovePlayerCloserToTarget(new Vector2(targetX, targetY),walkedTiles));
+        currMovementCoroutine = StartCoroutine(MovePlayerCloserToTarget(new Vector2(targetX, targetY),walkedTiles));
 
        
     }
@@ -414,7 +421,8 @@ public class PlayerControls : MonoBehaviour
         }
         
         MoveCharacterOneTile(direction);
-        stats.tilesWalked++;
+        Debug.LogError("ayeea;jf");
+        stats.ChangeWalkedTiles(1);
         gameManager.UpdateRemainingMovesText(stats.speed - stats.tilesWalked);
         return true;
     }
@@ -461,7 +469,7 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    private void EnterNextLevel()
+    public void EnterNextLevel()
     {
         GameData.current.EnterNextFloor();
         
@@ -477,7 +485,7 @@ public class PlayerControls : MonoBehaviour
 
         // MOVE OTHER PLAYER CHARS TO NEW POS
         // MOVE main PLAYER CHAR TO NEW POSITION
-        gameManager.MovePlayerToFloorStart();
+        gameManager.MovePlayerCharsToFloorStart();
     }
 
     private void ConsumeHealthPack()
@@ -576,7 +584,7 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    private void LevelUp()
+    public void LevelUp()
     {
         stats.expRequired = (int)(2.1f * stats.expRequired);
         stats.level++;
@@ -634,7 +642,7 @@ public class PlayerControls : MonoBehaviour
     {
         Debug.Log("resetting");
         ActivateStatusEffects();
-        stats.tilesWalked = 0;
+        stats.ChangeWalkedTiles(reset: true);
         hasUsedSkillThisTurn = false;
     }
 
@@ -729,7 +737,7 @@ public class PlayerControls : MonoBehaviour
                     MoveCharacterOneTile(Direction.Down);
                 }
             }
-            stats.tilesWalked++;
+            stats.ChangeWalkedTiles(1);
             distance--;
         }
 

@@ -73,10 +73,18 @@ public class GameData
     {
         dungeonFloor++;
         totalFloorsCleared++;
+        ResetTurnTimer();
         //maxFloorReached = dungeonFloor + 2;
         //dungeonFloor += 4;
         //totalFloorsCleared += 4;
     }
+
+    private void ResetTurnTimer()
+    {
+        playerTurnStartTime = Time.time;
+        playerTurnEndTime = playerTurnStartTime + playerTurnTimer;
+    }
+
     public void UpdateMaxFloorReached()
     {
         maxFloorReached = RealFloor();

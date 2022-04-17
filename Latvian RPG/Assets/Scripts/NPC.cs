@@ -259,7 +259,9 @@ public class NPC : MonoBehaviour
                     {
 
                     }
-                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord + 1, npcControls.yCoord)))
+                    else if (gameManager.IsTileOccupiedByObstacle
+                        (new Vector2(npcControls.xCoord + 1, npcControls.yCoord),
+                        characterIsObstacle: true))
                     {
                         // CANT MOVE RIGHT BECAUSE OCCUPPIED BY OBSTACLE
                         StartCoroutine(MoveCloserToTarget(target: target,
@@ -284,7 +286,8 @@ public class NPC : MonoBehaviour
                     {
 
                     }
-                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord - 1, npcControls.yCoord)))
+                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord - 1, npcControls.yCoord),
+                        characterIsObstacle: true))
                     {
                         // CANT MOVE LEFT BECAUSE OCCUPPIED BY OBSTACLE
                         StartCoroutine(MoveCloserToTarget(target: target,
@@ -322,7 +325,8 @@ public class NPC : MonoBehaviour
                     {
 
                     }
-                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord, npcControls.yCoord + 1)))
+                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord, npcControls.yCoord + 1),
+                        characterIsObstacle: true))
                     {
                         // CANT MOVE up BECAUSE OCCUPPIED BY OBSTACLE
                         StartCoroutine(MoveCloserToTarget(target: target,
@@ -347,7 +351,8 @@ public class NPC : MonoBehaviour
                     {
 
                     }
-                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord, npcControls.yCoord - 1)))
+                    else if (gameManager.IsTileOccupiedByObstacle(new Vector2(npcControls.xCoord, npcControls.yCoord - 1),
+                        characterIsObstacle: true))
                     {
                         // CANT MOVE down BECAUSE OCCUPPIED BY OBSTACLE
                         StartCoroutine(MoveCloserToTarget(target: target,
@@ -386,9 +391,12 @@ public class NPC : MonoBehaviour
                     firstCounter--;
                 }
             }
-            
+
             if (!hasRandomMoved)
-                npcControls.stats.tilesWalked++;
+            {
+                Debug.LogError("YES NPC");
+                npcControls.stats.ChangeWalkedTiles(1);
+            }
             movedThisLoop = false;
         }
         if (attemptAttackAfter)

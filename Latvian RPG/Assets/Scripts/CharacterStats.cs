@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Runtime.CompilerServices;
 
 public enum Alignment
 {
@@ -74,6 +75,14 @@ public class CharacterStats
     public string name;
 
     public List<SkillEffect> activeStatusEffects = new List<SkillEffect>();
+
+    public void ChangeWalkedTiles(int change = 0, bool reset = false, [CallerMemberName] string callerName = "")
+    {
+        Debug.Log("called " + callerName);
+        tilesWalked += change;
+        if (reset)
+            tilesWalked = 0;
+    }
 
     public CharacterStats (Character newCharacter)
     {
