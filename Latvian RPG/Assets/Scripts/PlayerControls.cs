@@ -235,7 +235,6 @@ public class PlayerControls : MonoBehaviour
             return;
         if (addToFull)
             amount = stats.maxMana - stats.currMana;
-        Debug.LogError("ADDING " + amount + "MANA. aDDTOFULL: " + addToFull);
         if (stats.currMana < stats.maxMana || removeMana)
         {
             // UI

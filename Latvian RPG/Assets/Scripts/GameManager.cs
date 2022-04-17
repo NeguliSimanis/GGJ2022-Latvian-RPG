@@ -104,9 +104,11 @@ public class GameManager : MonoBehaviour
     #region ENVIRONMENT
     [Header("ENVIRONMENT")]
     [SerializeField]
-    private GameObject [] dungeonFloors;
+    private GameObject[] dungeonFloors;
     [SerializeField]
     private GameObject[] endGameDungeonFloors;
+    [SerializeField]
+    private GameObject[] scholarFloors;
     [SerializeField]
     private GameObject currFloor;
     [HideInInspector]
@@ -219,7 +221,7 @@ public class GameManager : MonoBehaviour
                     newNPC.npcControls = newControls;
                     newNPC.gameManager = this;
                 }
-                
+
                 newControls.charMarker.UpdateMarkerColor(loadedCharStats.savedCharType);
                 newControls.TeleportPlayerCharacter(loadedCharStats.lastSavedPosX, loadedCharStats.lastSavedPosY,
                     instantTeleport: true);
@@ -258,7 +260,7 @@ public class GameManager : MonoBehaviour
         allCharacters.Add(newControls);
 
         highlightedChar = newControls;
-        HighlightChar(newControls, highlight:true);
+        HighlightChar(newControls, highlight: true);
         SelectChar(newControls);
         if (GameData.totalFloorsCleared > 0 && applyRebirthBonus)
             RebirthManager.instance.ApplyRebirthBonus(newControls);
@@ -330,7 +332,7 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
-            
+
         }
     }
 
@@ -350,7 +352,7 @@ public class GameManager : MonoBehaviour
         foreach (InteractableObject iObject in levelObjects)
         {
             if (MathUtils.FastApproximately(coord.x, iObject.xCoord, 0.1f) &&
-                MathUtils.FastApproximately(coord.y,iObject.yCoord, 0.1f))
+                MathUtils.FastApproximately(coord.y, iObject.yCoord, 0.1f))
             {
                 if (iObject.objType == ObjectType.HealingPotion && !iObject.consumed)
                 {
@@ -367,7 +369,7 @@ public class GameManager : MonoBehaviour
                     int i = iObject.GetComponent<Scholar>().SelectSkillsToTeach(selectedChar);
                     Debug.LogError("has to learn " + i + " skils0");
                     popupManager.DisplayScholarPopup(selectedChar);
-                   
+
                     return ObjectType.LearnSkill;
                 }
             }
@@ -540,7 +542,7 @@ public class GameManager : MonoBehaviour
         {
             reuseOldTargetHighlights = true;
         }
-        
+
         if (GameData.current.turnType != CharType.Player)
         {
             allowedWalkCoordsNPC.Clear();
@@ -554,7 +556,7 @@ public class GameManager : MonoBehaviour
             Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x,
             selectedChar.transform.position.y, selectedChar.transform.position.z);
             if (actionType != ActionType.UseUtilitySkill)
-            SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType, allowInteraction: false);
+                SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType, allowInteraction: false);
             else
                 SpawnHighlightTile(highlightLocation, reuseOldTargetHighlights, actionType, allowInteraction: true);
         }
@@ -649,7 +651,7 @@ public class GameManager : MonoBehaviour
         //    if (MathUtils.FastApproximately(obstacle.pos.x, highlightLocation.x, 0.2f)
         //         && MathUtils.FastApproximately(obstacle.pos.y, highlightLocation.y, 0.2f))
         //    {
-                
+
         //        return;
         //    }
         //}
@@ -660,7 +662,7 @@ public class GameManager : MonoBehaviour
         {
             if (actionType != ActionType.Walk)
                 break;
-            if (!character.isDead && 
+            if (!character.isDead &&
                 MathUtils.FastApproximately(character.xCoord, highlightLocation.x, 0.2f) &&
                 MathUtils.FastApproximately(character.yCoord, highlightLocation.y, 0.2f))
                 return;
@@ -859,7 +861,7 @@ public class GameManager : MonoBehaviour
                 character.SelectCharacter(false);
             }
         }
-        
+
         return characterSelected;
     }
 
@@ -1015,7 +1017,7 @@ public class GameManager : MonoBehaviour
             }
 
         }
-       
+
         // LAST SELECTED CHAR IS DEAD
         foreach (PlayerControls character in allCharacters)
         {
@@ -1115,31 +1117,11 @@ public class GameManager : MonoBehaviour
         // WALK INTERACTION
         if (actionType == ActionType.Walk)
         {
-
-            // 1 - check if tile not occupied
-            foreach (PlayerControls character in allCharacters)
-            {
-                if (MathUtils.FastApproximately(xCoordinate, character.xCoord, 0.01F) &&
-                    MathUtils.FastApproximately(yCoordinate, character.yCoord, 0.01F) &&
-                    !character.isDead)
-                {
-                    UnityEngine.Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
-                    popupManager.UpdateGuideText("Cannot move there!");
-                    return;
-                }
-            }
-            foreach (Obstacle obstacle in allObstacles)
-            {
-                if (MathUtils.FastApproximately(xCoordinate, obstacle.pos.x, 0.1F) &&
-                    MathUtils.FastApproximately(yCoordinate, obstacle.pos.y, 0.1F))
-                {
-                    UnityEngine.Debug.LogError("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
-                    popupManager.UpdateGuideText("Cannot move there!");
-                    return;
-                }
-            }
-            selectedChar.TeleportPlayerCharacter(xCoordinate, yCoordinate);
-            UpdateRemainingMovesText(selectedChar.stats.speed - selectedChar.stats.tilesWalked);
+            AttemptTeleportPlayerToLocation(
+                player: selectedChar,
+                xCoordinate: xCoordinate,
+                yCoordinate: yCoordinate,
+                usePlayerSpeed: true);
             return;
         }
 
@@ -1160,6 +1142,11 @@ public class GameManager : MonoBehaviour
                     targetViable = true;
                 }
             }
+        }
+        if (selectedSkill.skillName == "Teleport")
+        {
+            target = selectedChar;
+            targetViable = true;
         }
         if (!targetViable)
         {
@@ -1209,11 +1196,18 @@ public class GameManager : MonoBehaviour
                 selectedChar.GainExp(ExpAction.Hire);
                 DisableSkillActions();
             }
-            }
+        }
         else if (selectedSkill.type[0] == SkillType.Buff)
         {
-            //if (selectedSkill.skillName == "Teleport")
-             
+            if (selectedSkill.skillName == "Teleport")
+            {
+                AttemptTeleportPlayerToLocation(
+                player: selectedChar,
+                xCoordinate: xCoordinate,
+                yCoordinate: yCoordinate,
+                usePlayerSpeed: false);
+            }
+
             selectedSkill.ApplySkillEffects(target);
             audioManager.PlayUtilitySFX();
             DisableSkillActions();
@@ -1226,6 +1220,34 @@ public class GameManager : MonoBehaviour
         newAnimation.transform.SetParent(null);
         selectedChar.SpendMana(selectedSkill.manaCost);
 
+    }
+
+    private void AttemptTeleportPlayerToLocation(PlayerControls player, float xCoordinate, float yCoordinate, bool usePlayerSpeed = true)
+    {
+        // 1 - check if tile not occupied
+        foreach (PlayerControls character in allCharacters)
+        {
+            if (MathUtils.FastApproximately(xCoordinate, character.xCoord, 0.01F) &&
+                MathUtils.FastApproximately(yCoordinate, character.yCoord, 0.01F) &&
+                !character.isDead)
+            {
+                UnityEngine.Debug.Log("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
+                popupManager.UpdateGuideText("Cannot move there!");
+                return;
+            }
+        }
+        foreach (Obstacle obstacle in allObstacles)
+        {
+            if (MathUtils.FastApproximately(xCoordinate, obstacle.pos.x, 0.1F) &&
+                MathUtils.FastApproximately(yCoordinate, obstacle.pos.y, 0.1F))
+            {
+                UnityEngine.Debug.LogError("TILE ALREADY OCCUPIED AT " + xCoordinate + ":" + yCoordinate);
+                popupManager.UpdateGuideText("Cannot move there!");
+                return;
+            }
+        }
+        selectedChar.TeleportPlayerCharacter(xCoordinate, yCoordinate, instantTeleport: !usePlayerSpeed);
+        UpdateRemainingMovesText(selectedChar.stats.speed - selectedChar.stats.tilesWalked);
     }
 
     public void DisableSkillActions (bool disable = true)
@@ -1330,19 +1352,42 @@ public class GameManager : MonoBehaviour
         audioManager.ManageMusicSwitch();
 
         bool spawnEndGame = false;
+        bool spawnScholar = false;
         
         if (newFloorID >= dungeonFloors.Length)
         {
             spawnEndGame = true;
             newFloorID = Random.Range(0, endGameDungeonFloors.Length);
+            GameData.current.floorsUntilScholar--;
+        }
+       
+        if (GameData.current.floorsUntilScholar == 0 && spawnEndGame)
+        {
+            GameData.current.floorsUntilScholar = 2;
+            spawnScholar = true;
+            newFloorID = Random.Range(0, scholarFloors.Length);
         }
 
 
         GameObject newFloorObj;
+        // STARTING FLOORS
         if (!spawnEndGame)
+        {
+            Debug.LogError("SPAWNING REGULAR FLOOR");
             newFloorObj = Instantiate(dungeonFloors[newFloorID]);
-        else
+        }
+        // END GAME FLOORS
+        else if (spawnEndGame && !spawnScholar)
+        {
+            Debug.LogError("SPAWNING ENDGAME FLOOR");
             newFloorObj = Instantiate(endGameDungeonFloors[newFloorID]);
+        }
+        // SCHOLAR
+        else
+        {
+            Debug.LogError("SPAWNING SCHOLR FLOOR");
+            newFloorObj = Instantiate(scholarFloors[newFloorID]);
+        }
         currFloor = newFloorObj;
         DungeonFloor newFloor = newFloorObj.GetComponent<DungeonFloor>();
         newFloor.InitializeFloor(spawnEnemies: !isLoadedProgress);

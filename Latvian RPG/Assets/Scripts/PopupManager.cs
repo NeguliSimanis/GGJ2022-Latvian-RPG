@@ -262,6 +262,8 @@ public class PopupManager : MonoBehaviour
 
         scholarPopup.lightOptionButton.onClick.AddListener(delegate { ScholarButtPress(isLight: true); });
         scholarPopup.darkOptionButton.onClick.AddListener(delegate { ScholarButtPress(isLight: false); });
+
+        scholarPopup.noSkillsButton.onClick.AddListener(delegate { ScholarButtPress(isLight: false, hasSkills: false); });
     }
 
     private void Start()
@@ -699,8 +701,15 @@ public class PopupManager : MonoBehaviour
 
         int skillsToLearnCount = apprentice.scholarOfferedSkills.Count;
 
-        if (skillsToLearnCount > 0)
+        if (skillsToLearnCount <= 0)
         {
+            scholarPopup.noSkillsPanel.SetActive(true);
+            scholarPopup.hasSkillsPanel.SetActive(false);
+        }
+        else if (skillsToLearnCount > 0)
+        {
+            scholarPopup.noSkillsPanel.SetActive(false);
+            scholarPopup.hasSkillsPanel.SetActive(true);
             scholarPopup.lightSkillToTeach = apprentice.scholarOfferedSkills[0];
             scholarPopup.scholarText.text =
             "An old man offers to teach you a new skil. Learn "
@@ -737,11 +746,14 @@ public class PopupManager : MonoBehaviour
 
     }
 
-    public void ScholarButtPress(bool isLight = true)
+    public void ScholarButtPress(bool isLight = true, bool hasSkills = true)
     {
         scholarPopupObject.SetActive(false);
 
         gameManager.PauseGame(false);
+
+        if (!hasSkills)
+            return;
 
         if (isLight)
         {

@@ -16,6 +16,11 @@ public class Scholar : MonoBehaviour
         List<Skill> availableSkills = new List<Skill>();
         apprentice.scholarOfferedSkills.Clear();
 
+        if (apprentice.currentSkills.Count >= 4)
+        {
+            return skillsToTeach;
+        }
+
 
         foreach (Skill skill in allowedSkills)
         {

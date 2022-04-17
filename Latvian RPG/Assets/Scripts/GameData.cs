@@ -28,6 +28,7 @@ public class GameData
     public static int totalFloorsCleared = 0;
     public static int maxFloorReached = 0;
     public bool secondSkillFloorSpawned = false;
+    public int floorsUntilScholar = 4;
     #endregion
 
     #region TURNDURATION
@@ -35,7 +36,7 @@ public class GameData
     public float npcActionDuration = 0.9f;
     public float playerMoveDuration = 0.35f;
 
-    public float playerTurnTimer = 15f;
+    public float playerTurnTimer = 17f;
     public float playerTurnIncrease = 4f;
     public float playerTurnEndTime;
     public float playerTurnStartTime;
