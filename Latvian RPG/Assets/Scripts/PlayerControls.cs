@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Runtime.CompilerServices;
 
 public enum Direction
 {
@@ -337,8 +338,9 @@ public class PlayerControls : MonoBehaviour
     /// <param name="targetX"></param>
     /// <param name="targetY"></param>
     /// <param name="instantTeleport"></param>
-    public void TeleportPlayerCharacter (float targetX, float targetY, bool instantTeleport = false)
+    public void TeleportPlayerCharacter (float targetX, float targetY, bool instantTeleport = false, [CallerMemberName] string callerName = "")
     {
+        Debug.Log("teleport called by" + callerName);
         if (isMovingNow && !instantTeleport)
         {
             return;
@@ -368,7 +370,6 @@ public class PlayerControls : MonoBehaviour
             return;
         }
         isMovingNow = true;
-        Debug.LogError("MOVING CHAR");
         // MOVE CHARACTER
         currMovementCoroutine = StartCoroutine(MovePlayerCloserToTarget(new Vector2(targetX, targetY),walkedTiles));
 
@@ -712,6 +713,10 @@ public class PlayerControls : MonoBehaviour
         while (distance > 0)
         {
             yield return new WaitForSeconds(GameData.current.playerMoveDuration);
+            if (!isMovingNow)
+            {
+                break;
+            }
             // FURTHER ON X AXIS - move closer on X axis
             if (Mathf.Abs(target.x - transform.position.x) >
                 Mathf.Abs(target.y - transform.position.y))
@@ -737,7 +742,8 @@ public class PlayerControls : MonoBehaviour
                     MoveCharacterOneTile(Direction.Down);
                 }
             }
-            stats.ChangeWalkedTiles(1);
+            if (isMovingNow)
+                stats.ChangeWalkedTiles(1);
             distance--;
         }
 

@@ -8,11 +8,10 @@ public class LevelBounds : MonoBehaviour
     public int yCoord;
     public Direction direction;
 
-    void Start()
+    void Awake()
     {
         xCoord = (int)transform.position.x;    
         yCoord = (int)transform.position.y;
-        Debug.Log("i'm alive");
 
         GameManager gameManager = FindObjectOfType<GameManager>();
         if (direction == Direction.Down)

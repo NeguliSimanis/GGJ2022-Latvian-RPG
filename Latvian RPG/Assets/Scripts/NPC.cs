@@ -394,7 +394,6 @@ public class NPC : MonoBehaviour
 
             if (!hasRandomMoved)
             {
-                Debug.LogError("YES NPC");
                 npcControls.stats.ChangeWalkedTiles(1);
             }
             movedThisLoop = false;

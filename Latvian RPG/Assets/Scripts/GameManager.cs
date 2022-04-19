@@ -420,7 +420,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("start poi " + startingPoint);
         int playerID = 0;
-        //PlayerControls oldSelected = selectedChar;
+        PlayerControls oldSelected = selectedChar;
         foreach (PlayerControls curPlayer in allCharacters)
         {
             if (curPlayer.charType == CharType.Player)
@@ -435,12 +435,11 @@ public class GameManager : MonoBehaviour
                 playerID++;
                 curPlayer.stats.ChangeWalkedTiles(reset: true);
                 DisplayActionRange(ActionType.Walk);
-                Debug.LogError("RESETTING TO 0");
-                Debug.LogError("speed " + curPlayer.stats.tilesWalked);
             }
         }
         // move camera
         MoveCameraToPlayer();
+        SelectChar(oldSelected);
     }
 
 
@@ -638,7 +637,7 @@ public class GameManager : MonoBehaviour
 
     private void ProcessSpawnHighlightTileRequest(int xOffset, int yOffset, bool reuseOldTargetHighlights, ActionType actionType)
     {
-
+        UnityEngine.Debug.LogError("Tile request: " + xOffset +"." + yOffset);
         Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x + xOffset,
                 selectedChar.transform.position.y + yOffset, selectedChar.transform.position.z);
 
@@ -651,6 +650,7 @@ public class GameManager : MonoBehaviour
             return;
         if (highlightLocation.y > levelTopBorder.yCoord)
             return;
+        Debug.LogError("NOT OUT OF BOUNDS");
 
         // DONT SPAWN IF ON TOP OF OBStacle        
         if (IsTileOccupiedByObstacle(highlightLocation))
@@ -704,6 +704,7 @@ public class GameManager : MonoBehaviour
 
     private void SpawnHighlightTile(Vector3 highLightLocation, bool oldHighlightsExist, ActionType actionType, bool allowInteraction = true)
     {
+        Debug.LogError("s[awning tile");
         bool createNewHighLights = true;
         targetHighlightCounter++;
         if (oldHighlightsExist)
