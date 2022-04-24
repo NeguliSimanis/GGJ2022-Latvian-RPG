@@ -17,10 +17,7 @@ public class Scholar : MonoBehaviour
         apprentice.scholarOfferedSkills.Clear();
 
         if (apprentice.currentSkills.Count >= 4)
-        {
-            return skillsToTeach;
-        }
-
+            ChooseSkillToForget(apprentice);
 
         foreach (Skill skill in allowedSkills)
         {
@@ -56,12 +53,13 @@ public class Scholar : MonoBehaviour
             safetyCounter--;
         }
         return skillsToTeach;
-
-
-
-
-        //int skillRoll = Random.Range(0, skillCount);
-        //Skill skillToTeach = apprentice.scholarOfferedSkills[skillRoll];
-        
     }
+
+    public void ChooseSkillToForget(PlayerControls apprentice)
+    {
+        int skillCount = apprentice.currentSkills.Count;
+        int randomRoll = Random.Range(0, skillCount);
+        apprentice.skillToForget = apprentice.currentSkills[randomRoll];
+    }
+
 }

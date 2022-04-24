@@ -44,7 +44,6 @@ public class PlayerControls : MonoBehaviour
     private Coroutine currMovementCoroutine;
     #endregion
     public bool availableInRoster = false;
-    public bool hasActedThisTurn = false;
     public CharType charType;
     [HideInInspector]
     public bool isDead = false;
@@ -70,6 +69,10 @@ public class PlayerControls : MonoBehaviour
     public Skill[] startingSkills;
     public List<Skill> currentSkills = new List<Skill>();
     public List<Skill> scholarOfferedSkills = new List<Skill>();
+    /// <summary>
+    /// used for scholar that offers forgetting a skill
+    /// </summary>
+    public Skill skillToForget;
     #endregion
 
     #region UI
@@ -1047,6 +1050,8 @@ public class PlayerControls : MonoBehaviour
     /// <param name="isLoadedSkill">has this skill been learned in a previous save file?</param>
     public void LearnSkill(Skill skillToLearn, bool isLoadedSkill = false)
     {
+        Debug.LogError("learn " + skillToLearn);
+        Debug.LogError("learn " + skillToLearn.skillName);
         if (!isLoadedSkill)
         {
             stats.skills.Add(skillToLearn.skillName);
@@ -1055,6 +1060,21 @@ public class PlayerControls : MonoBehaviour
         
         if (!isLoadedSkill)
             gameManager.popupManager.DisplayCharSkillButts(this);
+    }
+
+    public void ForgetSkill(Skill skillToForget)
+    {
+        Debug.LogError("FORGETTING " + skillToForget.skillName);
+        
+        stats.skills.Remove(skillToForget.skillName);
+        foreach (string skillName in stats.skills)
+            Debug.LogError("after forgetting skill: " + skillName);
+
+        currentSkills.Remove(skillToForget);
+        foreach (Skill skillName in currentSkills)
+            Debug.LogError("Player current skill: " + skillName);
+
+        gameManager.popupManager.DisplayCharSkillButts(this);
     }
 
     public void LoadSavedSkills(SkillManager skillManager)

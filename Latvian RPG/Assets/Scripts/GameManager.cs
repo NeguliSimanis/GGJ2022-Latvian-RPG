@@ -877,6 +877,10 @@ public class GameManager : MonoBehaviour
                 lastSelectedPlayerChar = selectedChar;
                 DisplayActionRange(ActionType.Walk, character.charType);
                 ShowSkillButton();
+                if (character.hasUsedSkillThisTurn)
+                {
+                    DisableSkillActions();
+                }
             }
             else
             {

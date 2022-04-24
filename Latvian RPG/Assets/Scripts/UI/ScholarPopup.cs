@@ -30,6 +30,8 @@ public class ScholarPopup : MonoBehaviour
     public Skill lightSkillToTeach;
     [HideInInspector]
     public Skill darkSkillToTeach;
+    [HideInInspector]
+    public Skill skillToForget;
 
     [Header("No skills option")]
     public Button noSkillsButton;

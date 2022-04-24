@@ -698,13 +698,34 @@ public class PopupManager : MonoBehaviour
             return;
         }
         StartCoroutine(gameManager.PauseGameAfterSeconds(true, seconds: 0.4f, debug: true));
-
         int skillsToLearnCount = apprentice.scholarOfferedSkills.Count;
 
-        if (skillsToLearnCount <= 0)
+        Debug.LogError("Apprentice current skills count: " + apprentice.currentSkills.Count);
+        Debug.LogError("Skills to learn: " + skillsToLearnCount);
+        if (apprentice.currentSkills.Count >= 4)
         {
-            scholarPopup.noSkillsPanel.SetActive(true);
-            scholarPopup.hasSkillsPanel.SetActive(false);
+            scholarPopup.noSkillsPanel.SetActive(false);
+            scholarPopup.hasSkillsPanel.SetActive(true);
+
+            scholarPopup.scholarText.text =
+            "A memory salesman is willing to give you the memories of a dead warrior" +
+            " who was famous for the skill of " + apprentice.scholarOfferedSkills[0].skillName + "." +
+            " In exchange, he wishes to receive your memories of " + apprentice.skillToForget.skillName;
+
+            // LIGHT OPTION - offer to forget 1 skill, learn another
+            scholarPopup.lightSkillToTeach = apprentice.scholarOfferedSkills[0];
+            scholarPopup.skillToForget = apprentice.skillToForget;
+            scholarPopup.lightSkillName.text = scholarPopup.lightSkillToTeach.skillName;
+            scholarPopup.lightSkillText.text = scholarPopup.lightSkillToTeach.GetDescription();
+            scholarPopup.lightButtonText.text = "Learn " + scholarPopup.lightSkillToTeach.skillName +
+                ", Forget " + scholarPopup.skillToForget.skillName;
+
+
+            // DARK OPTION - ignore
+            scholarPopup.darkSkillName.gameObject.SetActive(false);
+            scholarPopup.darkSkillText.gameObject.SetActive(false);
+            scholarPopup.darkButtonText.text = "Ignore";
+
         }
         else if (skillsToLearnCount > 0)
         {
@@ -723,19 +744,21 @@ public class PopupManager : MonoBehaviour
             scholarPopup.darkSkillText.gameObject.SetActive(false);
 
             scholarPopup.darkButtonText.text = "Ignore";
-        }
-        if (skillsToLearnCount > 1)
-        {
-            scholarPopup.scholarText.text =
+
+            if (skillsToLearnCount > 1)
+            {
+                scholarPopup.scholarText.text =
             "An old man offers to teach you one of two skils.";
-            scholarPopup.darkSkillToTeach = apprentice.scholarOfferedSkills[1];
+                scholarPopup.darkSkillToTeach = apprentice.scholarOfferedSkills[1];
 
-            scholarPopup.darkSkillName.gameObject.SetActive(true);
-            scholarPopup.darkSkillText.gameObject.SetActive(true);
+                scholarPopup.darkSkillName.gameObject.SetActive(true);
+                scholarPopup.darkSkillText.gameObject.SetActive(true);
 
-            scholarPopup.darkSkillName.text = scholarPopup.darkSkillToTeach.skillName;
-            scholarPopup.darkSkillText.text = scholarPopup.darkSkillToTeach.GetDescription();
-            scholarPopup.darkButtonText.text = "Learn " + scholarPopup.darkSkillToTeach.skillName;
+                scholarPopup.darkSkillName.text = scholarPopup.darkSkillToTeach.skillName;
+                scholarPopup.darkSkillText.text = scholarPopup.darkSkillToTeach.GetDescription();
+                scholarPopup.darkButtonText.text = "Learn " + scholarPopup.darkSkillToTeach.skillName;
+
+            }
         }
 
         scholarPopupObject.SetActive(true);
@@ -755,9 +778,15 @@ public class PopupManager : MonoBehaviour
         if (!hasSkills)
             return;
 
+
         if (isLight)
         {
-            gameManager.selectedChar.LearnSkill(scholarPopup.lightSkillToTeach);
+            PlayerControls apprentice = gameManager.selectedChar;
+
+            if (apprentice.currentSkills.Count >= 4)
+                apprentice.ForgetSkill(scholarPopup.skillToForget);
+
+            apprentice.LearnSkill(scholarPopup.lightSkillToTeach);
             gameManager.VictoryCheck(ExpAction.LevelUpLight);
         }
         else

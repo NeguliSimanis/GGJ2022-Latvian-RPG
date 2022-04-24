@@ -328,7 +328,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isMovingNow: 0
   availableInRoster: 1
-  hasActedThisTurn: 0
   charType: 1
   isDead: 0
   hasUsedSkillThisTurn: 0
@@ -354,8 +353,8 @@ MonoBehaviour:
     maxMana: 10
     currMana: 10
     manaRegen: 1
-    offense: 10
-    defense: 9
+    offense: 9
+    defense: 10
     tilesWalked: 0
     speed: 2
     skills: []
@@ -375,6 +374,7 @@ MonoBehaviour:
   - {fileID: 2076941935685868744, guid: be83b26a10ac0004780b049e8a12673a, type: 3}
   - {fileID: 2076941935685868744, guid: 8221f9aa724f5e648897509b4f38e677, type: 3}
   scholarOfferedSkills: []
+  skillToForget: {fileID: 0}
   manaBar: {fileID: 4734224236474661545}
   lifeBar: {fileID: 1918163350017964131}
   charAnimatedText: {fileID: 5361427295985306136}

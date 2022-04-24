@@ -226,7 +226,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isMovingNow: 0
   availableInRoster: 0
-  hasActedThisTurn: 0
   charType: 0
   isDead: 0
   hasUsedSkillThisTurn: 0
@@ -272,6 +271,7 @@ MonoBehaviour:
   - {fileID: 2076941935685868744, guid: 9231bcb5102ad124797ee5f4812646fe, type: 3}
   - {fileID: 2076941935685868744, guid: 7c2406d4aa17f7f4aa7444c36362766f, type: 3}
   scholarOfferedSkills: []
+  skillToForget: {fileID: 0}
   manaBar: {fileID: 6282360774337940444}
   lifeBar: {fileID: 5512605230241633197}
   charAnimatedText: {fileID: 5593579935697332582}
