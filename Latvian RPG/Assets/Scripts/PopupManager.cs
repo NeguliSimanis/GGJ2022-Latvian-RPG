@@ -225,6 +225,9 @@ public class PopupManager : MonoBehaviour
     #region PAUSE MENU
     [Header("PAUSE MENU")]
     [SerializeField]
+    Button pauseButton;
+
+    [SerializeField]
     GameObject pausePanel;
 
     [SerializeField]
@@ -301,6 +304,7 @@ public class PopupManager : MonoBehaviour
         endPausePanelButt.onClick.AddListener((delegate {ShowPausePanel(false);}));
         saveAndExitButt.onClick.AddListener((delegate {gameManager.SaveAndExitToMenu();}));
         loadGameButt.onClick.AddListener((delegate {gameManager.LoadGame();}));
+        pauseButton.onClick.AddListener(ToggleGamePause);
     }
 
     void CharButtonPressed()
@@ -885,6 +889,14 @@ public class PopupManager : MonoBehaviour
     {
         int realFloor = GameData.current.RealFloor();
         currFloorText.text = "FLOOR " + realFloor.ToString();
+    }
+
+    public void ToggleGamePause()
+    {
+        if (GameData.current.isGamePaused)
+            ShowPausePanel(false);
+        else
+            ShowPausePanel(true);
     }
 
     public void ShowPausePanel(bool show)

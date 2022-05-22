@@ -270,8 +270,14 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    private void ShowTurnTimerBar(bool show = true)
+    #region TURN TIMER
+    public void ShowTurnTimerBar(bool show = true)
     {
+        if (!GameData.current.hasTurnDuration)
+        {
+            turnTimerObject.SetActive(false);
+            return;
+        }
         turnTimerObject.SetActive(show);
         if (show)
         {
@@ -282,9 +288,15 @@ public class GameManager : MonoBehaviour
 
     private void UpdateTurnTimeBar()
     {
+        if (!GameData.current.hasTurnDuration)
+        {
+            ShowTurnTimerBar(false);
+            return;
+        }
         turnTimerFill1.fillAmount = Mathf.InverseLerp(GameData.current.playerTurnEndTime, GameData.current.playerTurnStartTime, Time.time);
         turnTimerFill2.fillAmount = Mathf.InverseLerp(GameData.current.playerTurnEndTime, GameData.current.playerTurnStartTime, Time.time);
     }
+    #endregion
 
     private void Start()
     {
@@ -734,12 +746,16 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        Debug.LogError(GameData.current.isGamePaused);
         if (!GameData.current.gameStarted)
             return;
         if (GameData.current.turnType != CharType.Player)
             return;
+
+        
         UpdateTurnTimeBar();
-        if (Time.time > GameData.current.playerTurnEndTime)
+        if (Time.time > GameData.current.playerTurnEndTime &&
+            GameData.current.hasTurnDuration)
         {
             EndTurn();
             return;

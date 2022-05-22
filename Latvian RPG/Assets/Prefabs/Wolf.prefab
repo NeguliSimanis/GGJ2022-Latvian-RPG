@@ -145,12 +145,12 @@ MonoBehaviour:
     expRequired: 10
     darkLevelUpStat: 0
     lightLevelUpStat: 0
-    maxLife: 10
-    currLife: 10
+    maxLife: 9
+    currLife: 9
     maxMana: 10
     currMana: 10
     manaRegen: 1
-    offense: 9
+    offense: 10
     defense: 10
     tilesWalked: 0
     speed: 2

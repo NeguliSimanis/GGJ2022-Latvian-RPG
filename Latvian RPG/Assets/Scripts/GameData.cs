@@ -32,6 +32,8 @@ public class GameData
     #endregion
 
     #region TURNDURATION
+    public bool hasTurnDuration = false;
+
     public float npcMoveDuration = 0.5f;
     public float npcActionDuration = 0.9f;
     public float playerMoveDuration = 0.35f;
