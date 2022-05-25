@@ -226,6 +226,8 @@ public class PopupManager : MonoBehaviour
     [Header("PAUSE MENU")]
     [SerializeField]
     Button pauseButton;
+    [SerializeField]
+    GameObject optionsPanel;
 
     [SerializeField]
     GameObject pausePanel;
@@ -904,5 +906,7 @@ public class PopupManager : MonoBehaviour
         GameData.current.PauseGame(show);
         gameManager.audioManager.PlayButtonSFX();
         pausePanel.SetActive(show);
+        if (!show)
+        optionsPanel.SetActive(false);
     }
 }

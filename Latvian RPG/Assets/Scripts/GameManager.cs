@@ -716,7 +716,6 @@ public class GameManager : MonoBehaviour
 
     private void SpawnHighlightTile(Vector3 highLightLocation, bool oldHighlightsExist, ActionType actionType, bool allowInteraction = true)
     {
-        Debug.LogError("s[awning tile");
         bool createNewHighLights = true;
         targetHighlightCounter++;
         if (oldHighlightsExist)
@@ -746,7 +745,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        Debug.LogError(GameData.current.isGamePaused);
         if (!GameData.current.gameStarted)
             return;
         if (GameData.current.turnType != CharType.Player)
@@ -767,16 +765,25 @@ public class GameManager : MonoBehaviour
 
     private void ListenForShortcuts()
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
+        #region CHEAT CODES
         if (Input.GetKeyDown(KeyCode.N))
         {
             selectedChar.EnterNextLevel();
         }
-
         if (Input.GetKeyDown(KeyCode.L))
         {
             selectedChar.LevelUp();
         }
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            selectedChar.AddMana(5, false);
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            selectedChar.stats.speed++;
+        }
+        #endregion
 
 #endif
         if (!isAnyCharSelected)

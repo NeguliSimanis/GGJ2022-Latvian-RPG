@@ -236,7 +236,8 @@ public class PlayerControls : MonoBehaviour
         return true;
     }
 
-    public void AddMana(float amount, bool addedBySkill, bool removeMana = false, bool addToFull = false, bool animate = true)
+    public void AddMana(float amount, bool addedBySkill, bool removeMana = false, 
+        bool addToFull = false, bool animate = true, bool ignoreManaCeiling = false)
     {
         if (isDead)
             return;
@@ -274,7 +275,7 @@ public class PlayerControls : MonoBehaviour
 
         // ADD MANA
         stats.currMana += amount;
-        if (stats.currMana > stats.maxMana)
+        if (stats.currMana > stats.maxMana && ignoreManaCeiling)
         {
             stats.currMana = stats.maxMana;
         }
