@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
     #endregion 
 
     [SerializeField] GameObject targetHighlight;
-    List<HighlightTileObject> skillHighlights = new List<HighlightTileObject>();
+    List<HighlightTileObject> tileHighlights = new List<HighlightTileObject>();
 
     #region CHAR MANAGEMENT
     public GameObject[] charRoster;
@@ -558,7 +558,7 @@ public class GameManager : MonoBehaviour
 
         bool reuseOldTargetHighlights = false;
         targetHighlightCounter = 0;
-        if (skillHighlights.Count > 0)
+        if (tileHighlights.Count > 0)
         {
             reuseOldTargetHighlights = true;
         }
@@ -704,7 +704,7 @@ public class GameManager : MonoBehaviour
           colorAll: true);
         }
 
-        foreach (HighlightTileObject skillHighlight in skillHighlights)
+        foreach (HighlightTileObject skillHighlight in tileHighlights)
         {
             skillHighlight.ShowTile(ActionType.Walk, false);
         }
@@ -720,7 +720,7 @@ public class GameManager : MonoBehaviour
         targetHighlightCounter++;
         if (oldHighlightsExist)
         {
-            if (targetHighlightCounter <= skillHighlights.Count)
+            if (targetHighlightCounter <= tileHighlights.Count)
                 createNewHighLights = false;
         }
 
@@ -730,14 +730,14 @@ public class GameManager : MonoBehaviour
                 GameObject newHighlight = Instantiate(targetHighlight, highLightLocation, Quaternion.identity);
                 newHighlight.name = "highlight" + targetHighlightCounter.ToString();
                 HighlightTileObject highlightTileObject = new HighlightTileObject(targetHighlightCounter, newHighlight);
-                skillHighlights.Add(highlightTileObject);
+                tileHighlights.Add(highlightTileObject);
                 highlightTileObject.ShowTile(actionType, true, allowInteraction);
                 break;
 
 
             case false:
-                skillHighlights[targetHighlightCounter - 1].ShowTile(actionType, true, allowInteraction);
-                skillHighlights[targetHighlightCounter - 1].highlightObject.transform.position = highLightLocation;
+                tileHighlights[targetHighlightCounter - 1].ShowTile(actionType, true, allowInteraction);
+                tileHighlights[targetHighlightCounter - 1].highlightObject.transform.position = highLightLocation;
                 break;
         }
 
@@ -1120,7 +1120,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="xCoordinate"></param>
     /// <param name="yCoordinate"></param>
-    public void ProcessInteractionRequest(float xCoordinate, float yCoordinate, ActionType actionType)
+    public void ProcessInteractionRequest(float xCoordinate, float yCoordinate, ActionType actionType,
+        TileHighlight interactionTile)
     {
         if (GameData.current.turnType != CharType.Player)
             return;
@@ -1148,13 +1149,16 @@ public class GameManager : MonoBehaviour
             switch (selectedSkill.type[0])
             {
                 case SkillType.Buff:
-                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill);
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill,
+                        interactionTile);
                     return;
                 case SkillType.Damage:
-                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseCombatSkill);
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseCombatSkill,
+                        interactionTile);
                     return;
                 case SkillType.Recruit:
-                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill);
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill,
+                        interactionTile);
                     return;
                 default:
                     Debug.LogError("YO WTF DUDE");
@@ -1351,6 +1355,12 @@ public class GameManager : MonoBehaviour
         }
         UnityEngine.Debug.Log("game manage " + coord + " not occupied by obstacle");
         return false;
+    }
+
+    public TileHighlight GetTileHighlightAtPos(int xPos, int yPos)
+    {
+        TileHighlight tileHighlight = new TileHighlight();
+        return tileHighlight;
     }
 
     public void ShowManaRegenTexts()

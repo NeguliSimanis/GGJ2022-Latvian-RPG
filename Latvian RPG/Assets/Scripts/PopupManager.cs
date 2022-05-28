@@ -49,8 +49,7 @@ public class PopupManager : MonoBehaviour
 
     #region DEBUG
     [Header("DEBUG")]
-    [SerializeField]
-    Text debugText;
+    public Text debugText;
     #endregion
 
     #region CHARACTER POPUP
@@ -285,6 +284,11 @@ public class PopupManager : MonoBehaviour
         if (!GameData.current.isDebugMode)
             return;
         debugText.gameObject.SetActive(true);
+
+
+
+        #region LIFE DEBUG
+        /*
         if (gameManager.selectedChar == null)
         {
             debugText.text = "no selected char";
@@ -293,7 +297,8 @@ public class PopupManager : MonoBehaviour
         {
             PlayerControls selectedChar = gameManager.selectedChar;
             debugText.text = selectedChar.name + " - " + selectedChar.stats.currLife + "/" + selectedChar.stats.maxLife + " laif";
-        }
+        }*/
+        #endregion
     }
 
     private void AddButtListeners()
