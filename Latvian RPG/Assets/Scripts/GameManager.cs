@@ -21,7 +21,7 @@ public class HighlightTileObject
     private Color transparent = new Color(1, 1, 1, 0);
     private Color red = new Color(1, 0.3f, 0.3f, 0.4f);
     private SpriteRenderer spriteRenderer;
-    private TileHighlight tileHighlight;
+    public TileHighlight tileHighlight;
 
     public HighlightTileObject(int newID, GameObject newObject)
     {
@@ -34,6 +34,23 @@ public class HighlightTileObject
     public void ShowTile(ActionType actionType, bool show, bool allowInteraction = true)
     {
         tileHighlight.EnableTile(actionType, show, allowInteraction);
+    }
+
+    public Vector2 GetTileCoord()
+    {
+        Vector2 coord = new Vector2(highlightObject.transform.position.x,
+            highlightObject.transform.position.y);
+        return coord;
+    }
+
+    float xSeconds = 1f;
+    public IEnumerator ChangeColorForXSeconds()
+    {
+        Debug.LogError("its happenin2");
+        Color currColor = tileHighlight.spriteRenderer.color;
+        tileHighlight.ChangeColor(Color.red);
+        yield return new WaitForSeconds(xSeconds);
+        tileHighlight.ChangeColor(currColor);
     }
 }
 
@@ -63,16 +80,6 @@ public class GameManager : MonoBehaviour
     Image turnTimerFill2;
 
     [SerializeField] Button endTurnButton;
-
-    [SerializeField] Button skillButton;
-    [SerializeField] SkillButton skillButtonControls;
-    Text skillButtonText;
-    Image skillButtonImage;
-
-    [SerializeField] Button skillButton2;
-    [SerializeField] SkillButton skillButtonControls2;
-    Text skillButtonText2;
-    Image skillButtonImage2;
 
     int lastSelectedSkillButton = -1; // -1 - none , 0 - first , 1 - second
     #endregion 
@@ -223,8 +230,8 @@ public class GameManager : MonoBehaviour
                 }
 
                 newControls.charMarker.UpdateMarkerColor(loadedCharStats.savedCharType);
-                newControls.TeleportPlayerCharacter(loadedCharStats.lastSavedPosX, loadedCharStats.lastSavedPosY,
-                    instantTeleport: true);
+                StartCoroutine(newControls.TeleportPlayerCharacter(loadedCharStats.lastSavedPosX, loadedCharStats.lastSavedPosY,
+                    instantTeleport: true));
                 StartCoroutine(newControls.AnimateStatNumbersForXSeconds(xSeconds: 0.1f,
                     charStat: CharStat.life,
                     animateAll: true));
@@ -438,12 +445,19 @@ public class GameManager : MonoBehaviour
             if (curPlayer.charType == CharType.Player)
             {
                 Debug.Log("TELEPORTING " + curPlayer.name + " to " + levelStartPoint.position);
-                curPlayer.TeleportPlayerCharacter(levelStartPoint.position.x, levelStartPoint.position.y, instantTeleport: true);
+                StartCoroutine(curPlayer.TeleportPlayerCharacter
+                    (levelStartPoint.position.x, levelStartPoint.position.y, instantTeleport: true));
                 curPlayer.AddMana(amount: 0, addedBySkill: false, addToFull: true);
                 if (playerID == 1)
-                    curPlayer.TeleportPlayerCharacter(startingPoint2.x, startingPoint2.y, instantTeleport: true);
+                {
+                    StartCoroutine(curPlayer.TeleportPlayerCharacter
+                        (startingPoint2.x, startingPoint2.y, instantTeleport: true));
+                }
                 if (playerID == 2)
-                    curPlayer.TeleportPlayerCharacter(startingPoint3.x, startingPoint3.y, instantTeleport: true);
+                {
+                    StartCoroutine(curPlayer.TeleportPlayerCharacter
+                        (startingPoint3.x, startingPoint3.y, instantTeleport: true));
+                }
                 playerID++;
                 curPlayer.stats.ChangeWalkedTiles(reset: true);
                 DisplayActionRange(ActionType.Walk);
@@ -649,7 +663,7 @@ public class GameManager : MonoBehaviour
 
     private void ProcessSpawnHighlightTileRequest(int xOffset, int yOffset, bool reuseOldTargetHighlights, ActionType actionType)
     {
-        UnityEngine.Debug.LogError("Tile request: " + xOffset +"." + yOffset);
+        UnityEngine.Debug.Log("Tile request: " + xOffset +"." + yOffset);
         Vector3 highlightLocation = new Vector3(selectedChar.transform.position.x + xOffset,
                 selectedChar.transform.position.y + yOffset, selectedChar.transform.position.z);
 
@@ -662,7 +676,6 @@ public class GameManager : MonoBehaviour
             return;
         if (highlightLocation.y > levelTopBorder.yCoord)
             return;
-        Debug.LogError("NOT OUT OF BOUNDS");
 
         // DONT SPAWN IF ON TOP OF OBStacle        
         if (IsTileOccupiedByObstacle(highlightLocation))
@@ -1120,8 +1133,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="xCoordinate"></param>
     /// <param name="yCoordinate"></param>
-    public void ProcessInteractionRequest(float xCoordinate, float yCoordinate, ActionType actionType,
-        TileHighlight interactionTile)
+    public void ProcessInteractionRequest(float xCoordinate, float yCoordinate, ActionType actionType)
     {
         if (GameData.current.turnType != CharType.Player)
             return;
@@ -1129,6 +1141,12 @@ public class GameManager : MonoBehaviour
             return;
         if (selectedChar.isMovingNow)
             return;
+
+        #region Highlight tile at the request area
+        //HighlightTileObject requestedTile = GetTileHighlightObjAtPos(xPos: xCoordinate, yPos: yCoordinate);
+        //StartCoroutine(requestedTile.ChangeColorForXSeconds());
+        #endregion
+
 
         #region Unknown Action type
         // Determine action type and call method again if valid request
@@ -1149,16 +1167,13 @@ public class GameManager : MonoBehaviour
             switch (selectedSkill.type[0])
             {
                 case SkillType.Buff:
-                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill,
-                        interactionTile);
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill);
                     return;
                 case SkillType.Damage:
-                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseCombatSkill,
-                        interactionTile);
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseCombatSkill);
                     return;
                 case SkillType.Recruit:
-                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill,
-                        interactionTile);
+                    ProcessInteractionRequest(xCoordinate, yCoordinate, ActionType.UseUtilitySkill);
                     return;
                 default:
                     Debug.LogError("YO WTF DUDE");
@@ -1299,7 +1314,8 @@ public class GameManager : MonoBehaviour
                 return;
             }
         }
-        selectedChar.TeleportPlayerCharacter(xCoordinate, yCoordinate, instantTeleport: !usePlayerSpeed);
+        StartCoroutine(selectedChar.TeleportPlayerCharacter
+            (xCoordinate, yCoordinate, instantTeleport: !usePlayerSpeed));
         UpdateRemainingMovesText(selectedChar.stats.speed - selectedChar.stats.tilesWalked);
     }
 
@@ -1357,10 +1373,23 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public TileHighlight GetTileHighlightAtPos(int xPos, int yPos)
+    public HighlightTileObject GetTileHighlightObjAtPos(float xPos, float yPos)
     {
-        TileHighlight tileHighlight = new TileHighlight();
-        return tileHighlight;
+        HighlightTileObject tileHighlightObj = tileHighlights[0];
+        foreach (HighlightTileObject obj in tileHighlights)
+        {
+            Vector2 pos = obj.GetTileCoord();
+            if (MathUtils.FastApproximately(pos.x,xPos, 0.1f) &&
+                MathUtils.FastApproximately(pos.y, yPos, 0.1f))
+            {
+                if (obj.highlightObject.activeInHierarchy)
+                {
+                    tileHighlightObj = obj;
+                    break;
+                }
+            }
+        }
+        return tileHighlightObj;
     }
 
     public void ShowManaRegenTexts()

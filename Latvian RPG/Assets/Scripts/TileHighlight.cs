@@ -30,7 +30,7 @@ public class TileHighlight : MonoBehaviour
 
 
 
-    private SpriteRenderer spriteRenderer;
+    public SpriteRenderer spriteRenderer;
     private int defaultSortingOrder;
 
     [SerializeField]
@@ -102,12 +102,19 @@ public class TileHighlight : MonoBehaviour
             return;
         if (active && allowInteraction)
         {
+            UpdateCoord();
             gameManager.ProcessInteractionRequest(xCoord, yCoord, tileActionType);
+            
         }
         else if (!allowInteraction)
         {
             gameManager.HighlightChar(gameManager.selectedChar);
         }
+    }
+
+    public void ChangeColor(Color32 targetColor)
+    {
+        spriteRenderer.color = targetColor;
     }
 
 

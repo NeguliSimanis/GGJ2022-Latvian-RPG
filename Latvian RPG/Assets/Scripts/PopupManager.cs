@@ -852,8 +852,14 @@ public class PopupManager : MonoBehaviour
         for (int i = startingID; i < skillButtCount; i++)
         {
             int id = i; // dunno why doesnt work if I dont save it as a separate variable
-            skillButts[id].thisButton.onClick.AddListener((delegate { gameManager.SelectSkill(id); }));
+            skillButts[id].thisButton.onClick.AddListener((delegate { ProcessSkillButtPress(id); }));
         }
+    }
+
+    private void ProcessSkillButtPress(int buttID)
+    {
+        gameManager.audioManager.PlayButtonSFX();
+        gameManager.SelectSkill(buttID);
     }
 
     public void ColorSkillButts(SkillButton thisButton, bool isSelected = false, bool colorAll = true)

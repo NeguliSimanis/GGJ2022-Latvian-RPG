@@ -74,13 +74,42 @@ public class CameraController : MonoBehaviour
         m_targetCamPosition.y = Mathf.Clamp(m_targetCamPosition.y, m_levelBounds.min.y + cam.orthographicSize, m_levelBounds.max.y - cam.orthographicSize);
     }
 
+    public float dragSpeed = -25;
+    private Vector3 dragOrigin;
     private void LateUpdate()
     {
-        if (!initialized)
+        if (Input.GetAxis("Mouse X")!=0)
+        Debug.LogError(Input.GetAxis("Mouse X"));
+
+            if (!initialized)
             return;
+        #region CAMERA PANNING
+#if UNITY_EDITOR ||  UNITY_ANDROID
+        if (Input.GetMouseButtonDown(0))
+        {
+            dragOrigin = Input.mousePosition;
+            return;
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            if ((Input.GetAxis("Mouse X") != 0) ||
+                (Input.GetAxis("Mouse Y") != 0) )
+            {
+                Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+                Vector3 move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+                transform.Translate(move, Space.World);
+                m_targetCamPosition = transform.position;
+            }
+        }
+    
         transform.position = Vector3.Lerp(m_prevCamPosition, m_targetCamPosition, m_cameraSpeed * Time.deltaTime);
         m_prevCamPosition = transform.position;
+#endif
+        #endregion
     }
+
+
 
 
     public void SetPosition(Vector3 position, bool instant = false)

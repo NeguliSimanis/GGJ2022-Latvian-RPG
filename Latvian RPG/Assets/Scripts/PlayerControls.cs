@@ -342,12 +342,12 @@ public class PlayerControls : MonoBehaviour
     /// <param name="targetX"></param>
     /// <param name="targetY"></param>
     /// <param name="instantTeleport"></param>
-    public void TeleportPlayerCharacter (float targetX, float targetY, bool instantTeleport = false, [CallerMemberName] string callerName = "")
+    public IEnumerator TeleportPlayerCharacter (float targetX, float targetY, bool instantTeleport = false, [CallerMemberName] string callerName = "")
     {
         Debug.Log("teleport called by" + callerName);
         if (isMovingNow && !instantTeleport)
         {
-            return;
+            yield break;
         }
         float currX = transform.position.x;
         float currY = transform.position.y;
@@ -364,6 +364,7 @@ public class PlayerControls : MonoBehaviour
             Debug.Log("should teleport to " + targetPos);
             transform.position = targetPos;
             UpdateCoordAndSortOrder();
+           // yield return new WaitForSeconds(0.5f);
             gameManager.HideActionRange();
             gameManager.DisplayActionRange(ActionType.Walk);
             if (isMovingNow)
@@ -371,10 +372,11 @@ public class PlayerControls : MonoBehaviour
                 isMovingNow = false;
                 StopCoroutine(currMovementCoroutine);
             }
-            return;
+            yield break;
         }
         isMovingNow = true;
         // MOVE CHARACTER
+        Debug.LogError("here!");
         currMovementCoroutine = StartCoroutine(MovePlayerCloserToTarget(new Vector2(targetX, targetY),walkedTiles));
 
        
