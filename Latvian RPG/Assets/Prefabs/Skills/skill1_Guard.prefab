@@ -55,3 +55,4 @@ MonoBehaviour:
   skillAnimation: {fileID: 153183041852810696, guid: c3f5a35cff8f2084eba6e45f0972f04d,
     type: 3}
   animationOffset: {x: 0, y: 0}
+  skillIcon: {fileID: 21300000, guid: 5fa51b5084f65164ab4e3013809acaa3, type: 3}

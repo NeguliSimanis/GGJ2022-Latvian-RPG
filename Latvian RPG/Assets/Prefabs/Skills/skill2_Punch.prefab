@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7225139782170318055}
   - component: {fileID: 2076941935685868744}
   m_Layer: 0
-  m_Name: Punch
+  m_Name: skill2_Punch
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,3 +54,4 @@ MonoBehaviour:
   skillAnimation: {fileID: 153183041852810696, guid: f266ae2b2d7a0f14ba329994c9860fb1,
     type: 3}
   animationOffset: {x: 0, y: 0}
+  skillIcon: {fileID: 21300000, guid: 1e69eabf0d1add948b6629388fd18959, type: 3}

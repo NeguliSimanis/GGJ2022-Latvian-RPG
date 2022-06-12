@@ -78,13 +78,11 @@ public class CameraController : MonoBehaviour
     private Vector3 dragOrigin;
     private void LateUpdate()
     {
-        if (Input.GetAxis("Mouse X")!=0)
-        Debug.LogError(Input.GetAxis("Mouse X"));
 
             if (!initialized)
             return;
         #region CAMERA PANNING
-#if UNITY_EDITOR ||  UNITY_ANDROID
+
         if (Input.GetMouseButtonDown(0))
         {
             dragOrigin = Input.mousePosition;
@@ -105,7 +103,7 @@ public class CameraController : MonoBehaviour
     
         transform.position = Vector3.Lerp(m_prevCamPosition, m_targetCamPosition, m_cameraSpeed * Time.deltaTime);
         m_prevCamPosition = transform.position;
-#endif
+
         #endregion
     }
 

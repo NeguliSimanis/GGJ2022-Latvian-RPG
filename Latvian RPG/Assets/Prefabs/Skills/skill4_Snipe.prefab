@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7225139782170318055}
   - component: {fileID: 2076941935685868744}
   m_Layer: 0
-  m_Name: Snipe
+  m_Name: skill4_Snipe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,6 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c34369e6c218c4aacb27bdcfa07139, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skillID: 0
   skillDamage: 6
   manaCost: 7
   skillName: Snipe
@@ -53,3 +54,4 @@ MonoBehaviour:
   skillAnimation: {fileID: 153183041852810696, guid: 18bd9f7e6b28c834f9358fefcdaa9ed0,
     type: 3}
   animationOffset: {x: 0, y: 0}
+  skillIcon: {fileID: 21300000, guid: 175a85d89623efa4a9a7616433cf1f94, type: 3}

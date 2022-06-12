@@ -128,6 +128,12 @@ public class PlayerControls : MonoBehaviour
     {
         statChangeAnim = charAnimatedText.transform.parent.gameObject.GetComponent<StatChangeAnim>();
 
+        if (GameData.current.noUIMode)
+        {
+            roundManaText.transform.parent.gameObject.SetActive(false);
+            roundLifeText.transform.parent.gameObject.SetActive(false);
+        }
+
         currLifeText = stats.currLife;
         currManaText = stats.currMana;
         StartCoroutine(AnimateStatNumbersForXSeconds(xSeconds: 0.1f, charStat:CharStat.life, animateAll: true));
@@ -275,7 +281,7 @@ public class PlayerControls : MonoBehaviour
 
         // ADD MANA
         stats.currMana += amount;
-        if (stats.currMana > stats.maxMana && ignoreManaCeiling)
+        if (stats.currMana > stats.maxMana && !ignoreManaCeiling)
         {
             stats.currMana = stats.maxMana;
         }

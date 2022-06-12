@@ -12,6 +12,7 @@ public class GameData
 
     #region TESTING
     public bool isDebugMode = false; // turned on for testing game
+    public bool noUIMode = false; 
     #endregion
 
     #region GENERAL

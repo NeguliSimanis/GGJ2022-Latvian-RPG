@@ -14,14 +14,24 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
     GameObject helpObject;
     [SerializeField]
     Text helpText;
+    [SerializeField]
+    Image skillIcon;
+    public Button skillInfoButt;
 
     public Text skillButtonText;
     public Image skillButtonImage;
     public Button thisButton;
 
+    Color skillIconDefColor = Color.white;
+    Color skillIconSelectedColor = Color.black;
+
+
     private void Start()
     {
         ShowSkillInfo(false);
+        skillInfoButt.gameObject.SetActive(true);
+        skillInfoButt.onClick.AddListener(() => ShowSkillInfo(true));
+        skillInfoButt.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -32,7 +42,7 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
         }
     }
 
-    private void ShowSkillInfo(bool show)
+    public void ShowSkillInfo(bool show = true)
     {
         if (!show)
         {
@@ -45,6 +55,19 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
         helpObject.SetActive(show);
         helpText.text = skill.GetDescription();
         skillInitialized = true;
+    }
+
+    public void UpdateSkillIcon(Sprite newIcon)
+    {
+        skillIcon.sprite = newIcon;
+    }
+
+    public void ColorSkillIcon(Color newColor)
+    {
+        
+       skillIcon.color = newColor;
+
+        //Debug.LogError(Time.time + " " + "color all: " + colorAll);
     }
 
     private void IsMouseOverButton()
@@ -62,6 +85,11 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
     /// <param name="eventData"></param>
     public void OnPointerEnter(PointerEventData eventData)
     {
+#if UNITY_EDITOR || UNITY_ANDROID
+        return;
+#endif
+
+#if UNITY_STANDALONE_WIN
         if (GameData.current.gameStarted && GameData.current.turnType == CharType.Player)
         {
             if (eventData.pointerCurrentRaycast.gameObject != null)
@@ -81,8 +109,8 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
         {
             ShowSkillInfo(false);
         }
+#endif
 
-        
     }
 
 }

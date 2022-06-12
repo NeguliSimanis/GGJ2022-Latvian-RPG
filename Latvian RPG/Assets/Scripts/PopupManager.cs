@@ -230,6 +230,8 @@ public class PopupManager : MonoBehaviour
 
     [SerializeField]
     GameObject pausePanel;
+    [SerializeField]
+    GameObject mainMenuOptionsPanel; 
 
     [SerializeField]
     Button endPausePanelButt;
@@ -789,10 +791,10 @@ public class PopupManager : MonoBehaviour
         if (!hasSkills)
             return;
 
-
+        PlayerControls apprentice = gameManager.selectedChar;
         if (isLight)
         {
-            PlayerControls apprentice = gameManager.selectedChar;
+            
 
             if (apprentice.currentSkills.Count >= 4)
                 apprentice.ForgetSkill(scholarPopup.skillToForget);
@@ -802,8 +804,12 @@ public class PopupManager : MonoBehaviour
         }
         else
         {
-            if (gameManager.selectedChar.scholarOfferedSkills.Count>1)
-                gameManager.selectedChar.LearnSkill(scholarPopup.darkSkillToTeach);
+
+            if (apprentice.scholarOfferedSkills.Count > 1 && apprentice.currentSkills.Count < 4)
+            {
+                apprentice.LearnSkill(scholarPopup.darkSkillToTeach);
+            }
+            
             gameManager.VictoryCheck(ExpAction.LevelUpDark);
         }
     }
@@ -830,14 +836,12 @@ public class PopupManager : MonoBehaviour
             skillButt.gameObject.SetActive(display);
             if (display)
             {
-
                 if (currSkillID < skillCount)
                 {
-
-                    skillButt.skillButtonText.text = charToDisplay.currentSkills[currSkillID].skillName;
-                    
-                    skillButt.skill = charToDisplay.currentSkills[currSkillID];
-                   
+                    Skill currSkill = charToDisplay.currentSkills[currSkillID];
+                    //skillButt.skillButtonText.text = currSkill.skillName;
+                    skillButt.UpdateSkillIcon(currSkill.skillIcon);
+                    skillButt.skill = currSkill;
                 }
                 else
                     skillButt.gameObject.SetActive(false);
@@ -864,10 +868,13 @@ public class PopupManager : MonoBehaviour
 
     public void ColorSkillButts(SkillButton thisButton, bool isSelected = false, bool colorAll = true)
     {
+        
         if (isSelected)
         {
             thisButton.skillButtonImage.sprite = lightButtonGraphic;
-            thisButton.skillButtonText.color = Color.black;
+            //thisButton.skillButtonText.color = Color.black;
+            thisButton.skillInfoButt.gameObject.SetActive(true);
+            thisButton.ColorSkillIcon(Color.black);
         }
 
         if (!colorAll)
@@ -875,7 +882,9 @@ public class PopupManager : MonoBehaviour
         foreach(SkillButton skillButton in skillButts)
         {
             skillButton.skillButtonImage.sprite = darkButtonGraphic;
-            skillButton.skillButtonText.color = Color.white;
+            // skillButton.skillButtonText.color = Color.white;
+            thisButton.skillInfoButt.gameObject.SetActive(false);
+            thisButton.ColorSkillIcon(Color.white);
         }
     }
 
@@ -914,10 +923,19 @@ public class PopupManager : MonoBehaviour
 
     public void ShowPausePanel(bool show)
     {
-        GameData.current.PauseGame(show);
         gameManager.audioManager.PlayButtonSFX();
-        pausePanel.SetActive(show);
-        if (!show)
-        optionsPanel.SetActive(false);
+
+        if (GameData.current.gameStarted)
+        {
+            GameData.current.PauseGame(show);
+            pausePanel.SetActive(show);
+            if (!show)
+                optionsPanel.SetActive(false);
+        }
+        else
+        {
+            GameData.current.PauseGame(show);
+            mainMenuOptionsPanel.SetActive(show);
+        }
     }
 }

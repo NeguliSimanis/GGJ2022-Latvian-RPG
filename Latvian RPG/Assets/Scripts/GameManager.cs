@@ -512,8 +512,15 @@ public class GameManager : MonoBehaviour
             skillSelected = true;
         lastSelectedSkillButton = skillID;
 
-        popupManager.ColorSkillButts(popupManager.skillButts[0], isSelected: false,
+        foreach (SkillButton skillButton in popupManager.skillButts)
+        {
+            popupManager.ColorSkillButts(skillButton, isSelected: false,
             colorAll: true);
+        }
+        //popupManager.ColorSkillButts(popupManager.skillButts[0], isSelected: false,
+          //  colorAll: true);
+        //popupManager.ColorSkillButts(popupManager.skillButts[1], isSelected: false,
+        //   colorAll: true);
 
         // SKILL DESELECTED
         if (!skillSelected)

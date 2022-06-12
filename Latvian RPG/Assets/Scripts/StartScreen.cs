@@ -11,6 +11,12 @@ public class StartScreen : MonoBehaviour
     [SerializeField]
     GameObject[] startSreenObjects;
 
+    #region MAIN MENU
+    [Header("Main menu")]
+    [SerializeField]
+    GameObject optionsCentralButton;
+    #endregion
+
     #region CUTSCENES
     [Header("CUTSCENES")]
     [SerializeField]
@@ -43,6 +49,9 @@ public class StartScreen : MonoBehaviour
     [SerializeField]
     GameObject charSelectButtonPrefab;
 
+    [SerializeField]
+    Sprite randomCharIcon;
+
     List<PlayerControls> characterList = new List<PlayerControls>();
     #endregion
 
@@ -52,6 +61,9 @@ public class StartScreen : MonoBehaviour
         if (GameData.current.isDebugMode)
             EndCutScenes();
 #endif
+
+        optionsCentralButton.SetActive(false);
+
         cutScene1.SetActive(false);
         cutScene2.SetActive(false);
         cutScene3.SetActive(false);
@@ -144,7 +156,7 @@ public class StartScreen : MonoBehaviour
         SelectCharButton selectCharButton = displayPlace.GetComponent<SelectCharButton>();
         if (secretChar)
         {
-            selectCharButton.charPortrait.color = Color.black;
+            selectCharButton.charPortrait.sprite = randomCharIcon;
             selectCharButton.charName.text = "Random";
             selectCharButton.charSkills.text = "Starting skills: " +
                 "????????" + ", " +

@@ -22,26 +22,28 @@ public class Skill : MonoBehaviour
     public SkillEffectObject[] skillEffects;
     public GameObject skillAnimation;
     public Vector2 animationOffset;
+    public Sprite skillIcon;
 
     public string GetDescription()
     {
         string totalDescription;
+        totalDescription = skillName.ToUpper() + "\n\n";
 
         if (type[0] == SkillType.Recruit)
         {
-            totalDescription = description 
+            totalDescription += description 
                  + "\n\nMana cost: " + (int)manaCost
                 + "\nRange: " + skillRange;
         }
         else if (type[0] == SkillType.Buff)
         {
-            totalDescription = description
+            totalDescription += description
                  + "\n\nMana cost: " + (int)manaCost
                 + "\nRange: " + skillRange;
         }
         else
         {
-            totalDescription = description
+            totalDescription += description
                 + "\n \nBase damage: " + (int)skillDamage
                 + "\nMana cost: " + (int)manaCost
                 + "\nRange: " + skillRange;

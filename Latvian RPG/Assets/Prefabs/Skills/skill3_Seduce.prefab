@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7225139782170318055}
   - component: {fileID: 2076941935685868744}
   m_Layer: 0
-  m_Name: Seduce
+  m_Name: skill3_Seduce
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,6 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c34369e6c218c4aacb27bdcfa07139, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skillID: 0
   skillDamage: 5
   manaCost: 9
   skillName: Seduce
@@ -53,3 +54,4 @@ MonoBehaviour:
   skillAnimation: {fileID: 153183041852810696, guid: e0cf930235026ea4b802d55f06c58275,
     type: 3}
   animationOffset: {x: 0, y: 0}
+  skillIcon: {fileID: 21300000, guid: 9997de9901095df408d32451a72994b4, type: 3}
