@@ -181,6 +181,12 @@ public class PopupManager : MonoBehaviour
     Text turnText;
     #endregion
 
+    #region IAP
+    [Header("IAP")]
+    [SerializeField]
+    GameObject fullVerPopup;
+    #endregion
+
     #region SKILL BUTTS
     [Header("SKILL BUTTS")]
     [SerializeField]
@@ -193,6 +199,8 @@ public class PopupManager : MonoBehaviour
     public List<SkillButton> skillButts = new List<SkillButton>();
     [HideInInspector]
     public int skillButtCount = 0;
+
+    public SkillExplanation skillExplanation;
     #endregion
 
     #region REBIRTH
@@ -246,7 +254,7 @@ public class PopupManager : MonoBehaviour
 
         AddButtListeners();
 
-            
+        skillExplanation.gameObject.SetActive(false);
 
         ShowLevelUpPopup(new PlayerControls(), false);
         ShowWarningPopup(false);
@@ -254,6 +262,7 @@ public class PopupManager : MonoBehaviour
         InitializeScholarInfo();
         InitializeCharPopup();
         ShowPausePanel(false);
+        ShowUnlockFullVerPopup(false);
 
         startScreen.SetActive(true);
         darkVictoryScreen.SetActive(false);
@@ -815,18 +824,56 @@ public class PopupManager : MonoBehaviour
     }
 
     #region SKILL BUTTONS
+
+    private void InstantiateSkillButtonObj(int buttCount)
+    {
+        Vector3 newButtPosition = Vector3.zero;
+        int currButtID = skillButtCount;
+        while (skillButtCount < buttCount)
+        {
+            //    #region Calculate butt position
+            //    switch(currButtID)
+            //    {
+            //        case 0: // bottom left
+            //            newButtPosition = new Vector3(-100
+            //                , -60);
+            //            break;
+            //        case 1: // bottom right
+            //            newButtPosition = new Vector3(-20,
+            //                -60);
+            //            break;
+            //        case 2: // top left
+            //            newButtPosition = new Vector3(-100,
+            //                +20);
+            //            break;
+            //        case 3: // top right
+            //            newButtPosition = new Vector3(-20,
+            //                +20);
+            //            break;
+            //        default:
+            //            Debug.LogError("somethings wrong");
+            //            break;
+            //    }
+            //    #endregion
+
+            GameObject newSkillButtObj = Instantiate(skillButtObj, skillButtPanel);
+            Debug.LogError("placing butt at " + newButtPosition);
+            newSkillButtObj.transform.localPosition = newButtPosition;
+            SkillButton newSkillButt = newSkillButtObj.GetComponent<SkillButton>();
+            newSkillButt.popupManager = this;
+            skillButts.Add(newSkillButt);
+            skillButtCount++;
+            currButtID++;
+        }
+    }
+
     public void DisplayCharSkillButts(PlayerControls charToDisplay, bool display = true)
     {
         int skillCount = charToDisplay.stats.skills.Count;
         int lastSkillCount = skillButtCount;
-       
 
-        while (skillButtCount < skillCount)
-        {
-            GameObject newSkillButtObj = Instantiate(skillButtObj, skillButtPanel);
-            skillButts.Add(newSkillButtObj.GetComponent<SkillButton>());
-            skillButtCount++;
-        }
+        InstantiateSkillButtonObj(skillCount);
+      
 
         if (lastSkillCount < skillButtCount)
             InitializeSkillButts(lastSkillCount);
@@ -875,6 +922,7 @@ public class PopupManager : MonoBehaviour
             //thisButton.skillButtonText.color = Color.black;
             thisButton.skillInfoButt.gameObject.SetActive(true);
             thisButton.ColorSkillIcon(Color.black);
+            // set button as last child so that it is rendered on top
         }
 
         if (!colorAll)
@@ -904,6 +952,15 @@ public class PopupManager : MonoBehaviour
             }
 
         }
+    }
+    #endregion
+
+    #region Iap
+    public void ShowUnlockFullVerPopup(bool show = true)
+    {
+        
+        GameData.current.PauseGame(show);
+        fullVerPopup.SetActive(show);
     }
     #endregion
 

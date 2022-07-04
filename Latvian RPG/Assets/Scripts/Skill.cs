@@ -27,7 +27,7 @@ public class Skill : MonoBehaviour
     public string GetDescription()
     {
         string totalDescription;
-        totalDescription = skillName.ToUpper() + "\n\n";
+        totalDescription = "";
 
         if (type[0] == SkillType.Recruit)
         {

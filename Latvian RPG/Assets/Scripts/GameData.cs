@@ -10,6 +10,11 @@ public class GameData
 {
     public static GameData current;
 
+    #region IAP
+    public int freeFloorLimit = 10;
+    public bool hasFullVersion = false;
+    #endregion
+
     #region TESTING
     public bool isDebugMode = false; // turned on for testing game
     public bool noUIMode = false; 

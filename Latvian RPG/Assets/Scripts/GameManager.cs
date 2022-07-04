@@ -423,6 +423,8 @@ public class GameManager : MonoBehaviour
     /// <param name="recoverMana"></param>
     public void MovePlayerCharsToFloorStart(bool recoverMana = true)
     {
+
+
         DungeonFloor dungeonFloor = currFloor.GetComponent<DungeonFloor>();
         Transform levelStartPoint = dungeonFloor.levelStartPoint[0];
         Transform levelStartPoint2 = dungeonFloor.levelStartPoint[1];
@@ -465,6 +467,14 @@ public class GameManager : MonoBehaviour
         }
         // move camera
         MoveCameraToPlayer();
+
+        if (!GameData.current.hasFullVersion
+            && GameData.current.RealFloor() > GameData.current.freeFloorLimit
+            )
+        {
+            popupManager.ShowUnlockFullVerPopup();
+        }
+
         SelectChar(oldSelected);
     }
 
