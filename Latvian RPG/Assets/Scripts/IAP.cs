@@ -1,18 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Purchasing;
 
 public class IAP : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public void OnPurchaseComplete(Product product)
     {
-        
+
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnPurchaseFailed(Product product, PurchaseFailureReason reason)
     {
-        
+
     }
 }
