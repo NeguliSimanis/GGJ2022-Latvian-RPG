@@ -17,10 +17,11 @@ public class GameData
 
     #region TESTING
     public bool isDebugMode = false; // turned on for testing game
-    public bool noUIMode = false; 
+    public bool noUIMode = false;
     #endregion
 
     #region GENERAL
+    public bool canPauseGame = true; // not allowed when full version popup active
     private bool gamePaused = false;
     public bool gameStarted = false;
     public int currentTurn = 1;
@@ -111,8 +112,16 @@ public class GameData
         }
     }
 
-    public void PauseGame(bool pause)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pause"></param>
+    /// <param name="overridePause"> ignore pause permission </param>
+    public void PauseGame(bool pause, bool overridePause = false)
     {
+        if (!overridePause && !canPauseGame)
+            return;
+
         if (pause)
         {
             gamePaused = true;
