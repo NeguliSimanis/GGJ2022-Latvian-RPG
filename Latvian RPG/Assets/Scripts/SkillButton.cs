@@ -8,8 +8,6 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
 {
     bool skillInitialized = false;
 
-    [HideInInspector]
-    public PopupManager popupManager;
     public Skill skill;
 
     [SerializeField]
@@ -26,57 +24,36 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
 
     Color skillIconDefColor = Color.white;
     Color skillIconSelectedColor = Color.black;
-    int touchCountWhenOpenedSkillInfo = 0;
 
 
     private void Start()
     {
+        ShowSkillInfo(false);
         skillInfoButt.gameObject.SetActive(true);
-        skillInfoButt.onClick.AddListener(() => ShowSkillInfo());
+        skillInfoButt.onClick.AddListener(() => ShowSkillInfo(true));
         skillInfoButt.gameObject.SetActive(false);
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        // hide skill info if u click anywhere while it's open
         if (GameData.current.gameStarted && GameData.current.turnType == CharType.Player)
         {
-            if (popupManager.skillExplanation.gameObject.activeInHierarchy)
-            {
-                if (Input.touchCount > 0 || Input.GetKey(0))
-                {
-                    Debug.LogError("HOOOO");
-                    ShowSkillInfo(); 
-                }
-            }
+            IsMouseOverButton();
         }
     }
 
     public void ShowSkillInfo(bool show = true)
     {
-        Debug.LogError("im here baby");
-        if (popupManager.skillExplanation.gameObject.activeInHierarchy) 
-            //&& popupManager.skillExplanation.currSkill.skillName == skill.skillName)
-            show = false;
         if (!show)
         {
-            //helpObject.SetActive(show);
-            popupManager.skillExplanation.gameObject.SetActive(show);
+            helpObject.SetActive(show);
             skillInitialized = false;
             return;
         }
-        //if (skillInitialized && )
-        //{
-        //    return;
-        //}
-        touchCountWhenOpenedSkillInfo = Input.touchCount;
-        //  helpObject.SetActive(show);
-        popupManager.skillExplanation.gameObject.SetActive(show);
-        popupManager.skillExplanation.skillDescr.text = skill.GetDescription();
-        popupManager.skillExplanation.skillIcon.sprite = skill.skillIcon;
-        popupManager.skillExplanation.skillNameText.text = skill.skillName.ToUpper();
-        popupManager.skillExplanation.currSkill = skill;
-        ///helpText.text = skill.GetDescription();
+        if (skillInitialized)
+            return;
+        helpObject.SetActive(show);
+        helpText.text = skill.GetDescription();
         skillInitialized = true;
     }
 
@@ -95,11 +72,11 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler
 
     private void IsMouseOverButton()
     {
-        //if (EventSystem.current.IsPointerOverGameObject())
-        //{
-        //}
-        //else
-        //    ShowSkillInfo();
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+        }
+        else
+            ShowSkillInfo(false);
     }
 
     /// <summary>
