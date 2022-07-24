@@ -958,7 +958,8 @@ public class PopupManager : MonoBehaviour
     #region Iap
     public void ShowUnlockFullVerPopup(bool show = true)
     {
-        GameData.current.PauseGame(show, overridePause: true);
+        
+        GameData.current.PauseGame(show);
         fullVerPopup.SetActive(show);
     }
     #endregion
