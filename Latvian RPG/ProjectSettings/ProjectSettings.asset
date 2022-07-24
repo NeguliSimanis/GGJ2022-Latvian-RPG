@@ -12,8 +12,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
-  productName: ' Moonaria'
+  companyName: SimanisMikoss
+  productName: Moonaria
   defaultCursor: {fileID: 2800000, guid: e4397b28bee12754d84ed6b6ed805bc7, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -166,10 +166,15 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier: {}
   buildNumber: {}
+<<<<<<< HEAD
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 19
+=======
+  AndroidBundleVersionCode: 11
+  AndroidMinSdkVersion: 30
+>>>>>>> parent of 6e94b78 (Revert "iAP problems")
   AndroidTargetSdkVersion: 0
-  AndroidPreferredInstallLocation: 1
+  AndroidPreferredInstallLocation: 0
   aotOptions: 
   stripEngineCode: 1
   iPhoneStrippingLevel: 0
@@ -243,8 +248,13 @@ PlayerSettings:
   AndroidTargetArchitectures: 1
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
+<<<<<<< HEAD
   AndroidKeystoreName: 
   AndroidKeyaliasName: 
+=======
+  AndroidKeystoreName: E:/3_GameProjects/10_moonaria/keystore/user.keystore
+  AndroidKeyaliasName: moon1
+>>>>>>> parent of 6e94b78 (Revert "iAP problems")
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0
   AndroidIsGame: 1
