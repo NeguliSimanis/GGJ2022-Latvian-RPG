@@ -468,12 +468,12 @@ public class GameManager : MonoBehaviour
         // move camera
         MoveCameraToPlayer();
 
-        if (!GameData.current.hasFullVersion
-            && GameData.current.RealFloor() > GameData.current.freeFloorLimit
-            )
-        {
-            popupManager.ShowUnlockFullVerPopup();
-        }
+        //if (!GameData.current.hasFullVersion
+        //    && GameData.current.RealFloor() > GameData.current.freeFloorLimit
+        //    )
+        //{
+        //    popupManager.ShowUnlockFullVerPopup();
+        //}
 
         SelectChar(oldSelected);
     }

@@ -182,9 +182,9 @@ public class PopupManager : MonoBehaviour
     #endregion
 
     #region IAP
-    [Header("IAP")]
-    [SerializeField]
-    GameObject fullVerPopup;
+    //[Header("IAP")]
+    //[SerializeField]
+    //GameObject fullVerPopup;
     #endregion
 
     #region SKILL BUTTS
@@ -262,7 +262,6 @@ public class PopupManager : MonoBehaviour
         InitializeScholarInfo();
         InitializeCharPopup();
         ShowPausePanel(false);
-        ShowUnlockFullVerPopup(false);
 
         startScreen.SetActive(true);
         darkVictoryScreen.SetActive(false);
@@ -956,11 +955,11 @@ public class PopupManager : MonoBehaviour
     #endregion
 
     #region Iap
-    public void ShowUnlockFullVerPopup(bool show = true)
-    {
-        GameData.current.PauseGame(show, overridePause: true);
-        fullVerPopup.SetActive(show);
-    }
+    //public void ShowUnlockFullVerPopup(bool show = true)
+    //{
+    //    GameData.current.PauseGame(show, overridePause: true);
+    //    fullVerPopup.SetActive(show);
+    //}
     #endregion
 
     public void UpdateFloorText()
